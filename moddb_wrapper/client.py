@@ -17,7 +17,7 @@ class Client:
         else:
             headers = {
               'Accept': 'application/json',
-              'Authorization': self.access_token
+              'Authorization': "Bearer " + self.access_token
             }
 
         if need_token:
@@ -52,8 +52,7 @@ class Client:
                 raise ModDBException(r.json()["error"]["message"])
 
             
-        else:
-            return r.json()
+        return r.json()
 
     def get_game(self, id):
         game_json = self._get_request('https://api.mod.io/v1/games/{}'.format(id))
@@ -431,7 +430,12 @@ class User:
         self.name_id = user_json["name_id"]
         self.username = user_json["username"]
         self.date_online = user_json["date_online"]
-        self.avatar = Image(user_json["avatar"])
+
+        if len(user_json["avatar"].keys()) > 0:
+            self.avatar = Image(user_json["avatar"])
+        else:
+            self.avatar = None
+
         self.timezone = user_json["timezone"]
         self.language = user_json["language"]
         self.profile_url = user_json["profile_url"]
