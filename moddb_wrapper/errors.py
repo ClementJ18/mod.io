@@ -3,37 +3,38 @@ class ModDBException(Exception):
         super().__init__(message)
 
 class BadRequest(ModDBException):
-    def __init__(self):
-        super().__init__("Server cannot process the request due to malformed syntax or invalid request message framing.")
+    def __init__(self, msg):
+        super().__init__(msg)
 
 class Unauthorized(ModDBException):
-    def __init__(self):
-        super().__init__("Your API key/access token is incorrect.")
+    def __init__(self, msg):
+        super().__init__(msg)
 
 class Forbidden(ModDBException):
-    def __init__(self):
-        super().__init__("You do not have permission to perform the requested action.")
+    def __init__(self, msg):
+        super().__init__(msg)
 
 class NotFound(ModDBException):
-    def __init__(self):
-        super().__init__("The resource requested could not be found.")
+    def __init__(self, msg):
+        super().__init__(msg)
 
 class MethodNotAllowed(ModDBException):
-    def __init__(self):
-        super().__init__("The method of your request is incorrect.")
+    def __init__(self, msg):
+        super().__init__(msg)
 
 class NotAcceptable(ModDBException):
-    def __init__(self):
-        super().__init__("You supplied or requested an incorrect Content-Type.")
+    def __init__(self, msg):
+        super().__init__(msg)
 
 class Gone(ModDBException):
-    def __init__(self):
-        super().__init__("The requested resource is no longer available.")
+    def __init__(self, msg):
+        super().__init__(msg)
 
 class UnprocessableEntity(ModDBException):
-    def __init__(self):
-        super().__init__(" The request was well formed but unable to be followed due to semantic errors.")
+    def __init__(self, msg, errors):
+        msg = msg + "\n  -" + "\n  -".join([x + ": " + errors[x] for x in errors])
+        super().__init__(msg)
 
 class TooManyRequests(ModDBException):
-    def __init__(self):
-        super().__init__("You have made too many requests, inspect headers for reset time.")
+    def __init__(self, msg):
+        super().__init__(msg)

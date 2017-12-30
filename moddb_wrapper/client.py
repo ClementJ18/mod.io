@@ -1,6 +1,8 @@
 import requests
 from errors import *
 
+BASE_PATH = "https://api.mod.io/v1"
+
 class Client:
     def __init__(self, api_key, access_token=None):
         self.api_key = api_key
@@ -30,31 +32,32 @@ class Client:
 
         if "error" in r.json():
             code = r.json()["error"]["code"]
+            msg = r.json()["error"]["message"]
             if code == 400:
-                raise BadRequest()
+                raise BadRequest(msg)
             elif code == 401:
-                raise Unauthorized()
+                raise Unauthorized(msg)
             elif code == 403:
-                raise Forbidden()
+                raise Forbidden(msg)
             elif code == 404:
-                raise NotFound()
+                raise NotFound(msg)
             elif code == 405:
-                raise MethodNotAllowed()
+                raise MethodNotAllowed(msg)
             elif code == 406:
-                raise NotAcceptable()
+                raise NotAcceptable(msg)
             elif code == 410:
-                raise Gone()
+                raise Gone(msg)
             elif code == 422:
-                raise UnprocessableEntity()
+                errors = r.json()["error"]["errors"]
+                raise UnprocessableEntity(msg, errors)
             elif code == 429:
-                raise TooManyRequests()
+                raise TooManyRequests(msg)
             else:
-                raise ModDBException(r.json()["error"]["message"])
+                raise ModDBException(msg)
+        else:
+            return r.json()
 
-            
-        return r.json()
-
-    def get_game(self, id):
+    def get_game(self, id : int):
         game_json = self._get_request('https://api.mod.io/v1/games/{}'.format(id))
         return Game(game_json, self)
 
@@ -68,7 +71,7 @@ class Client:
         return game_list
 
     def get_users(self):
-        user_json = self._get_request("https://api.mod.io/v1/users")
+        user_json = self._get_request(BASE_PATH + "/users")
 
         user_list = list()
         for user in user_json["data"]:
@@ -76,19 +79,18 @@ class Client:
 
         return user_list
 
-
-    def get_user(self, id):
-        user_json = self._get_request("https://api.mod.io/v1/users/{}".format(id))
+    def get_user(self, id : int):
+        user_json = self._get_request(BASE_PATH + "/users/{}".format(id))
 
         return User(user_json)
 
     def get_me(self):
-        me_json = self._get_request("https://api.mod.io/v1/me", True)
+        me_json = self._get_request(BASE_PATH + "/me", True)
 
         return User(me_json)
 
     def get_me_sub(self):
-        mod_json = self._get_request("https://api.mod.io/v1/me/subscribed", True)
+        mod_json = self._get_request(BASE_PATH + "/me/subscribed", True)
 
         mod_list = list()
         for mod in mod_json["data"]:
@@ -106,7 +108,7 @@ class Client:
         return game_list
 
     def get_me_mods(self):
-        mod_json = self._get_request("https://api.mod.io/v1/me/mods", True)
+        mod_json = self._get_request(BASE_PATH + "/me/mods", True)
 
         mod_list = list()
         for mod in mod_json["data"]:
@@ -115,7 +117,7 @@ class Client:
         return mod_list
 
     def get_me_modfiles(self):
-        files_json = self._get_request("https://api.mod.io/v1/me/files", True)
+        files_json = self._get_request(BASE_PATH + "/me/files", True)
 
         file_list = list()
         for file in files_json["data"]:
@@ -139,7 +141,12 @@ class Game:
         self.ugc_name = game_json["ugc_name"]
         self.icon = Image(game_json["icon"])
         self.logo = Image(game_json["logo"])
-        self.header = Image(game_json["header"])
+
+        try:
+            self.header = Image(game_json["header"])
+        except KeyError:
+            self.header = None
+
         self.homepage = game_json["homepage"]
         self.name = game_json["name"]
         self.name_id = game_json["name_id"]
@@ -149,22 +156,22 @@ class Game:
         self.tag_options = game_json["tag_options"]
         self.client = client
 
-    def get_mod(self, id):
-        mod_json = self.client._get_request("https://api.mod.io/v1/games/{}/mods/{}".format(self.id, id))
+    def get_mod(self, id : int):
+        mod_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}".format(self.id, id))
 
         return Mod(mod_json, self.client)
 
     def get_mods(self):
-        mod_json = self.client._get_request("https://api.mod.io/v1/games/{}/mods".format(self.id))
+        mod_json = self.client._get_request(BASE_PATH + "/games/{}/mods".format(self.id))
 
         mod_list = list()
         for mod in mod_json["data"]:
-            mod_list.append(Mod(mod), self.client)
+            mod_list.append(Mod(mod, self.client))
 
         return mod_list
 
     def get_activity(self): #in common with mod obj
-        activity_json = self.client._get_request("https://api.mod.io/v1/games/{}/activity".format(self.id))
+        activity_json = self.client._get_request(BASE_PATH + "/games/{}/activity".format(self.id))
 
         activity_list = list()
         for activity in activity_json["data"]:
@@ -173,7 +180,7 @@ class Game:
         return activity_list
 
     def get_mods_activity(self):
-        activity_json = self.client._get_request("https://api.mod.io/v1/games/{}/mods/activity".format(self.id))
+        activity_json = self.client._get_request(BASE_PATH + "/games/{}/mods/activity".format(self.id))
 
         activity_list = list()
         for activity in activity_json["data"]:
@@ -182,16 +189,16 @@ class Game:
         return activity_list
 
     def get_tags(self): #in common with mod obj
-        tag_json = self.client._get_request("https://api.mod.io/v1/games/{}/tags".format(self.id))
+        tag_json = self.client._get_request(BASE_PATH + "/games/{}/tags".format(self.id))
 
         tags_list = list()
         for tag_option in tag_json["data"]:
-            tag_list.append(GameTag(tag_option))
+            tags_list.append(GameTag(tag_option))
 
-        return tag_list
+        return tags_list
 
     def get_team(self): #in common with mod obj
-        team_json = self.client._get_request("https://api.mod.io/v1/games/{}/team".format(self.id))
+        team_json = self.client._get_request(BASE_PATH + "/games/{}/team".format(self.id))
 
         team_list = list()
         for team_member in team_json["data"]:
@@ -220,18 +227,18 @@ class Mod:
         self.rating_summary = RatingSummary(mod_json["rating_summary"])
         self.client = client
         
-        tag_list = list()
+        tags_list = list()
         for tag in mod_json["tags"]:
-            tag_list.append(Tag(tag))
+            tags_list.append(ModTag(tag))
 
-        self.tags = tag_list
+        self.tags = tags_list
 
-    def get_file(self, id):
-        file_json = self.client._get_request("https://api.mod.io/v1/games/{}/mods/{}/files/{}".format(self.game_id, self.id, id))
+    def get_file(self, id : int):
+        file_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/files/{}".format(self.game_id, self.id, id))
         return ModFile(file_json)
 
     def get_files(self):
-        files_json = self.client._get_request("https://api.mod.io/v1/games/{}/mods/{}/files".format(self.game_id, self.id))
+        files_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/files".format(self.game_id, self.id))
 
         file_list = list()
         for file in files_json["data"]:
@@ -240,7 +247,7 @@ class Mod:
         return file_list
 
     def get_activity(self): #in common with game obj
-        activity_json = self.client._get_request("https://api.mod.io/v1/games/{}/mods/{}/activity".format(self.mod_id, self.id))
+        activity_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/activity".format(self.game_id, self.id))
 
         activity_list = list()
         for activity in activity_json["data"]:
@@ -249,23 +256,25 @@ class Mod:
         return activity_list
 
     def get_tags(self): #in common with game obj
-        tag_json = self.client._get_request("https://api.mod.io/v1/games/{}/mods/{}/tags".format(self.mod_id, self.id))
+        tag_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/tags".format(self.game_id, self.id))
 
         tags_list = list()
         for tag_option in tag_json["data"]:
-            tag_list.append(ModTag(tag_option))
+            tags_list.append(ModTag(tag_option))
 
-        return tag_list
+        return tags_list
 
     def get_meta(self):
-        meta_json = self.client._get_request("https://api.mod.io/v1/games/{}/mods/{}/metadatakvp".format(self.mod_id, self.id))
+        meta_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/metadatakvp".format(self.game_id, self.id))
 
         meta_list = list()
         for meta in meta_json["data"]:
             meta_list.append(MetaData(meta))
 
+        return meta_list
+
     def get_dependencies(self):
-        depen_json = self.client._get_request("https://api.mod.io/v1/games/{}/mods/{}/dependecies".format(self.mod_id, self.id))
+        depen_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/dependecies".format(self.game_id, self.id))
 
         depen_list = list()
         for dependecy in depen_json["data"]:
@@ -274,7 +283,7 @@ class Mod:
         return depen_list
 
     def get_team(self): #in common with game obj
-        team_json = self.client._get_request("https://api.mod.io/v1/games/{}/mods/{}/team".format(self.mod_id, self.id))
+        team_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/team".format(self.game_id, self.id))
 
         team_list = list()
         for member in team_json["data"]:
@@ -283,7 +292,7 @@ class Mod:
         return team_list
 
     def get_comments(self):
-        comment_json = self.client._get_request("https://api.mod.io/v1/games/{}/mods/{}/comments".format(self.mod_id, self.id))
+        comment_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/comments".format(self.game_id, self.id))
 
         comment_list = list()
         for comment in comment_json["data"]:
@@ -381,8 +390,11 @@ class ModFile:
 
 class ModMedia:
     def __init__(self, media_json):
-        self.youtube = media_json["youtube"]
-        self.sketchfab = media_json["sketchfab"]
+        if "youtube" in media_json:
+            self.youtube = media_json["youtube"]
+
+        if "sketchfab" in media_json:
+            self.sketchfab = media_json["sketchfab"]
 
         images_list = list()
         for image in media_json["images"]:
