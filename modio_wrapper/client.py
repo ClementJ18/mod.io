@@ -11,25 +11,7 @@ class Client:
           'Accept': 'application/json'
         }
 
-    def _get_request(self, url, need_token=False):
-        if self.access_token is None:
-            headers = {
-              'Accept': 'application/json'
-            }
-        else:
-            headers = {
-              'Accept': 'application/json',
-              'Authorization': "Bearer " + self.access_token
-            }
-
-        if need_token:
-            r = requests.get(url, 
-                headers = headers)
-        else:
-            r = requests.get(url, params={
-              'api_key': self.api_key
-            }, headers = headers)
-
+    def _error_check(self, r):
         if "error" in r.json():
             code = r.json()["error"]["code"]
             msg = r.json()["error"]["message"]
@@ -56,6 +38,42 @@ class Client:
                 raise ModDBException(msg)
         else:
             return r.json()
+
+    def _get_request(self, url, need_token=False):
+        if self.access_token is None:
+            headers = {
+              'Accept': 'application/json'
+            }
+        else:
+            headers = {
+              'Accept': 'application/json',
+              'Authorization': "Bearer " + self.access_token
+            }
+
+        if need_token:
+            r = requests.get(url, 
+                headers = headers)
+        else:
+            r = requests.get(url, params={
+              'api_key': self.api_key
+            }, headers = headers)
+
+        return self._error_check(r)
+
+    def _post_request(self, url, file_json=None):
+        if self.access_token is None:
+            raise Forbidden("Please aquire a O Auth 2 token to make POST requests")
+
+        headers = {
+              'Accept': 'application/json',
+              'Authorization': "Bearer " + self.access_token,
+              'Content-Type': "application/x-www-form-urlencoded"
+            }
+
+        r = requests.post(url, 
+                headers = headers)
+
+        return self._error_check(r)
 
     def get_game(self, id : int):
         game_json = self._get_request('https://api.mod.io/v1/games/{}'.format(id))
@@ -99,7 +117,7 @@ class Client:
         return mod_list
 
     def get_me_games(self):
-        game_json = self._get_request('https://api.mod.io/v1/me/games', True)
+        game_json = self._get_request(BASE_PATH + "/me/games", True)
 
         game_list = list()
         for game in game_json["data"]:
@@ -124,6 +142,33 @@ class Client:
             file_list.append(ModFile(file))
 
         return file_list
+
+    def email_request(self, email):
+        headers = {
+          'Accept': 'application/json',
+          'Content-Type': "application/x-www-form-urlencoded"
+        }
+
+        r = requests.post(BASE_PATH + "/oauth/emailrequest", params={
+          'api_key': self.api_key,
+          'email' : email
+        }, headers = headers)
+
+        return self._error_check(r)
+
+    def email_exchange(self, code):
+        headers = {
+          'Accept': 'application/json',
+          'Content-Type': "application/x-www-form-urlencoded"
+        }
+
+        r = requests.post(BASE_PATH + "/oauth/emailexchange", params={
+          'api_key': self.api_key,
+          'security_code' : code
+        }, headers = headers)
+
+        return self._error_check(r)
+
 
 class Game:
     def __init__(self, game_json, client):
