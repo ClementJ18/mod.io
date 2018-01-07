@@ -11,8 +11,13 @@ class Client:
     def __init__(self, api_key, access_token=None):
         self.api_key = api_key
         self.access_token = access_token
+        self.rate_limit = None
+        self.rate_remain = None
 
     def _error_check(self, r):
+        self.rate_limit = r.headers.get("X-RateLimit-Limit", self.rate_limit)
+        self.rate_remain = r.headers.get("X-RateLimit-Remaining", self.rate_remain)
+
         if "error" in r.json():
             code = r.json()["error"]["code"]
             msg = r.json()["error"]["message"]
@@ -59,7 +64,6 @@ class Client:
               'api_key': self.api_key
             }, headers = headers)
 
-        print(url)
         return self._error_check(r)
 
     def _post_request(self, url, file=False, **fields):
@@ -179,3 +183,11 @@ class Client:
         message = self._post_request(BASE_PATH + '/report', False, **fields)
 
         return Message(**self._error_check(message))
+
+    def get_all_mods(self):
+        mod_list = list()
+        for game in self.get_games():
+            mods = game.get_mods()
+            mod_list += mods
+
+        return mod_list
