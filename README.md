@@ -1,5 +1,7 @@
 # mod.io
 
+![mod.io Logo](https://media.mod.io/images/global/modio-dark.png "https://mod.io")
+
 A WIP wrapper for the mod.io API in Python. 
 
 ## Getting an OAuth 2 Access Token
