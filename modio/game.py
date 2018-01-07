@@ -43,23 +43,14 @@ class Game:
 
         return mod_list
 
-    def get_activity(self): #in common with mod obj
-        activity_json = self.client._get_request(BASE_PATH + "/games/{}/activity".format(self.id))
+    def get_mods_events(self):
+        event_json = self.client._get_request(BASE_PATH + "/games/{}/mods/events".format(self.id))
 
-        activity_list = list()
-        for activity in activity_json["data"]:
-            activity_list.append(GameActivity(**activity))
+        event_list = list()
+        for event in event_json["data"]:
+            event_list.append(Event(**event))
 
-        return activity_list
-
-    def get_mods_activity(self):
-        activity_json = self.client._get_request(BASE_PATH + "/games/{}/mods/activity".format(self.id))
-
-        activity_list = list()
-        for activity in activity_json["data"]:
-            activity_list.append(ModActivity(**activity))
-
-        return activity_list
+        return event_list
 
     def get_tags(self): #in common with mod obj
         tag_json = self.client._get_request(BASE_PATH + "/games/{}/tags".format(self.id))

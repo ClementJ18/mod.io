@@ -59,6 +59,7 @@ class Client:
               'api_key': self.api_key
             }, headers = headers)
 
+        print(url)
         return self._error_check(r)
 
     def _post_request(self, url, file=False, **fields):
@@ -159,7 +160,7 @@ class Client:
           'email' : email
         }, headers = headers)
 
-        return self._error_check(r)
+        return Message(**self._error_check(r))
 
     def email_exchange(self, code):
         headers = {
@@ -172,9 +173,9 @@ class Client:
           'security_code' : code
         }, headers = headers)
 
-        return self._error_check(r)
+        return Message(**self._error_check(r))
 
     def report(self, **fields):
         message = self._post_request(BASE_PATH + '/report', False, **fields)
 
-        return Message(**message)
+        return Message(**self._error_check(message))

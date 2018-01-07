@@ -20,6 +20,7 @@ class Mod:
         self.profile_url = attrs.pop("profile_url", None)
         self.modfile = ModFile(**attrs.pop("modfile", None))
         self.media = ModMedia(**attrs.pop("media", None))
+
         self.rating_summary = RatingSummary(**attrs.pop("rating_summary", None))
         self.client = client
         
@@ -44,14 +45,14 @@ class Mod:
 
         return file_list
 
-    def get_activity(self): #in common with game obj
-        activity_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/activity".format(self.game_id, self.id))
+    def get_event(self): #in common with game obj
+        event_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/event".format(self.game_id, self.id))
 
-        activity_list = list()
-        for activity in activity_json["data"]:
-            activity_list.append(ModActivity(**activity))
+        event_list = list()
+        for event in event_json["data"]:
+            event_list.append(Event(**event))
 
-        return activity_list
+        return event_list
 
     def get_tags(self): #in common with game obj
         tag_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/tags".format(self.game_id, self.id))

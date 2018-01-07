@@ -24,23 +24,7 @@ class Image: #is used for Logo Object, Icon Object, Header Object, Avatar Object
         if len(attrs) > 4:
             self.large = list(attrs.values())[4]            
 
-class GameActivity:
-    def __init__(self, **attrs):
-        self.id = attrs.pop("id", None)
-        self.game_id = attrs.pop("game_id", None)
-        self.user_id = attrs.pop("user_id", None)
-        self.date_added = attrs.pop("date_added", None)
-        self.event = attrs.pop("event", None)
-
-        changes_list = list()
-        changes = attrs.pop("changes", None)
-        if not changes is None:
-            for change in changes:
-                changes_list.append(FieldChange(**change))
-
-        self.changes = changes_list
-
-class ModActivity:
+class Event:
     def __init__(self, **attrs):
         self.id = attrs.pop("id", None)
         self.mod_id = attrs.pop("mod_id", None)
