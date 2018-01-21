@@ -5,6 +5,8 @@ BASE_PATH = "https://api.mod.io/v1"
 class Mod:
     def __init__(self, client, **attrs):
         self.id = attrs.pop("id", None)
+        self.status = attrs.pop("status", None)
+        self.visiable = attrs.pop("visible", None)
         self.game_id = attrs.pop("game_id", None)
         self.submitter = User(**attrs.pop("submitted_by", None))
         self.date_added = attrs.pop("date_added", None)
@@ -18,7 +20,7 @@ class Mod:
         self.description = attrs.pop("description", None)
         self.metadata_blob = attrs.pop("metadata_blob", None)
         self.profile_url = attrs.pop("profile_url", None)
-        self.modfile = ModFile(**attrs.pop("modfile", None))
+        self.modfile = ModFile(**attrs.pop("modfile", None), game_id=self.game_id)
         self.media = ModMedia(**attrs.pop("media", None))
 
         self.rating_summary = RatingSummary(**attrs.pop("rating_summary", None))
@@ -34,19 +36,19 @@ class Mod:
 
     def get_file(self, id : int):
         file_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/files/{}".format(self.game_id, self.id, id))
-        return ModFile(**file_json)
+        return ModFile(**file_json, game_id=self.game_id)
 
-    def get_files(self):
+    def get_files(self, **fields):
         files_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/files".format(self.game_id, self.id))
 
         file_list = list()
         for file in files_json["data"]:
-            file_list.append(ModFile(**file))
+            file_list.append(ModFile(**file, game_id=self.game_id))
 
         return file_list
 
-    def get_event(self): #in common with game obj
-        event_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/event".format(self.game_id, self.id))
+    def get_events(self, **fields):
+        event_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/events".format(self.game_id, self.id))
 
         event_list = list()
         for event in event_json["data"]:
@@ -54,7 +56,7 @@ class Mod:
 
         return event_list
 
-    def get_tags(self): #in common with game obj
+    def get_tags(self, **fields): #in common with game obj
         tag_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/tags".format(self.game_id, self.id))
 
         tags_list = list()
@@ -72,8 +74,8 @@ class Mod:
 
         return meta_list
 
-    def get_dependencies(self):
-        depen_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/dependecies".format(self.game_id, self.id))
+    def get_dependencies(self, **fields):
+        depen_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/dependencies".format(self.game_id, self.id))
 
         depen_list = list()
         for dependecy in depen_json["data"]:
@@ -81,7 +83,7 @@ class Mod:
 
         return depen_list
 
-    def get_team(self): #in common with game obj
+    def get_team(self):
         team_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/team".format(self.game_id, self.id))
 
         team_list = list()
@@ -90,7 +92,7 @@ class Mod:
 
         return team_list
 
-    def get_comments(self):
+    def get_comments(self, **fields):
         comment_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/comments".format(self.game_id, self.id))
 
         comment_list = list()
@@ -124,28 +126,14 @@ class Mod:
     def add_file(self, **fields):
         pass
 
-    def edit_file(self, id, **fields):
-            headers = {
-              'Authorization': 'Bearer ' + self.client.access_token,
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'Accept': 'application/json'
-            }
-
-            r = requests.put(BASE_PATH + '/games/{}/mods/{}/files/{}'.format(self.game_id, self.id, id), params= fields, headers = headers)
-
-            return ModFile(self.client._error_check(r))
-
     def add_media(self, **fields):
-        pass
-
-    def edit_media(self, id, **fields):
             headers = {
               'Authorization': 'Bearer ' + self.client.access_token,
               'Content-Type': 'application/x-www-form-urlencoded',
               'Accept': 'application/json'
             }
 
-            r = requests.put(BASE_PATH + '/games/{}/mods/{}/media/{}'.format(self.game_id, self.id, id), params= fields, headers = headers)
+            r = requests.post(BASE_PATH + '/games/{}/mods/{}/media/{}'.format(self.game_id, self.id, id), params= fields, headers = headers)
 
             return ModMedia(**self.client._error_check(r))
 

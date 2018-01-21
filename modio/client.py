@@ -45,7 +45,23 @@ class Client:
         else:
             return r.json()
 
-    def _get_request(self, url, need_token=False):
+    def _get_request(self, url, need_token=False, **fields):
+        extra = dict()
+        if "limit" in fields:
+            extra["_limit"] = int(fields.pop("limit"))
+
+        if "offset" in fields:
+            extra["_offset"] = int(fields.pop("offset"))
+
+        if "name" in fields:
+            extra["_q"] = fields.pop("name")
+
+        if "sort" in fields:
+            extra["_sort"] = fields.pop("sort")
+
+        fields = {k.replace("_", "-") : v for k, v in fields.items()}
+        extra = {**extra, **fields}
+
         if self.access_token is None:
             headers = {
               'Accept': 'application/json'
@@ -61,7 +77,8 @@ class Client:
                 headers = headers)
         else:
             r = requests.get(url, params={
-              'api_key': self.api_key
+              'api_key': self.api_key,
+              **extra
             }, headers = headers)
 
         return self._error_check(r)
@@ -89,8 +106,8 @@ class Client:
         game_json = self._get_request('https://api.mod.io/v1/games/{}'.format(id))
         return Game(self, **game_json)
 
-    def get_games(self):
-        game_json = self._get_request('https://api.mod.io/v1/games')
+    def get_games(self, **fields):
+        game_json = self._get_request('https://api.mod.io/v1/games', **fields)
 
         game_list = list()
         for game in game_json["data"]:
@@ -98,8 +115,8 @@ class Client:
 
         return game_list
 
-    def get_users(self):
-        user_json = self._get_request(BASE_PATH + "/users")
+    def get_users(self, **fields):
+        user_json = self._get_request(BASE_PATH + "/users", **fields)
 
         user_list = list()
         for user in user_json["data"]:
@@ -107,7 +124,7 @@ class Client:
 
         return user_list
 
-    def get_user(self, id : int):
+    def get_user(self, id):
         user_json = self._get_request(BASE_PATH + "/users/{}".format(id))
 
         return User(**user_json)
@@ -117,8 +134,8 @@ class Client:
 
         return User(**me_json)
 
-    def get_me_sub(self):
-        mod_json = self._get_request(BASE_PATH + "/me/subscribed", True)
+    def get_me_sub(self, **fields):
+        mod_json = self._get_request(BASE_PATH + "/me/subscribed", True, **fields)
 
         mod_list = list()
         for mod in mod_json["data"]:
@@ -126,8 +143,8 @@ class Client:
 
         return mod_list
 
-    def get_me_games(self):
-        game_json = self._get_request(BASE_PATH + "/me/games", True)
+    def get_me_games(self, **fields):
+        game_json = self._get_request(BASE_PATH + "/me/games", True, **fields)
 
         game_list = list()
         for game in game_json["data"]:
@@ -135,8 +152,8 @@ class Client:
 
         return game_list
 
-    def get_me_mods(self):
-        mod_json = self._get_request(BASE_PATH + "/me/mods", True)
+    def get_me_mods(self, **fields):
+        mod_json = self._get_request(BASE_PATH + "/me/mods", True, **fields)
 
         mod_list = list()
         for mod in mod_json["data"]:
@@ -144,12 +161,12 @@ class Client:
 
         return mod_list
 
-    def get_me_modfiles(self):
-        files_json = self._get_request(BASE_PATH + "/me/files", True)
+    def get_me_modfiles(self, **fields):
+        files_json = self._get_request(BASE_PATH + "/me/files", True, **fields)
 
         file_list = list()
         for file in files_json["data"]:
-            file_list.append(ModFile(**file))
+            file_list.append(MeModFile(**file))
 
         return file_list
 
@@ -183,11 +200,4 @@ class Client:
         message = self._post_request(BASE_PATH + '/report', False, **fields)
 
         return Message(**self._error_check(message))
-
-    def get_all_mods(self):
-        mod_list = list()
-        for game in self.get_games():
-            mods = game.get_mods()
-            mod_list += mods
-
-        return mod_list
+        

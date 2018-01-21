@@ -7,3 +7,4 @@ archive/moddb_objects.py
 archive/objects.py
 archive/oo_layout.txt
 *.pyc
+test.py

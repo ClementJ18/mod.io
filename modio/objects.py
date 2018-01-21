@@ -1,4 +1,5 @@
 import requests
+from .errors import ModDBException
 BASE_PATH = "https://api.mod.io/v1"    
 
 class Message:
@@ -30,16 +31,8 @@ class Event:
         self.mod_id = attrs.pop("mod_id", None)
         self.user_id = attrs.pop("user_id", None)
         self.date_added = attrs.pop("date_added", None)
-        self.event = attrs.pop("event", None)
+        self.event = attrs.pop("event_type", None)
         
-        changes_list = list()
-        changes = attrs.pop("changes", None)
-        if not changes is None:
-            for change in changes:
-                changes_list.append(FieldChange(**change))
-
-        self.changes = changes_list
-
 class FieldChange:
     def __init__(self, **attrs):
         self.field = attrs.pop("field", None)
@@ -63,7 +56,7 @@ class ModDependencies:
         self.mod_id = attrs.pop("mod_id", None)
         self.date_added = attrs.pop("date_added", None)
 
-class ModFile:
+class MeModFile:
     def __init__(self,**attrs):
         self.id = attrs.pop("id", None)
         self.mod_id = attrs.pop("mod_id", None)
@@ -73,10 +66,35 @@ class ModFile:
         self.virus_positive = attrs.pop("virus_positive", None)
         self.virustotal_hash = attrs.pop("virustotal_hash", None)
         self.filesize = attrs.pop("filesize", None)
-        self.filehash = attrs.pop("filehash", None)["md5"]
+
+        self.filehash = attrs.pop("filehash", None)
+        if not self.filehash is None:
+            self.filehash = self.filehash["md5"]
+
         self.filename = attrs.pop("filename", None)
         self.version = attrs.pop("version", None)
         self.changelog = attrs.pop("changelog", None)
+        self.meta_data = attrs.pop("metadata_blob", None)
+        self.download = attrs.pop("download", None)
+
+        def edit_file(self, **fields):
+            raise ModDBException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
+
+class ModFile(MeModFile):
+    def __init__(self, **attrs):
+        super().__init__(**attrs)
+        self.game_id = attrs.pop("game_id", None)
+
+        def edit_file(self, **fields):
+            headers = {
+              'Authorization': 'Bearer ' + self.client.access_token,
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Accept': 'application/json'
+            }
+
+            r = requests.put(BASE_PATH + '/games/{}/mods/{}/files/{}'.format(self.game_id, self.mod_id, self.id), params= fields, headers = headers)
+
+            return ModFile(self.client._error_check(r))
 
 class ModMedia:
     def __init__(self, **attrs):
@@ -105,8 +123,8 @@ class GameTag:
 
 class MetaData:
     def __init__(self, **attrs):
-        self.key = attrs.pop("key", None)
-        self.value = attrs.pop("value", None)
+        self.key = attrs.pop("metakey", None)
+        self.value = attrs.pop("metavalue", None)
 
 class RatingSummary:
     def __init__(self, **attrs):
@@ -142,3 +160,21 @@ class User:
         self.timezone = attrs.pop("timezone", None)
         self.language = attrs.pop("language", None)
         self.profile_url = attrs.pop("profile_url", None)
+
+class NewMod:
+    def __init__(self, **attrs):
+        self.name = attrs.pop("name")
+        self.name_id = attrs.pop("name_id", None)
+        self.summary = attrs.pop("summary")
+        self.description = attrs.pop("description")
+        self.homepage = attrs.pop("homepage", None)
+        self.metadata_blob = attrs.pop("metadata_blob")
+        self.stock = int(attrs.pop("stock"))
+        self.tags = list()
+
+    def add_tags(self, *args):
+        self.tags += args
+
+    def add_logo(self, path):
+        self.logo = open(path, "rb").read()
+

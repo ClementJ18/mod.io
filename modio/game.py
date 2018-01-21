@@ -6,16 +6,17 @@ BASE_PATH = "https://api.mod.io/v1"
 class Game:
     def __init__(self, client, **attrs):
         self.id = attrs.pop("id", None)
+        self.status = attrs.pop("status", None)
         self.submitter = User(**attrs.pop("submitted_by", None))
         self.date_added = attrs.pop("date_added", None)
         self.date_updated = attrs.pop("date_updated", None)
         self.date_live = attrs.pop("date_live", None)
-        self.presentation = attrs.pop("presentation", None)
-        self.submission = attrs.pop("submission", None)
-        self.curation = attrs.pop("curation", None)
-        self.community = attrs.pop("community", None)
-        self.revenue = attrs.pop("revenue", None)
-        self.api = attrs.pop("api", None)
+        self.presentation = attrs.pop("presentation_options", None)
+        self.submission = attrs.pop("submission_options", None)
+        self.curation = attrs.pop("curation_options", None)
+        self.community = attrs.pop("community_options", None)
+        self.revenue = attrs.pop("revenue_options", None)
+        self.api = attrs.pop("api_options", None)
         self.ugc_name = attrs.pop("ugc_name", None)
         self.icon = Image(**attrs.pop("icon", None))
         self.logo = Image(**attrs.pop("logo", None))
@@ -34,7 +35,7 @@ class Game:
 
         return Mod(self.client, **mod_json)
 
-    def get_mods(self):
+    def get_mods(self, **fields):
         mod_json = self.client._get_request(BASE_PATH + "/games/{}/mods".format(self.id))
 
         mod_list = list()
@@ -43,7 +44,7 @@ class Game:
 
         return mod_list
 
-    def get_mods_events(self):
+    def get_mod_events(self, **fields):
         event_json = self.client._get_request(BASE_PATH + "/games/{}/mods/events".format(self.id))
 
         event_list = list()
@@ -52,7 +53,7 @@ class Game:
 
         return event_list
 
-    def get_tags(self): #in common with mod obj
+    def get_tags(self, **fields): #in common with mod obj
         tag_json = self.client._get_request(BASE_PATH + "/games/{}/tags".format(self.id))
 
         tags_list = list()
@@ -60,15 +61,6 @@ class Game:
             tags_list.append(GameTag(**tag_option))
 
         return tags_list
-
-    def get_team(self): #in common with mod obj
-        team_json = self.client._get_request(BASE_PATH + "/games/{}/team".format(self.id))
-
-        team_list = list()
-        for team_member in team_json["data"]:
-            team_list.append(TeamMember(**team_member))
-
-        return team_list
 
     def edit(self, **fields):
         headers = {
@@ -81,14 +73,17 @@ class Game:
 
         self.__init__(self.client, **self.client._error_check(r))
 
-    def add_mod(self, **fields):
+    def add_mod(self, mod):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
           'Content-Type': 'multipart/form-data',
           'Accept': 'application/json'
         }
 
-        r = requests.post(BASE_PATH + '/games/{}/mods'.format(self.id), params= fields, headers = headers)
+        print(mod.__dict__["logo"][:50])
+        r = requests.post(BASE_PATH + '/games/{}/mods'.format(self.id), files = mod.__dict__, headers = headers)
+        print(r.text)
+        
 
         return Mod(self.client, **self.client._error_check(r))
 
@@ -97,13 +92,3 @@ class Game:
 
     def del_tag(self, **fields):
         pass
-
-    def add_team_member(self, **fields):
-        pass
-
-    def update_team_member(self, **fields):
-        pass
-
-    def del_team_member(self, **fields):
-        pass
-
