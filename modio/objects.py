@@ -1,11 +1,14 @@
 import requests
 from .errors import ModDBException
-BASE_PATH = "https://api.mod.io/v1"    
+BASE_PATH = "https://api.test.mod.io/v1"    
 
 class Message:
     def __init__(self, **attrs):
         self.code = attrs.pop("code", None)
         self.message =attrs.pop("message", None)
+
+    def __str__(self):
+        return "{} : {}".format(self.code, self.message)
 
 class Error:
     def __init__(self, **attrs):
@@ -114,12 +117,18 @@ class ModTag:
         self.name = attrs.pop("name", None)
         self.date_added = attrs.pop("date_added", None)
 
+    def __str__(self):
+        return self.name
+
 class GameTag:
     def __init__(self, **attrs):
         self.name = attrs.pop("name", None)
         self.type = attrs.pop("type", None)
         self.hidden = attrs.pop("hidden", None)
         self.tags = attrs.pop("tags", None)
+
+    def __str__(self):
+        return self.name
 
 class MetaData:
     def __init__(self, **attrs):
@@ -173,8 +182,8 @@ class NewMod:
         self.tags = list()
 
     def add_tags(self, *args):
-        self.tags += args
+        self.tags += [tag for tag in args if tag not in self.tags]
 
     def add_logo(self, path):
-        self.logo = open(path, "rb").read()
+        self.logo = open(path, "rb")
 

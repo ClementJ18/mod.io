@@ -1,7 +1,9 @@
 import requests
+import json
 from .mod import Mod
 from .objects import *
-BASE_PATH = "https://api.mod.io/v1"
+from .utils import find
+BASE_PATH = "https://api.test.mod.io/v1"
 
 class Game:
     def __init__(self, client, **attrs):
@@ -27,7 +29,12 @@ class Game:
         self.summary = attrs.pop("summary", None)
         self.instructions = attrs.pop("instructions", None)
         self.profile_url = attrs.pop("profile_url", None)
-        self.tag_options = attrs.pop("tag_options", None)
+        self.tag_options = list()
+
+        for tag in attrs.pop("tag_options", None):
+            game_tag = GameTag(**tag)
+            self.tag_options.append(game_tag)
+
         self.client = client
 
     def get_mod(self, id : int):
@@ -62,6 +69,7 @@ class Game:
 
         return tags_list
 
+    #not working
     def edit(self, **fields):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
@@ -73,6 +81,7 @@ class Game:
 
         self.__init__(self.client, **self.client._error_check(r))
 
+    #not working
     def add_mod(self, mod):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
@@ -80,15 +89,54 @@ class Game:
           'Accept': 'application/json'
         }
 
-        print(mod.__dict__["logo"][:50])
         r = requests.post(BASE_PATH + '/games/{}/mods'.format(self.id), files = mod.__dict__, headers = headers)
-        print(r.text)
         
-
         return Mod(self.client, **self.client._error_check(r))
 
-    def add_tag(self, **fields):
-        pass
+    def add_tags(self, **fields):
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
 
-    def del_tag(self, **fields):
-        pass
+        if "tags" in fields:
+            tags = fields.pop("tags")
+            for tag in tags:
+                fields["tags[{}]".format(tags.index(tag))] = tag
+
+        if "hidden" in fields:
+            hidden = fields.pop("hidden")
+
+        print(fields)
+        r = requests.post(BASE_PATH + '/games/{}/tags'.format(self.id), data = fields, json = {"hidden" : hidden}, headers = headers)
+
+        message = self.client._error_check(r)
+        self.tag_options.append(GameTag(**fields))
+        return Message(**message)
+
+    def del_tags(self, **fields):
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        if "tags" in fields:
+            tags = fields.pop("tags")
+            for tag in tags:
+                fields["tags[{}]".format(tags.index(tag))] = tag
+
+        r = requests.delete(BASE_PATH + '/games/{}/tags'.format(self.id), data = fields, headers = headers)
+
+        try:
+            r = self.client._error_check(r)
+        except json.JSONDecodeError:
+            pass
+
+
+        for tag in self.tags:
+            if tag.name in tags:
+                self.tags.remove(tag)
+
+        return r

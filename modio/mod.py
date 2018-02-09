@@ -1,6 +1,12 @@
 import requests
+from math import sqrt
+import json
+import time
+
+from .utils import find
 from .objects import *
-BASE_PATH = "https://api.mod.io/v1"
+from .errors import *
+BASE_PATH = "https://api.test.mod.io/v1"
 
 class Mod:
     def __init__(self, client, **attrs):
@@ -154,17 +160,104 @@ class Mod:
     def unsubscribe(self):
         pass
 
-    def add_tag(self, **fields):
-        pass
+    def add_tags(self, *tags):
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
 
-    def del_tag(self, **fields):
-        pass
+        fields = dict()
+        for tag in tags:
+            fields["tags[{}]".format(tags.index(tag))] = tag
+
+        r = requests.post(BASE_PATH + '/games/{}/mods/{}/tags'.format(self.game_id, self.id), data = fields, headers = headers)
+
+        message = self.client._error_check(r)
+        for tag in tags:
+            self.tags.append(ModTag(name=tag, date_added=int(time.time())))
+
+        return Message(**message)
+
+    def del_tags(self, *tags):
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        fields = dict()
+        for tag in tags:
+            fields["tags[{}]".format(tags.index(tag))] = tag
+
+        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/tags'.format(self.game_id, self.id), data = fields, headers = headers)
+
+        try:
+            r = self.client._error_check(r)
+        except json.JSONDecodeError:
+            pass
+
+        for mod_tag in self.tags:
+            if mod_tag.name in tags:
+                self.tags.remove(mod_tag)
+            
+        return r
 
     def add_rating(self, rating):
-        pass
+        def confidence(ups, downs):
+            n = ups + downs
 
+            if n == 0:
+                return 0
+
+            z = 1.96 #1.44 = 85%, 1.96 = 95%
+            phat = float(ups) / n
+            return ((phat + z*z/(2*n) - z * sqrt((phat*(1-phat)+z*z/(4*n))/n))/(1+z*z/n))
+
+        if not rating == 1 or not rating == -1:
+            raise ModDBException("Rating is an argument that can only be 1 or -1")
+
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        r = requests.post(BASE_PATH + '/games/{}/mods/{}/rating'.format(self.game_id, self.id), data={"rating":rating}, headers=headers)
+
+        checked = self.client._error_check(r)
+        self.rating_summary.total_rating += 1
+        if rating == 1:
+            self.rating_summary.positive_ratings += 1
+        else:
+            self.rating_summary.negative_ratings += 1
+
+        self.rating_summary.percentage_positive = int((self.rating_summary.positive_ratings / self.rating_summary.total_rating)*100)
+        self.rating_summary.weighted_aggregate = confidence(self.rating_summary.positive_ratings, self.rating_summary.negative_ratings)
+        #need to recalculate mod message
+
+        return Message(**checked)
+
+    #working?
     def add_meta(self, **fields):
-        pass
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        metadata = dict()
+        index = 0
+        for data in fields:
+            metadata["metadata[{}]".format(index)] = "{}:{}".format(data, fields[data])
+            index += 1
+
+        r = requests.post(BASE_PATH + '/games/{}/mods/{}/metadatakvp'.format(self.game_id, self.id), data=metadata, headers=headers)
+        checked = self.client._error_check(r)
+
+        for data in fields:
+            
+        return Message(**checked)
 
     def del_meta(self, **fields):
         pass

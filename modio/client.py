@@ -5,7 +5,7 @@ from .errors import *
 from .objects import *
 from .utils import *
 
-BASE_PATH = "https://api.mod.io/v1"
+BASE_PATH = "https://api.test.mod.io/v1"
 
 class Client:
     def __init__(self, api_key, access_token=None):
@@ -103,11 +103,11 @@ class Client:
         return self._error_check(r)
 
     def get_game(self, id : int):
-        game_json = self._get_request('https://api.mod.io/v1/games/{}'.format(id))
+        game_json = self._get_request(BASE_PATH + '/games/{}'.format(id))
         return Game(self, **game_json)
 
     def get_games(self, **fields):
-        game_json = self._get_request('https://api.mod.io/v1/games', **fields)
+        game_json = self._get_request(BASE_PATH + '/games', **fields)
 
         game_list = list()
         for game in game_json["data"]:
@@ -196,6 +196,7 @@ class Client:
 
         return Message(**self._error_check(r))
 
+    #does not work/untested
     def report(self, **fields):
         message = self._post_request(BASE_PATH + '/report', False, **fields)
 
