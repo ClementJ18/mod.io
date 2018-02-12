@@ -8,9 +8,9 @@ from .utils import *
 BASE_PATH = "https://api.test.mod.io/v1"
 
 class Client:
-    def __init__(self, api_key, access_token=None):
-        self.api_key = api_key
-        self.access_token = access_token
+    def __init__(self, **fields):
+        self.api_key = fields.pop("api_key")
+        self.access_token = fields.pop("auth", None)
         self.rate_limit = None
         self.rate_remain = None
 

@@ -107,6 +107,7 @@ class Mod:
 
         return comment_list
 
+    #doesn't work
     def edit(self, **fields):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
@@ -118,6 +119,7 @@ class Mod:
 
         self.__init__(self.client, **self.client._error_check(r))
 
+    #untested
     def delete(self):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
@@ -125,13 +127,15 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.delete(BASE_PATH + '/games/{}/mods/{}'.format(self.game_id, self.id), params={}, headers = headers)
+        r = requests.delete(BASE_PATH + '/games/{}/mods/{}'.format(self.game_id, self.id), headers = headers)
 
         return self.client._error_check(r)
 
+    #unfinished
     def add_file(self, **fields):
         pass
 
+    #unfinished
     def add_media(self, **fields):
             headers = {
               'Authorization': 'Bearer ' + self.client.access_token,
@@ -143,6 +147,7 @@ class Mod:
 
             return ModMedia(**self.client._error_check(r))
 
+    #does not work
     def delete_media(self):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
@@ -155,10 +160,31 @@ class Mod:
         return ModMedia(**self.client._error_check(r))
 
     def subscribe(self):
-        pass
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        r = requests.post(BASE_PATH + '/games/{}/mods/{}/subscribe'.format(self.game_id, self.id), headers = headers)
+
+        return Mod(self.client, **self.client._error_check(r))
 
     def unsubscribe(self):
-        pass
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/subscribe'.format(self.game_id, self.id), headers = headers)
+
+        try:
+            r = self.client._error_check(r)
+        except json.JSONDecodeError:
+            pass
+
+        return r
 
     def add_tags(self, *tags):
         headers = {
@@ -254,28 +280,133 @@ class Mod:
 
         r = requests.post(BASE_PATH + '/games/{}/mods/{}/metadatakvp'.format(self.game_id, self.id), data=metadata, headers=headers)
         checked = self.client._error_check(r)
-
-        for data in fields:
             
         return Message(**checked)
 
     def del_meta(self, **fields):
-        pass
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
 
-    def add_depen(self, **fields):
-        pass
+        metadata = dict()
+        index = 0
+        for data in fields:
+            metadata["metadata[{}]".format(index)] = "{}:{}".format(data, fields[data])
+            index += 1
 
-    def del_depen(self, **fields):
-        pass
+        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/metadatakvp'.format(self.game_id, self.id), data=metadata, headers=headers)
+
+        try:
+            r = self.client._error_check(r)
+        except json.JSONDecodeError:
+            pass
+
+        return r
+
+    def add_depen(self, dependencies : list):
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        # composite_list = [dependencies[x:x+5] for x in range(0, len(dependencies), 5)]
+        # for depend in composite_list:
+        #     dependecy = dict()
+        #     for data in depend:
+        #         dependecy["dependencies[{}]".format(depend.index(data))] = data
+
+        #     r = requests.post(BASE_PATH + '/games/{}/mods/{}/dependencies'.format(self.game_id, self.id), data=dependecy, headers=headers)
+        #     self.client._error_check(r)
+
+        # return "all good"
+
+        if len(dependencies) > 5:
+            raise ModDBException("You can only submit 5 dependencies at a time")
+
+        dependecy = dict()
+        for data in dependencies:
+            dependecy["dependencies[{}]".format(dependencies.index(data))] = data
+
+        r = requests.post(BASE_PATH + '/games/{}/mods/{}/dependencies'.format(self.game_id, self.id), data=dependecy, headers=headers)
+
+        return Message(**self.client._error_check(r))
+
+
+    def del_depen(self, dependencies : list):
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        dependecy = dict()
+        for data in dependencies:
+            dependecy["dependencies[{}]".format(dependencies.index(data))] = data
+
+        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/dependencies'.format(self.game_id, self.id), data=dependecy, headers=headers)
+
+        try:
+            r = self.client._error_check(r)
+        except json.JSONDecodeError:
+            pass
+
+        return r
 
     def add_team_member(self, **fields):
-        pass
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        r = requests.post(BASE_PATH + '/games/{}/mods/{}/team'.format(self.game_id, self.id), data=fields, headers=headers)
+
+        return Message(**self.client._error_check(r))
+
+
 
     def update_team_member(self, **fields):
-        pass
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
 
-    def del_team_member(self, **fields):
-        pass
+        r = requests.put(BASE_PATH + '/games/{}/mods/{}/team/{}'.format(self.game_id, self.id, id), data=fields, headers=headers)
+
+        return Message(**self.client._error_check(r))
+
+    def del_team_member(self, id : int):
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/team/{}'.format(self.game_id, self.id, id), headers=headers)
+
+        try:
+            r = self.client._error_check(r)
+        except json.JSONDecodeError:
+            pass
+
+        return r
 
     def del_comment(self, id):
-        pass
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/comments/{}'.format(self.game_id, self.id, id), headers=headers)
+
+        try:
+            r = self.client._error_check(r)
+        except json.JSONDecodeError:
+            pass
+
+        return r

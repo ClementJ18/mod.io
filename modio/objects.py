@@ -16,7 +16,7 @@ class Error:
         self.message = attrs.pop("message", None)
         self.errors = attrs.pop("errors", None)
 
-class Image: #is used for Logo Object, Icon Object, Header Object, Avatar Object and Image Object
+class Image:
     def __init__(self, **attrs):
         self.filename = attrs.pop("filename", None)
         self.original = attrs.pop("original", None)
@@ -88,6 +88,7 @@ class ModFile(MeModFile):
         super().__init__(**attrs)
         self.game_id = attrs.pop("game_id", None)
 
+        #doesn't work
         def edit_file(self, **fields):
             headers = {
               'Authorization': 'Bearer ' + self.client.access_token,
