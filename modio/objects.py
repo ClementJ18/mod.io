@@ -88,7 +88,6 @@ class ModFile(MeModFile):
         super().__init__(**attrs)
         self.game_id = attrs.pop("game_id", None)
 
-        #doesn't work
         def edit_file(self, **fields):
             headers = {
               'Authorization': 'Bearer ' + self.client.access_token,
@@ -96,7 +95,7 @@ class ModFile(MeModFile):
               'Accept': 'application/json'
             }
 
-            r = requests.put(BASE_PATH + '/games/{}/mods/{}/files/{}'.format(self.game_id, self.mod_id, self.id), params= fields, headers = headers)
+            r = requests.put(BASE_PATH + '/games/{}/mods/{}/files/{}'.format(self.game_id, self.mod_id, self.id), data= fields, headers = headers)
 
             return ModFile(self.client._error_check(r))
 

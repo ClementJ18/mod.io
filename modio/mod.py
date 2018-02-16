@@ -107,8 +107,9 @@ class Mod:
 
         return comment_list
 
-    #doesn't work
     def edit(self, **fields):
+        raise ModDBExeception("Not implemented yet")
+
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -119,7 +120,6 @@ class Mod:
 
         self.__init__(self.client, **self.client._error_check(r))
 
-    #untested
     def delete(self):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
@@ -131,23 +131,22 @@ class Mod:
 
         return self.client._error_check(r)
 
-    #unfinished
     def add_file(self, **fields):
+        raise ModDBExeception("Not implemented yet")
         pass
 
-    #unfinished
     def add_media(self, **fields):
-            headers = {
-              'Authorization': 'Bearer ' + self.client.access_token,
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'Accept': 'application/json'
-            }
+        raise ModDBExeception("Not implemented yet")
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
 
-            r = requests.post(BASE_PATH + '/games/{}/mods/{}/media/{}'.format(self.game_id, self.id, id), params= fields, headers = headers)
+        r = requests.post(BASE_PATH + '/games/{}/mods/{}/media/{}'.format(self.game_id, self.id, id), params= fields, headers = headers)
 
-            return ModMedia(**self.client._error_check(r))
+        return ModMedia(**self.client._error_check(r))
 
-    #does not work
     def delete_media(self):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
@@ -155,9 +154,14 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/media'.format(self.game_id, self.id), params={}, headers = headers)
+        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/media'.format(self.game_id, self.id), headers = headers)
 
-        return ModMedia(**self.client._error_check(r))
+        try:
+            r = self.client._error_check(r)
+        except json.JSONDecodeError:
+            pass
+
+        return r
 
     def subscribe(self):
         headers = {
@@ -264,7 +268,6 @@ class Mod:
 
         return Message(**checked)
 
-    #working?
     def add_meta(self, **fields):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
@@ -312,6 +315,7 @@ class Mod:
           'Accept': 'application/json'
         }
 
+        #to add more than 5 depen at a time
         # composite_list = [dependencies[x:x+5] for x in range(0, len(dependencies), 5)]
         # for depend in composite_list:
         #     dependecy = dict()

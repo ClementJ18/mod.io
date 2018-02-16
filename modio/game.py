@@ -3,6 +3,7 @@ import json
 from .mod import Mod
 from .objects import *
 from .utils import find
+from .errors import *
 BASE_PATH = "https://api.test.mod.io/v1"
 
 class Game:
@@ -37,6 +38,9 @@ class Game:
 
         self.client = client
 
+    def __cmp__(self, other):
+        return self.id == other.id
+
     def get_mod(self, id : int):
         mod_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}".format(self.id, id))
 
@@ -69,8 +73,8 @@ class Game:
 
         return tags_list
 
-    #not working
     def edit(self, **fields):
+        raise ModDBExeception("Not implemented yet")
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -81,8 +85,8 @@ class Game:
 
         self.__init__(self.client, **self.client._error_check(r))
 
-    #not working
     def add_mod(self, mod):
+        raise ModDBExeception("Not implemented yet")
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
           'Content-Type': 'multipart/form-data',

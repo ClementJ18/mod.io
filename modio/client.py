@@ -17,10 +17,11 @@ class Client:
     def _error_check(self, r):
         self.rate_limit = r.headers.get("X-RateLimit-Limit", self.rate_limit)
         self.rate_remain = r.headers.get("X-RateLimit-Remaining", self.rate_remain)
+        request_json = r.json()
 
-        if "error" in r.json():
-            code = r.json()["error"]["code"]
-            msg = r.json()["error"]["message"]
+        if "error" in request_json:
+            code = request_json["error"]["code"]
+            msg = request_json["error"]["message"]
             if code == 400:
                 raise BadRequest(msg)
             elif code == 401:
@@ -36,14 +37,14 @@ class Client:
             elif code == 410:
                 raise Gone(msg)
             elif code == 422:
-                errors = r.json()["error"]["errors"]
+                errors = request_json["error"]["errors"]
                 raise UnprocessableEntity(msg, errors)
             elif code == 429:
                 raise TooManyRequests(msg)
             else:
                 raise ModDBException(msg)
         else:
-            return r.json()
+            return request_json
 
     def _get_request(self, url, need_token=False, **fields):
         extra = dict()
@@ -198,6 +199,7 @@ class Client:
 
     #does not work/untested
     def report(self, **fields):
+        raise ModDBException("Not implemented yet")
         message = self._post_request(BASE_PATH + '/report', False, **fields)
 
         return Message(**self._error_check(message))
