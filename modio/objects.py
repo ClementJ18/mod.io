@@ -80,24 +80,27 @@ class MeModFile:
         self.meta_data = attrs.pop("metadata_blob", None)
         self.download = attrs.pop("download", None)
 
-        def edit_file(self, **fields):
-            raise ModDBException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
+    def edit(self, **fields):
+        raise ModDBException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
 
 class ModFile(MeModFile):
     def __init__(self, **attrs):
         super().__init__(**attrs)
         self.game_id = attrs.pop("game_id", None)
+        self.client = attrs.pop("client", None)
 
-        def edit_file(self, **fields):
-            headers = {
-              'Authorization': 'Bearer ' + self.client.access_token,
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'Accept': 'application/json'
-            }
+    def edit(self, **fields):
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+        if all(item in self.__dict__.items() for item in fields.items()):
+            return self
 
-            r = requests.put(BASE_PATH + '/games/{}/mods/{}/files/{}'.format(self.game_id, self.mod_id, self.id), data= fields, headers = headers)
-
-            return ModFile(self.client._error_check(r))
+        r = requests.put(BASE_PATH + '/games/{}/mods/{}/files/{}'.format(self.game_id, self.mod_id, self.id), data = fields, headers = headers)
+        
+        return ModFile(**self.client._error_check(r), client=self.client)
 
 class ModMedia:
     def __init__(self, **attrs):
@@ -186,4 +189,10 @@ class NewMod:
 
     def add_logo(self, path):
         self.logo = open(path, "rb")
+
+class Object:
+    def __init__(self, **attrs):
+        self.id = attrs.pop("id", None)
+        self.game_id = attrs.pop("game_id", None)
+        self.mod_id = attrs.pop("mod_id", None)
 

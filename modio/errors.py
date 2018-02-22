@@ -36,5 +36,5 @@ class UnprocessableEntity(ModDBException):
         super().__init__(msg)
 
 class TooManyRequests(ModDBException):
-    def __init__(self, msg):
-        super().__init__(msg)
+    def __init__(self, msg, retry):
+        super().__init__("{} Retry in {} minutes.".format(msg, retry))

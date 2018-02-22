@@ -1,4 +1,6 @@
 import requests
+import json
+
 from .game import Game
 from .mod import Mod
 from .errors import *
@@ -8,15 +10,45 @@ from .utils import *
 BASE_PATH = "https://api.test.mod.io/v1"
 
 class Client:
+    """Represents the base-level client to make requests to the mod.io API with.
+
+    Parameters
+    -----------
+    api_key : str
+        The api key that will be used to authenticate the bot while it makes most of 
+        its GET requests. This can be generated on the mod.io website.
+    auth : Optional[str]
+        The O Auth 2 token that will be used to make more complex GET requests and to make
+        POST requests. This can either be generated using the library's oauth2 functions
+        or through the mod.io website. This is referred as an access token in the rest of
+        the documentation.
+
+    Attributes
+    -----------
+    rate_limit : int
+        Number of requests that can be made using the supplied API Key/access token. Is
+        None until first request is made.
+    rate_remain : int
+        Number of requests remaining. Once this number hits 0 the requests will become 
+        rejected and the library will return 429 TooManyRequests. Is None until first
+        request is made
+    rate_retry : int
+        Number of minutes until the rate limits are reset for this API Key/access token.
+        Is None until the rate_remain is 0. 
+    """
+
     def __init__(self, **fields):
         self.api_key = fields.pop("api_key")
         self.access_token = fields.pop("auth", None)
         self.rate_limit = None
         self.rate_remain = None
+        self.rate_retry = None
 
     def _error_check(self, r):
+        """Updates the rate-limit attributes and check validity of the request."""
         self.rate_limit = r.headers.get("X-RateLimit-Limit", self.rate_limit)
         self.rate_remain = r.headers.get("X-RateLimit-Remaining", self.rate_remain)
+        self.rate_retry = r.headers.get("X-Ratelimit-RetryAfter", None)
         request_json = r.json()
 
         if "error" in request_json:
@@ -40,13 +72,15 @@ class Client:
                 errors = request_json["error"]["errors"]
                 raise UnprocessableEntity(msg, errors)
             elif code == 429:
-                raise TooManyRequests(msg)
+                raise TooManyRequests(msg, self.rate_retry)
             else:
                 raise ModDBException(msg)
         else:
             return request_json
 
     def _get_request(self, url, need_token=False, **fields):
+        """Contains the code for GET request. Adapts the given search terms to 
+        fit the API requirements."""
         extra = dict()
         if "limit" in fields:
             extra["_limit"] = int(fields.pop("limit"))
@@ -81,25 +115,6 @@ class Client:
               'api_key': self.api_key,
               **extra
             }, headers = headers)
-
-        return self._error_check(r)
-
-    def _post_request(self, url, file=False, **fields):
-        if self.access_token is None:
-            raise Forbidden("You need an O Auth 2 token to make write requests")
-
-        if file:
-            content_type = "multipart/form-data"
-        else:
-            content_type = "application/x-www-form-urlencoded"
-
-        headers = {
-          'Authorization': 'Bearer ' + self.access_token,
-          'Content-Type': content_type,
-          'Accept': 'application/json'
-        }
-
-        r = requests.post(url, params=fields, headers = headers)
 
         return self._error_check(r)
 
@@ -197,10 +212,25 @@ class Client:
 
         return Message(**self._error_check(r))
 
-    #does not work/untested
-    def report(self, **fields):
-        raise ModDBException("Not implemented yet")
-        message = self._post_request(BASE_PATH + '/report', False, **fields)
+    def report(self, *, resource, type=0, name, summary):
+        headers = {
+          'Authorization': 'Bearer ' + self.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
 
-        return Message(**self._error_check(message))
+        fields = {
+            "id" : resource.id,
+            "resource" : str(type(resource).__name__).lower() + "s",
+            "name" : name,
+            "type" : type,
+            "summary" : summary
+        }
+
+        if fields["resource"] not in ["games", "mods", "users"]:
+            raise ModDBException("You cannot report this type of resources")
+
+        r = requests.post(BASE_PATH + '/report', data = fields, headers = headers)
+
+        return Message(**self._error_check(r))
         

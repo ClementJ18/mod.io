@@ -64,7 +64,7 @@ class Game:
 
         return event_list
 
-    def get_tags(self, **fields): #in common with mod obj
+    def get_tags(self, **fields):
         tag_json = self.client._get_request(BASE_PATH + "/games/{}/tags".format(self.id))
 
         tags_list = list()
@@ -74,26 +74,27 @@ class Game:
         return tags_list
 
     def edit(self, **fields):
-        raise ModDBExeception("Not implemented yet")
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json'
         }
+        if all(item in self.__dict__.items() for item in fields.items()):
+            return self
 
-        r = requests.put(BASE_PATH + '/games/{}'.format(self.id), params= fields, headers = headers)
+        r = requests.put(BASE_PATH + '/games/{}'.format(self.id), data = fields, headers = headers)
 
-        self.__init__(self.client, **self.client._error_check(r))
+        return Game(self.client, **self.client._error_check(r))
 
+    #still not working *bonks head on table*
     def add_mod(self, mod):
-        raise ModDBExeception("Not implemented yet")
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
           'Content-Type': 'multipart/form-data',
           'Accept': 'application/json'
         }
 
-        r = requests.post(BASE_PATH + '/games/{}/mods'.format(self.id), files = mod.__dict__, headers = headers)
+        r = requests.post(BASE_PATH + '/games/{}/mods'.format(self.id), data = {"logo" : mod.logo}, headers = headers)
         
         return Mod(self.client, **self.client._error_check(r))
 
@@ -109,11 +110,8 @@ class Game:
             for tag in tags:
                 fields["tags[{}]".format(tags.index(tag))] = tag
 
-        if "hidden" in fields:
-            hidden = fields.pop("hidden")
-
         print(fields)
-        r = requests.post(BASE_PATH + '/games/{}/tags'.format(self.id), data = fields, json = {"hidden" : hidden}, headers = headers)
+        r = requests.post(BASE_PATH + '/games/{}/tags'.format(self.id), data = {"input_json" : fields}, headers = headers)
 
         message = self.client._error_check(r)
         self.tag_options.append(GameTag(**fields))
@@ -144,3 +142,4 @@ class Game:
                 self.tags.remove(tag)
 
         return r
+

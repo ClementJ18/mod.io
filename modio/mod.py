@@ -26,7 +26,7 @@ class Mod:
         self.description = attrs.pop("description", None)
         self.metadata_blob = attrs.pop("metadata_blob", None)
         self.profile_url = attrs.pop("profile_url", None)
-        self.modfile = ModFile(**attrs.pop("modfile", None), game_id=self.game_id)
+        self.modfile = ModFile(**attrs.pop("modfile", None), game_id=self.game_id, client=client)
         self.media = ModMedia(**attrs.pop("media", None))
 
         self.rating_summary = RatingSummary(**attrs.pop("rating_summary", None))
@@ -42,14 +42,14 @@ class Mod:
 
     def get_file(self, id : int):
         file_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/files/{}".format(self.game_id, self.id, id))
-        return ModFile(**file_json, game_id=self.game_id)
+        return ModFile(**file_json, game_id=self.game_id, client=self.client)
 
     def get_files(self, **fields):
         files_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/files".format(self.game_id, self.id))
 
         file_list = list()
         for file in files_json["data"]:
-            file_list.append(ModFile(**file, game_id=self.game_id))
+            file_list.append(ModFile(**file, game_id=self.game_id, client=self.client))
 
         return file_list
 
@@ -108,17 +108,18 @@ class Mod:
         return comment_list
 
     def edit(self, **fields):
-        raise ModDBExeception("Not implemented yet")
-
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json'
         }
 
-        r = requests.put(BASE_PATH + '/games/{}/mods/{}'.format(self.game_id, self.id), params= fields, headers = headers)
+        if all(item in self.__dict__.items() for item in fields.items()):
+            return self
 
-        self.__init__(self.client, **self.client._error_check(r))
+        r = requests.put(BASE_PATH + '/games/{}/mods/{}'.format(self.game_id, self.id), data = fields, headers = headers)
+
+        return Mod(self.client, **self.client._error_check(r))
 
     def delete(self):
         headers = {
