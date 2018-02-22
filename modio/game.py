@@ -98,6 +98,17 @@ class Game:
         
         return Mod(self.client, **self.client._error_check(r))
 
+    def add_media(self, media):
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json'
+        }
+
+        r = requests.post(BASE_PATH + '/games/{}/media'.format(self.id), data = {"logo" : mod.logo}, headers = headers)
+        
+        return Message(**self.client._error_check(r))
+
     def add_tags(self, **fields):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
