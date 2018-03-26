@@ -1,5 +1,7 @@
 import requests
 from .errors import ModDBException
+import hashlib
+
 BASE_PATH = "https://api.test.mod.io/v1"    
 
 class Message:
@@ -189,6 +191,24 @@ class NewMod:
 
     def add_logo(self, path):
         self.logo = open(path, "rb")
+
+class NewFile:
+    def __init__(self, **attrs):
+        self.version = attrs.pop("version")
+        self.changelog = attrs.pop("changelog")
+        self.active = attrs.pop("active", False)
+        self.metadata_blob = attrs.pop("metadata_blob")
+
+    def _file_hash(self, file):
+        hash_md5 = hashlib.md5()
+        with open(file, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                hash_md5.update(chunk)
+        return hash_md5.hexdigest()
+
+    def add_file(self, path):
+        self.file = open(path, "rb")
+        self.filehash = self._file_hash(path)
 
 class Object:
     def __init__(self, **attrs):

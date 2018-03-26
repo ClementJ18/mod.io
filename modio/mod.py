@@ -132,21 +132,31 @@ class Mod:
 
         return self.client._error_check(r)
 
-    def add_file(self, **fields):
-        raise ModDBExeception("Not implemented yet")
-        pass
-
-    def add_media(self, **fields):
-        raise ModDBExeception("Not implemented yet")
+    def add_file(self, file):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json'
         }
 
-        r = requests.post(BASE_PATH + '/games/{}/mods/{}/media/{}'.format(self.game_id, self.id, id), params= fields, headers = headers)
+        if not isinstance(file, NewFile):
+            raise ModDBException("mod argument must be type modio.NewFile")
 
-        return ModMedia(**self.client._error_check(r))
+        file_d = file.__dict__
+        files = {"filedata" : file_d.pop("file")}
+        print(file_d)
+        r = requests.post(BASE_PATH + '/games/{}/mods/{}/media'.format(self.game_id, self.id), data = {"input_json" : file_d}, files=files, headers = headers)
+
+        return Message(**self.client._error_check(r))
+
+    def add_media(self, **fields):
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Accept': 'application/json'
+        }
+
+        r = requests.post(BASE_PATH + '/games/{}/mods/{}/media'.format(self.game_id, self.id), files = fields, headers = headers)
+
+        return Message(**self.client._error_check(r))
 
     def delete_media(self):
         headers = {

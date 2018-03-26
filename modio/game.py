@@ -86,26 +86,33 @@ class Game:
 
         return Game(self.client, **self.client._error_check(r))
 
-    #still not working *bonks head on table*
     def add_mod(self, mod):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'multipart/form-data',
           'Accept': 'application/json'
         }
 
-        r = requests.post(BASE_PATH + '/games/{}/mods'.format(self.id), data = {"logo" : mod.logo}, headers = headers)
+        if not isinstance(mod, NewMod):
+            raise ModDBException("mod argument must be type modio.NewMod")
+
+        mod_d = mod.__dict__
+        tags = mod_d.pop("tags")
+        files = {"logo":mod_d.pop("logo")}
+        for tag in tags:
+            mod_d["tags[{}]".format(tags.index(tag))] = tag
+
+        r = requests.post(BASE_PATH + '/games/{}/mods'.format(self.id), data = mod_d, files=files, headers = headers)
         
         return Mod(self.client, **self.client._error_check(r))
 
-    def add_media(self, media):
+    def add_media(self, **fields):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'multipart/form-data',
           'Accept': 'application/json'
         }
 
-        r = requests.post(BASE_PATH + '/games/{}/media'.format(self.id), data = {"logo" : mod.logo}, headers = headers)
+        r = requests.post(BASE_PATH + '/games/{}/media'.format(self.id), files = fields, headers = headers)
+
         
         return Message(**self.client._error_check(r))
 
@@ -121,7 +128,6 @@ class Game:
             for tag in tags:
                 fields["tags[{}]".format(tags.index(tag))] = tag
 
-        print(fields)
         r = requests.post(BASE_PATH + '/games/{}/tags'.format(self.id), data = {"input_json" : fields}, headers = headers)
 
         message = self.client._error_check(r)

@@ -32,7 +32,9 @@ class Gone(ModDBException):
 
 class UnprocessableEntity(ModDBException):
     def __init__(self, msg, errors):
-        msg = msg + "\n  -" + "\n  -".join([x + ": " + errors[x] for x in errors])
+        if errors is not None:
+            msg = msg + "\n  -" + "\n  -".join([x + ": " + errors[x] for x in errors])
+            
         super().__init__(msg)
 
 class TooManyRequests(ModDBException):

@@ -69,7 +69,10 @@ class Client:
             elif code == 410:
                 raise Gone(msg)
             elif code == 422:
-                errors = request_json["error"]["errors"]
+                if "errors" in request_json["error"]:
+                    errors = request_json["error"]["errors"]
+                else:
+                    errors = None
                 raise UnprocessableEntity(msg, errors)
             elif code == 429:
                 raise TooManyRequests(msg, self.rate_retry)
@@ -101,20 +104,20 @@ class Client:
             headers = {
               'Accept': 'application/json'
             }
+
+            r = requests.get(url, params={
+              'api_key': self.api_key,
+              **extra
+            }, headers = headers)
         else:
             headers = {
               'Accept': 'application/json',
               'Authorization': "Bearer " + self.access_token
             }
 
-        if need_token:
             r = requests.get(url, 
                 headers = headers)
-        else:
-            r = requests.get(url, params={
-              'api_key': self.api_key,
-              **extra
-            }, headers = headers)
+            
 
         return self._error_check(r)
 
