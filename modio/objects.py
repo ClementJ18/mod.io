@@ -189,8 +189,12 @@ class NewMod:
     def add_tags(self, *args):
         self.tags += [tag for tag in args if tag not in self.tags]
 
+        return self
+
     def add_logo(self, path):
         self.logo = open(path, "rb")
+
+        return self
 
 class NewFile:
     def __init__(self, **attrs):
@@ -210,9 +214,9 @@ class NewFile:
         self.file = open(path, "rb")
         self.filehash = self._file_hash(path)
 
+        return self
+
 class Object:
     def __init__(self, **attrs):
-        self.id = attrs.pop("id", None)
-        self.game_id = attrs.pop("game_id", None)
-        self.mod_id = attrs.pop("mod_id", None)
+        self.__dict__.update(attrs)
 

@@ -28,6 +28,7 @@ class Mod:
         self.profile_url = attrs.pop("profile_url", None)
         self.modfile = ModFile(**attrs.pop("modfile", None), game_id=self.game_id, client=client)
         self.media = ModMedia(**attrs.pop("media", None))
+        self.maturity_options = attrs.pop("maturity_options", None)
 
         self.rating_summary = RatingSummary(**attrs.pop("rating_summary", None))
         self.client = client
@@ -143,8 +144,7 @@ class Mod:
 
         file_d = file.__dict__
         files = {"filedata" : file_d.pop("file")}
-        print(file_d)
-        r = requests.post(BASE_PATH + '/games/{}/mods/{}/media'.format(self.game_id, self.id), data = {"input_json" : file_d}, files=files, headers = headers)
+        r = requests.post(BASE_PATH + '/games/{}/mods/{}/media'.format(self.game_id, self.id), data = file_d, files=files, headers = headers)
 
         return Message(**self.client._error_check(r))
 

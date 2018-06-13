@@ -31,6 +31,7 @@ class Game:
         self.instructions = attrs.pop("instructions", None)
         self.profile_url = attrs.pop("profile_url", None)
         self.tag_options = list()
+        self.maturity_options = attrs.pop("maturity_options", None)
 
         for tag in attrs.pop("tag_options", None):
             game_tag = GameTag(**tag)
