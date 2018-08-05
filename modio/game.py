@@ -1,7 +1,6 @@
 import requests
 from .mod import Mod
 from .objects import *
-from .utils import find
 from .errors import *
 
 class Game:
@@ -286,14 +285,56 @@ class Game:
         return Mod(self.client, **mod_json)
 
     def add_media(self, **fields):
+        """Upload new media to to the game. This function can take between 1 to 3 arguments
+        depending on what media you desire to upload/update
+        
+        Parameters
+        -----------
+        logo : str
+            Path to the file that you desire to be the game's logo. Dimensions must be at least 
+            640x360 and we recommended you supply a high resolution image with a 16 / 9 ratio. mod.io 
+            will use this logo to create three thumbnails with the dimensions of 320x180, 640x360 and 
+            1280x720.
+        icon : str
+            Path to the file that you desire to be the game's icon. Must be gif, jpg or png format 
+            and cannot exceed 1MB in filesize. Dimensions must be at least 64x64 and a transparent 
+            png that works on a colorful background is recommended. mod.io will use this icon to 
+            create three thumbnails with the dimensions of 64x64, 128x128 and 256x256.
+        header : str
+            Path to the file that you desire to be the game's header. Must be gif, jpg or png format 
+            and cannot exceed 256KB in filesize. Dimensions of 400x100 and a light transparent png that 
+            works on a dark background is recommended.
+
+        Returns
+        --------
+        Message
+            A message containing the result of the query if successful.
+        """
         for image in field:
             field[image] = open(field[image])
 
         message = self.client._post_request(f'/games/{self.id}/media', h_type = 1, files = fields)
+        self.__int__(self.client, self.client._get_request(f"/games/{self.id}", h_type = 0))
         
         return Message(**message)
 
     def add_tags(self, **fields):
+        """Add tags which mods can apply to their profiles. If the tag name already exists it will
+        overwrite it.
+
+        Parameters
+        -----------
+        name : str
+            Name of the tag group
+        type : str
+            dropdown : Mods can select only one tag from this group, dropdown menu shown on site profile.
+            checkboxes : Mods can select multiple tags from this group, checkboxes shown on site profile.
+        hidden : bool
+            Whether or not this group of tagas should be hidden from users and mod devs.
+        tags : list[str]
+            Array of tags that mod creators can apply to their mod
+
+        """
         if "tags" in fields:
             tags = fields.pop("tags")
             for tag in tags:
@@ -305,13 +346,25 @@ class Game:
         return Message(**message)
 
     def del_tags(self, **fields):
-        if "tags" in fields:
-            tags = fields.pop("tags")
-            for tag in tags:
-                fields[f"tags[{tags.index(tag)}]"] = tag
+        """Delete one or more tags from a tag option
+        
+        Parameters
+        -----------
+        name : str
+            Name of the group from which you wish to delete from
+        tags : list[str]
+            Optional. Tags to delete from group. If left blank the entire group will be
+            deleted
+        """
+        tags = fields.pop("tags", [])
+        for tag in tags:
+            fields[f"tags[{tags.index(tag)}]"] = tag
 
         r = self.client._delete_request(f'/games/{self.id}/tags', h_type = 0, data = fields)
-        self.tags -= tags
+        if len(tags) > 0:
+            self.tags[fields["name"]] -= tags
+        else:
+            del self.tags[fields["name"]]
 
         return r
 
