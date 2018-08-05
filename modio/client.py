@@ -82,7 +82,7 @@ class Client:
             return request_json
 
     def _get_request(self, url, need_token=False, **fields):
-        """Contains the code for GET request. Adapts the given search terms to 
+        """Contains the code for basic GET request. Adapts the given search terms to 
         fit the API requirements."""
         extra = dict()
         if "limit" in fields:
@@ -116,12 +116,26 @@ class Client:
             }
 
             r = requests.get(url, 
-                headers = headers)
+                headers = headers, params=extra)
             
 
         return self._error_check(r)
 
     def get_game(self, id : int):
+        """Queries the mod.io API for the given game ID and if found returns it as a 
+        modio.Game instance. If not found raises NotFound
+
+        Parameters
+        -----------
+        id : int
+            The ID of the game to query the API for
+
+        Raises
+        -------
+        NotFound
+            A game with the supplied id was not found.
+        
+        """
         game_json = self._get_request(BASE_PATH + '/games/{}'.format(id))
         return Game(self, **game_json)
 
@@ -134,6 +148,11 @@ class Client:
 
         return game_list
 
+    def get_user(self, id):
+        user_json = self._get_request(BASE_PATH + "/users/{}".format(id))
+
+        return User(**user_json)
+
     def get_users(self, **fields):
         user_json = self._get_request(BASE_PATH + "/users", **fields)
 
@@ -142,11 +161,6 @@ class Client:
             user_list.append(User(**user))
 
         return user_list
-
-    def get_user(self, id):
-        user_json = self._get_request(BASE_PATH + "/users/{}".format(id))
-
-        return User(**user_json)
 
     def get_me(self):
         me_json = self._get_request(BASE_PATH + "/me", True)

@@ -55,7 +55,7 @@ class Mod:
         return file_list
 
     def get_events(self, **fields):
-        event_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/events".format(self.game_id, self.id))
+        event_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/events".format(self.game_id, self.id), **fields)
 
         event_list = list()
         for event in event_json["data"]:
@@ -64,7 +64,7 @@ class Mod:
         return event_list
 
     def get_tags(self, **fields): #in common with game obj
-        tag_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/tags".format(self.game_id, self.id))
+        tag_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/tags".format(self.game_id, self.id), **fields)
 
         tags_list = list()
         for tag_option in tag_json["data"]:
@@ -82,7 +82,7 @@ class Mod:
         return meta_list
 
     def get_dependencies(self, **fields):
-        depen_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/dependencies".format(self.game_id, self.id))
+        depen_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/dependencies".format(self.game_id, self.id), **fields)
 
         depen_list = list()
         for dependecy in depen_json["data"]:
@@ -100,7 +100,7 @@ class Mod:
         return team_list
 
     def get_comments(self, **fields):
-        comment_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/comments".format(self.game_id, self.id))
+        comment_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/comments".format(self.game_id, self.id), **fields)
 
         comment_list = list()
         for comment in comment_json["data"]:
@@ -136,7 +136,7 @@ class Mod:
     def add_file(self, file):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
-          'Accept': 'application/json'
+          'Accept': 'application/json',
         }
 
         if not isinstance(file, NewFile):
@@ -144,9 +144,9 @@ class Mod:
 
         file_d = file.__dict__
         files = {"filedata" : file_d.pop("file")}
-        r = requests.post(BASE_PATH + '/games/{}/mods/{}/media'.format(self.game_id, self.id), data = file_d, files=files, headers = headers)
+        r = requests.post(BASE_PATH + '/games/{}/mods/{}/files'.format(self.game_id, self.id), data = file_d, files=files, headers = headers)
 
-        return Message(**self.client._error_check(r))
+        return ModFile(**self.client._error_check(r))
 
     def add_media(self, **fields):
         headers = {
@@ -256,7 +256,7 @@ class Mod:
             return ((phat + z*z/(2*n) - z * sqrt((phat*(1-phat)+z*z/(4*n))/n))/(1+z*z/n))
 
         if not rating == 1 or not rating == -1:
-            raise ModDBException("Rating is an argument that can only be 1 or -1")
+            raise ModDBException("rating is an argument that can only be 1 or -1")
 
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
@@ -307,7 +307,7 @@ class Mod:
         metadata = dict()
         index = 0
         for data in fields:
-            metadata["metadata[{}]".format(index)] = "{}:{}".format(data, fields[data])
+            metadata[f"metadata[{index}]"] = f"{data}:{fields[data]}"
             index += 1
 
         r = requests.delete(BASE_PATH + '/games/{}/mods/{}/metadatakvp'.format(self.game_id, self.id), data=metadata, headers=headers)
@@ -327,7 +327,7 @@ class Mod:
         }
 
         #to add more than 5 depen at a time
-        # composite_list = [dependencies[x:x+5] for x in range(0, len(dependencies), 5)]
+        # composite_list = [dependencies[x:x+5] for x in range(0, len(dependencies)-5, 5)]
         # for depend in composite_list:
         #     dependecy = dict()
         #     for data in depend:
@@ -359,7 +359,7 @@ class Mod:
 
         dependecy = dict()
         for data in dependencies:
-            dependecy["dependencies[{}]".format(dependencies.index(data))] = data
+            dependecy[f"dependencies[{dependencies.index(data)}]"] = data
 
         r = requests.delete(BASE_PATH + '/games/{}/mods/{}/dependencies'.format(self.game_id, self.id), data=dependecy, headers=headers)
 

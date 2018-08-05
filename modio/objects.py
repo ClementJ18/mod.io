@@ -73,7 +73,7 @@ class MeModFile:
         self.filesize = attrs.pop("filesize", None)
 
         self.filehash = attrs.pop("filehash", None)
-        if not self.filehash is None:
+        if self.filehash:
             self.filehash = self.filehash["md5"]
 
         self.filename = attrs.pop("filename", None)
@@ -83,6 +83,9 @@ class MeModFile:
         self.download = attrs.pop("download", None)
 
     def edit(self, **fields):
+        raise ModDBException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
+
+    def delete(self):
         raise ModDBException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
 
 class ModFile(MeModFile):
@@ -104,6 +107,22 @@ class ModFile(MeModFile):
         
         return ModFile(**self.client._error_check(r), client=self.client)
 
+    def delete(self):
+        headers = {
+          'Authorization': 'Bearer ' + self.client.access_token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+
+        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/files/{}'.format(self.game_id, self.mod_id, self.id), headers=headers)
+
+        try:
+            r = self.client._error_check(r)
+        except json.JSONDecodeError:
+            pass
+
+        return r
+
 class ModMedia:
     def __init__(self, **attrs):
         self.youtube = attrs.pop("youtube", None)
@@ -111,9 +130,8 @@ class ModMedia:
 
         images_list = list()
         images = attrs.pop("images", None)
-        if not images is None:
-            for image in images:
-                images_list.append(Image(**image))
+        if images:
+            self.images = [Image(**image) for image in images]
 
         self.images = images_list
 
@@ -139,6 +157,10 @@ class MetaData:
     def __init__(self, **attrs):
         self.key = attrs.pop("metakey", None)
         self.value = attrs.pop("metavalue", None)
+
+    @property    
+    def __dict__(self):
+        return {self.key : self.value}
 
 class RatingSummary:
     def __init__(self, **attrs):
@@ -219,4 +241,7 @@ class NewFile:
 class Object:
     def __init__(self, **attrs):
         self.__dict__.update(attrs)
+
+    def __str__(self):
+        return str(self.__dict__)
 

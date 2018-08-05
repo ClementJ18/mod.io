@@ -113,7 +113,6 @@ class Game:
         }
 
         r = requests.post(BASE_PATH + '/games/{}/media'.format(self.id), files = fields, headers = headers)
-
         
         return Message(**self.client._error_check(r))
 
@@ -154,10 +153,7 @@ class Game:
         except json.JSONDecodeError:
             pass
 
-
-        for tag in self.tags:
-            if tag.name in tags:
-                self.tags.remove(tag)
+        self.tags -= tags
 
         return r
 
