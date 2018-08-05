@@ -46,7 +46,7 @@ class Mod:
         return ModFile(**file_json, game_id=self.game_id, client=self.client)
 
     def get_files(self, **fields):
-        files_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/files".format(self.game_id, self.id))
+        files_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/files".format(self.game_id, self.id), **fields)
 
         file_list = list()
         for file in files_json["data"]:
@@ -140,7 +140,7 @@ class Mod:
         }
 
         if not isinstance(file, NewFile):
-            raise ModDBException("mod argument must be type modio.NewFile")
+            raise modioException("mod argument must be type modio.NewFile")
 
         file_d = file.__dict__
         files = {"filedata" : file_d.pop("file")}
@@ -256,7 +256,7 @@ class Mod:
             return ((phat + z*z/(2*n) - z * sqrt((phat*(1-phat)+z*z/(4*n))/n))/(1+z*z/n))
 
         if not rating == 1 or not rating == -1:
-            raise ModDBException("rating is an argument that can only be 1 or -1")
+            raise modioException("rating is an argument that can only be 1 or -1")
 
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
@@ -339,7 +339,7 @@ class Mod:
         # return "all good"
 
         if len(dependencies) > 5:
-            raise ModDBException("You can only submit 5 dependencies at a time")
+            raise modioException("You can only submit 5 dependencies at a time")
 
         dependecy = dict()
         for data in dependencies:

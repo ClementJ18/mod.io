@@ -94,7 +94,7 @@ class Game:
         }
 
         if not isinstance(mod, NewMod):
-            raise ModDBException("mod argument must be type modio.NewMod")
+            raise modioException("mod argument must be type modio.NewMod")
 
         mod_d = mod.__dict__
         tags = mod_d.pop("tags")

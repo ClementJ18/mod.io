@@ -1,5 +1,5 @@
 import requests
-from .errors import ModDBException
+from .errors import modioException
 import hashlib
 
 BASE_PATH = "https://api.test.mod.io/v1"    
@@ -83,10 +83,10 @@ class MeModFile:
         self.download = attrs.pop("download", None)
 
     def edit(self, **fields):
-        raise ModDBException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
+        raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
 
     def delete(self):
-        raise ModDBException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
+        raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
 
 class ModFile(MeModFile):
     def __init__(self, **attrs):

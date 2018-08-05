@@ -1,42 +1,42 @@
-class ModDBException(Exception):
+class modioException(Exception):
     def __init__(self, message):
         super().__init__(message)
 
-class BadRequest(ModDBException):
+class BadRequest(modioException):
     def __init__(self, msg):
         super().__init__(msg)
 
-class Unauthorized(ModDBException):
+class Unauthorized(modioException):
     def __init__(self, msg):
         super().__init__(msg)
 
-class Forbidden(ModDBException):
+class Forbidden(modioException):
     def __init__(self, msg):
         super().__init__(msg)
 
-class NotFound(ModDBException):
+class NotFound(modioException):
     def __init__(self, msg):
         super().__init__(msg)
 
-class MethodNotAllowed(ModDBException):
+class MethodNotAllowed(modioException):
     def __init__(self, msg):
         super().__init__(msg)
 
-class NotAcceptable(ModDBException):
+class NotAcceptable(modioException):
     def __init__(self, msg):
         super().__init__(msg)
 
-class Gone(ModDBException):
+class Gone(modioException):
     def __init__(self, msg):
         super().__init__(msg)
 
-class UnprocessableEntity(ModDBException):
+class UnprocessableEntity(modioException):
     def __init__(self, msg, errors):
         if errors is not None:
             msg = msg + "\n  -" + "\n  -".join([x + ": " + errors[x] for x in errors])
             
         super().__init__(msg)
 
-class TooManyRequests(ModDBException):
+class TooManyRequests(modioException):
     def __init__(self, msg, retry):
         super().__init__("{} Retry in {} seconds.".format(msg, retry))

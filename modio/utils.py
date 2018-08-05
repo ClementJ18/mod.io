@@ -5,7 +5,14 @@ def find(iterable, **fields):
         game = find(client.get_all_games(), id=2)
 
     would find the first :class: Game whose id is 2 and return it. If no entry is found then
-    None is returned.  """
+    None is returned.  
+    
+        game = find(client.get_all_games(), name="John")
+
+    would find the first :class: `Game` whose name is 'John'. If not entry is found then None
+    is returned
+
+    """
 
     for e in iterable:
         if all(key in e.__dict__ for key in fields.keys()):
@@ -21,7 +28,13 @@ def get(iterable, **fields):
         game = get(client.get_all_games(), id=2)
 
     would find the all :class: Game whose id is 2 and return them as a list. If no entry is found then
-    the empty list is returned.  """
+    the empty list is returned. 
+
+        game = find(client.get_all_games(), name="John")
+
+    would find all :class: `Game` whose name is 'John'. If not entry is found then an empty list
+    is returned
+    """
 
     e_list = list()
     for e in iterable:

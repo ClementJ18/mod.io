@@ -30,3 +30,20 @@ file.close()
 
 #and now the token is stored in oauth2.txt
 ```
+
+## Basic Examples
+```py
+import modio
+
+client = modio.Client(api_key="your api key here", auth="your o auth 2 token here")
+
+game = client.get_game(345)
+#gets the game with id 345
+
+print(game.name)
+#prints the name of the game
+
+mod = game.get_mod(231)
+#gets the mod for that game with id 231
+
+```

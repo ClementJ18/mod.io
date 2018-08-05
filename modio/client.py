@@ -77,11 +77,11 @@ class Client:
             elif code == 429:
                 raise TooManyRequests(msg, self.rate_retry)
             else:
-                raise ModDBException(msg)
+                raise modioException(msg)
         else:
             return request_json
 
-    def _get_request(self, url, need_token=False, **fields):
+    def _get_request(self, url, **fields):
         """Contains the code for basic GET request. Adapts the given search terms to 
         fit the API requirements."""
         extra = dict()
@@ -134,12 +134,25 @@ class Client:
         -------
         NotFound
             A game with the supplied id was not found.
+
+        Returns
+        --------
+        :class: `Game`
+            The game with the given ID
         
         """
         game_json = self._get_request(BASE_PATH + '/games/{}'.format(id))
         return Game(self, **game_json)
 
     def get_games(self, **fields):
+        """Gets all the games availaible on mod.io. Takes filtering arguments.
+
+        Returns
+        --------
+        list
+            A list of modio.Game instances
+               
+        """
         game_json = self._get_request(BASE_PATH + '/games', **fields)
 
         game_list = list()
@@ -149,11 +162,37 @@ class Client:
         return game_list
 
     def get_user(self, id):
+        """Gets a user with the specified ID.
+
+        Parameters
+        -----------
+        id : int
+            The ID of the user to query the API for
+
+        Raises
+        -------
+        NotFound
+            A user with the supplied id was not found.
+
+        Returns
+        --------
+        :class: `User`
+            The user with the given ID
+
+        """
         user_json = self._get_request(BASE_PATH + "/users/{}".format(id))
 
         return User(**user_json)
 
     def get_users(self, **fields):
+        """Gets all the users availaible on mod.io. Takes filtering arguments.
+
+        Returns
+        --------
+        list
+            A list of modio.User instances
+               
+        """
         user_json = self._get_request(BASE_PATH + "/users", **fields)
 
         user_list = list()
@@ -163,12 +202,37 @@ class Client:
         return user_list
 
     def get_me(self):
-        me_json = self._get_request(BASE_PATH + "/me", True)
+        """Gets the authenticated user's details (aka the user who created the API key/access token)
+        Raises
+        -------
+        Forbidden
+            The access token is invalid/missing
+
+        Returns
+        -------
+        User
+            The authenticated user
+        
+        """
+        me_json = self._get_request(BASE_PATH + "/me")
 
         return User(**me_json)
 
     def get_me_sub(self, **fields):
-        mod_json = self._get_request(BASE_PATH + "/me/subscribed", True, **fields)
+        """Gets all the mods the authenticated user is subscribed to.  Takes
+        filtering arguments.
+
+        Raises
+        -------
+        Forbidden
+            The access token is invalid/missing
+
+        Returns
+        -------
+        list
+            A list of modio.Mod instances representing all mods the user is subscribed to
+        """
+        mod_json = self._get_request(BASE_PATH + "/me/subscribed", **fields)
 
         mod_list = list()
         for mod in mod_json["data"]:
@@ -177,7 +241,20 @@ class Client:
         return mod_list
 
     def get_me_games(self, **fields):
-        game_json = self._get_request(BASE_PATH + "/me/games", True, **fields)
+        """Get all the games the authenticated user added or is a team member of. Takes
+        filtering arguments.
+
+        Raises
+        -------
+        Forbidden
+            The access token is invalid/missing
+
+        Returns
+        -------
+        list
+            A list of modio.Game instances representing all games the user is added or is team member of
+        """
+        game_json = self._get_request(BASE_PATH + "/me/games", **fields)
 
         game_list = list()
         for game in game_json["data"]:
@@ -186,7 +263,20 @@ class Client:
         return game_list
 
     def get_me_mods(self, **fields):
-        mod_json = self._get_request(BASE_PATH + "/me/mods", True, **fields)
+        """Get all the mods the authenticated user added or is a team member of. Takes
+        filtering arguments.
+
+        Raises
+        -------
+        Forbidden
+            The access token is invalid/missing
+
+        Returns
+        -------
+        list
+            A list of modio.Mod instances representing all mods the user is added or is team member of
+        """
+        mod_json = self._get_request(BASE_PATH + "/me/mods", **fields)
 
         mod_list = list()
         for mod in mod_json["data"]:
@@ -195,7 +285,20 @@ class Client:
         return mod_list
 
     def get_me_modfiles(self, **fields):
-        files_json = self._get_request(BASE_PATH + "/me/files", True, **fields)
+        """Get all the mods the authenticated user uploaded. The returned modfile objects cannot be
+        edited or deleted and do not have a `game_idè attribute. Takes filtering arguments.
+
+        Raises
+        -------
+        Forbidden
+            The access token is invalid/missing
+
+        Returns
+        -------
+        list
+            A list of modio.MeModFile instances representing all modfiles the user added.
+        """
+        files_json = self._get_request(BASE_PATH + "/me/files", **fields)
 
         file_list = list()
         for file in files_json["data"]:
@@ -204,6 +307,16 @@ class Client:
         return file_list
 
     def email_request(self, email):
+        """Posts an email request for an OAuth2 token. A code will be sent to the given email address
+        which can then be entered into :func:`email_exchange`.
+        
+        Parameters
+        ----------
+        email : str
+            A valid email to which the 5-digit code will be sent
+
+        """
+
         headers = {
           'Accept': 'application/json',
           'Content-Type': "application/x-www-form-urlencoded"
@@ -216,36 +329,94 @@ class Client:
 
         return Message(**self._error_check(r))
 
-    def email_exchange(self, code):
+    def email_exchange(self, code : int):
+        """Exchanges the given 5-digit code for an OAuth2 token.
+
+        Parameters
+        ----------
+        code : int
+            A 5-digit code received by email less than 15 minutes ago
+
+        Raises
+        -------
+        Unauthorized
+            Invalid security code
+        ValueError
+            Security code was not 5 digits long
+
+        Returns
+        --------
+        str
+            The access code. The access code will also be added directly to the Client's `access_token` 
+            attribute.
+        """
         headers = {
           'Accept': 'application/json',
           'Content-Type': "application/x-www-form-urlencoded"
         }
+
+        if len(code) != 5:
+            raise ValueError("Security code must be 5 digits")
 
         r = requests.post(BASE_PATH + "/oauth/emailexchange", params={
           'api_key': self.api_key,
           'security_code' : code
         }, headers = headers)
 
-        return Message(**self._error_check(r))
+        r = **self._error_check(r)
+        self.access_token = r["access_token"]
+
+        return r["access_token"]
 
     def report(self, *, resource, type=0, name, summary):
+        """Used to report for any resource on mod.io. Make sure to read mod.io's ToU to understand
+        what is and isn't acceptable
+
+        Parameters
+        -----------
+        resource : Union[modio.Game, modio.User, modio.Mod, modio.Object]
+            The resource to report, if it is an instnace of a modio.Object it must have an `id`
+            attribute (the id of the resource) and a `resource_name`  atttribute which can be either 
+            'games', 'mods' or 'users'
+        type : int
+            0 : Generic Report
+            1 : DMCA Report
+        name : str
+            Name of the report
+        summary : str
+            Detailed description of your report. Make sure you include all relevant information and 
+            links to help moderators investigate and respond appropiately.
+
+        Raises
+        -------
+        modioException
+            Resource not 'game', 'mod' or 'user'
+
+        Returns
+        -------
+        Message
+            :class: `Message` 
+
+
+        """
         headers = {
           'Authorization': 'Bearer ' + self.access_token,
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json'
         }
 
+        resource_name = resource.__class__.__name__.lower()
+
         fields = {
             "id" : resource.id,
-            "resource" : str(type(resource).__name__).lower() + "s",
+            "resource" :  resource_name + "s" if resource_name != "object" else resource.resource_name,
             "name" : name,
             "type" : type,
             "summary" : summary
         }
 
         if fields["resource"] not in ["games", "mods", "users"]:
-            raise ModDBException("You cannot report this type of resources")
+            raise modioException("You cannot report this type of resources")
 
         r = requests.post(BASE_PATH + '/report', data = fields, headers = headers)
 
