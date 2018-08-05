@@ -2,15 +2,13 @@ import requests
 from .errors import modioException
 import hashlib
 
-BASE_PATH = "https://api.test.mod.io/v1"    
-
 class Message:
     def __init__(self, **attrs):
         self.code = attrs.pop("code", None)
         self.message =attrs.pop("message", None)
 
     def __str__(self):
-        return "{} : {}".format(self.code, self.message)
+        return f"{self.code} : {self.message}"
 
 class Error:
     def __init__(self, **attrs):
@@ -103,7 +101,7 @@ class ModFile(MeModFile):
         if all(item in self.__dict__.items() for item in fields.items()):
             return self
 
-        r = requests.put(BASE_PATH + '/games/{}/mods/{}/files/{}'.format(self.game_id, self.mod_id, self.id), data = fields, headers = headers)
+        r = requests.put(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}', data = fields, headers = headers)
         
         return ModFile(**self.client._error_check(r), client=self.client)
 
@@ -114,12 +112,8 @@ class ModFile(MeModFile):
           'Accept': 'application/json'
         }
 
-        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/files/{}'.format(self.game_id, self.mod_id, self.id), headers=headers)
-
-        try:
-            r = self.client._error_check(r)
-        except json.JSONDecodeError:
-            pass
+        r = requests.delete(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}', headers=headers)
+        r = self.client._error_check(r)
 
         return r
 

@@ -1,13 +1,12 @@
 import requests
 import json
+import time
 
 from .game import Game
 from .mod import Mod
 from .errors import *
 from .objects import *
 from .utils import *
-
-BASE_PATH = "https://api.test.mod.io/v1"
 
 class Client:
     """Represents the base-level client to make requests to the mod.io API with.
@@ -30,8 +29,8 @@ class Client:
         None until first request is made.
     rate_remain : int
         Number of requests remaining. Once this number hits 0 the requests will become 
-        rejected and the library will return 429 TooManyRequests. Is None until first
-        request is made
+        rejected and the library will sleep until the limit resets then raise 429 TooManyRequests. 
+        Is None until first request is made
     rate_retry : int
         Number of minutes until the rate limits are reset for this API Key/access token.
         Is None until the rate_remain is 0. 
@@ -43,13 +42,18 @@ class Client:
         self.rate_limit = None
         self.rate_remain = None
         self.rate_retry = None
+        self.BASE_PATH = "https://api.test.mod.io/v1"
 
     def _error_check(self, r):
         """Updates the rate-limit attributes and check validity of the request."""
         self.rate_limit = r.headers.get("X-RateLimit-Limit", self.rate_limit)
         self.rate_remain = r.headers.get("X-RateLimit-Remaining", self.rate_remain)
         self.rate_retry = r.headers.get("X-Ratelimit-RetryAfter", None)
-        request_json = r.json()
+
+        try:
+            request_json = r.json()
+        except json.JSONDecoderError:
+            return r
 
         if "error" in request_json:
             code = request_json["error"]["code"]
@@ -75,6 +79,7 @@ class Client:
                     errors = None
                 raise UnprocessableEntity(msg, errors)
             elif code == 429:
+                time.sleep(rate_retry)
                 raise TooManyRequests(msg, self.rate_retry)
             else:
                 raise modioException(msg)
@@ -115,11 +120,50 @@ class Client:
               'Authorization': "Bearer " + self.access_token
             }
 
-            r = requests.get(url, 
+            r = requests.get(self.BASE_PATH + url, 
                 headers = headers, params=extra)
             
 
         return self._error_check(r)
+
+    def _define_headers(self, h_type):
+        if h_type == 0:
+            headers = {
+              'Authorization': 'Bearer ' + self.access_token,
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Accept': 'application/json'
+            }
+        elif h_type == 1:
+            headers = {
+              'Authorization': 'Bearer ' + self.access_token,
+              'Accept': 'application/json'
+            }
+        else:
+            headers = {
+              'Authorization': 'Bearer ' + self.access_token,
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data'
+            }
+
+        return headers
+
+    def _post_request(self, url, *, h_type, **fields):
+        r = requests.post(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
+        r = self._error_check(r)
+
+        return r
+
+    def _put_request(self, url, *, h_type, **fields):
+        r = requests.put(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
+        r = self._error_check(r)
+
+        return r
+
+    def _delete_request(self, url, *, h_type, **fields):
+        r = requests.delete(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
+        r = self._error_check(r)
+
+        return r
 
     def get_game(self, id : int):
         """Queries the mod.io API for the given game ID and if found returns it as a 
@@ -141,11 +185,11 @@ class Client:
             The game with the given ID
         
         """
-        game_json = self._get_request(BASE_PATH + '/games/{}'.format(id))
+        game_json = self._get_request(f'/games/{id}')
         return Game(self, **game_json)
 
     def get_games(self, **fields):
-        """Gets all the games availaible on mod.io. Takes filtering arguments.
+        """Gets all the games available on mod.io. Takes filtering arguments.
 
         Returns
         --------
@@ -153,7 +197,7 @@ class Client:
             A list of modio.Game instances
                
         """
-        game_json = self._get_request(BASE_PATH + '/games', **fields)
+        game_json = self._get_request('/games', **fields)
 
         game_list = list()
         for game in game_json["data"]:
@@ -180,7 +224,7 @@ class Client:
             The user with the given ID
 
         """
-        user_json = self._get_request(BASE_PATH + "/users/{}".format(id))
+        user_json = self._get_request(f"/users/{id}")
 
         return User(**user_json)
 
@@ -193,7 +237,7 @@ class Client:
             A list of modio.User instances
                
         """
-        user_json = self._get_request(BASE_PATH + "/users", **fields)
+        user_json = self._get_request("/users", **fields)
 
         user_list = list()
         for user in user_json["data"]:
@@ -214,7 +258,7 @@ class Client:
             The authenticated user
         
         """
-        me_json = self._get_request(BASE_PATH + "/me")
+        me_json = self._get_request("/me")
 
         return User(**me_json)
 
@@ -232,7 +276,7 @@ class Client:
         list
             A list of modio.Mod instances representing all mods the user is subscribed to
         """
-        mod_json = self._get_request(BASE_PATH + "/me/subscribed", **fields)
+        mod_json = self._get_request("/me/subscribed", **fields)
 
         mod_list = list()
         for mod in mod_json["data"]:
@@ -254,7 +298,7 @@ class Client:
         list
             A list of modio.Game instances representing all games the user is added or is team member of
         """
-        game_json = self._get_request(BASE_PATH + "/me/games", **fields)
+        game_json = self._get_request("/me/games", **fields)
 
         game_list = list()
         for game in game_json["data"]:
@@ -276,7 +320,7 @@ class Client:
         list
             A list of modio.Mod instances representing all mods the user is added or is team member of
         """
-        mod_json = self._get_request(BASE_PATH + "/me/mods", **fields)
+        mod_json = self._get_request("/me/mods", **fields)
 
         mod_list = list()
         for mod in mod_json["data"]:
@@ -298,7 +342,7 @@ class Client:
         list
             A list of modio.MeModFile instances representing all modfiles the user added.
         """
-        files_json = self._get_request(BASE_PATH + "/me/files", **fields)
+        files_json = self._get_request("/me/files", **fields)
 
         file_list = list()
         for file in files_json["data"]:
@@ -322,7 +366,7 @@ class Client:
           'Content-Type': "application/x-www-form-urlencoded"
         }
 
-        r = requests.post(BASE_PATH + "/oauth/emailrequest", params={
+        r = requests.post(self.BASE_PATH + "/oauth/emailrequest", params={
           'api_key': self.api_key,
           'email' : email
         }, headers = headers)
@@ -358,12 +402,12 @@ class Client:
         if len(code) != 5:
             raise ValueError("Security code must be 5 digits")
 
-        r = requests.post(BASE_PATH + "/oauth/emailexchange", params={
+        r = requests.post(self.BASE_PATH + "/oauth/emailexchange", params={
           'api_key': self.api_key,
           'security_code' : code
         }, headers = headers)
 
-        r = **self._error_check(r)
+        r = self._error_check(r)
         self.access_token = r["access_token"]
 
         return r["access_token"]
@@ -418,7 +462,7 @@ class Client:
         if fields["resource"] not in ["games", "mods", "users"]:
             raise modioException("You cannot report this type of resources")
 
-        r = requests.post(BASE_PATH + '/report', data = fields, headers = headers)
+        r = requests.post(self.BASE_PATH + '/report', data = fields, headers = headers)
 
         return Message(**self._error_check(r))
         

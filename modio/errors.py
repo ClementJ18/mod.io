@@ -39,4 +39,4 @@ class UnprocessableEntity(modioException):
 
 class TooManyRequests(modioException):
     def __init__(self, msg, retry):
-        super().__init__("{} Retry in {} seconds.".format(msg, retry))
+        super().__init__("{}. Slept for {}".format(msg, retry))

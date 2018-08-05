@@ -1,12 +1,10 @@
 import requests
 from math import sqrt
-import json
 import time
 
 from .utils import find
 from .objects import *
 from .errors import *
-BASE_PATH = "https://api.test.mod.io/v1"
 
 class Mod:
     def __init__(self, client, **attrs):
@@ -42,11 +40,11 @@ class Mod:
         self.tags = tags_list
 
     def get_file(self, id : int):
-        file_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/files/{}".format(self.game_id, self.id, id))
+        file_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/files/{id}")
         return ModFile(**file_json, game_id=self.game_id, client=self.client)
 
     def get_files(self, **fields):
-        files_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/files".format(self.game_id, self.id), **fields)
+        files_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/files", **fields)
 
         file_list = list()
         for file in files_json["data"]:
@@ -55,7 +53,7 @@ class Mod:
         return file_list
 
     def get_events(self, **fields):
-        event_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/events".format(self.game_id, self.id), **fields)
+        event_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/events", **fields)
 
         event_list = list()
         for event in event_json["data"]:
@@ -64,7 +62,7 @@ class Mod:
         return event_list
 
     def get_tags(self, **fields): #in common with game obj
-        tag_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/tags".format(self.game_id, self.id), **fields)
+        tag_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/tags", **fields)
 
         tags_list = list()
         for tag_option in tag_json["data"]:
@@ -73,7 +71,7 @@ class Mod:
         return tags_list
 
     def get_meta(self):
-        meta_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/metadatakvp".format(self.game_id, self.id))
+        meta_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/metadatakvp")
 
         meta_list = list()
         for meta in meta_json["data"]:
@@ -82,7 +80,7 @@ class Mod:
         return meta_list
 
     def get_dependencies(self, **fields):
-        depen_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/dependencies".format(self.game_id, self.id), **fields)
+        depen_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/dependencies", **fields)
 
         depen_list = list()
         for dependecy in depen_json["data"]:
@@ -91,7 +89,7 @@ class Mod:
         return depen_list
 
     def get_team(self):
-        team_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/team".format(self.game_id, self.id))
+        team_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/team")
 
         team_list = list()
         for member in team_json["data"]:
@@ -100,7 +98,7 @@ class Mod:
         return team_list
 
     def get_comments(self, **fields):
-        comment_json = self.client._get_request(BASE_PATH + "/games/{}/mods/{}/comments".format(self.game_id, self.id), **fields)
+        comment_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/comments", **fields)
 
         comment_list = list()
         for comment in comment_json["data"]:
@@ -118,7 +116,7 @@ class Mod:
         if all(item in self.__dict__.items() for item in fields.items()):
             return self
 
-        r = requests.put(BASE_PATH + '/games/{}/mods/{}'.format(self.game_id, self.id), data = fields, headers = headers)
+        r = requests.put(f'/games/{self.game_id}/mods/{self.id}', data = fields, headers = headers)
 
         return Mod(self.client, **self.client._error_check(r))
 
@@ -129,14 +127,14 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.delete(BASE_PATH + '/games/{}/mods/{}'.format(self.game_id, self.id), headers = headers)
+        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}', headers = headers)
 
         return self.client._error_check(r)
 
     def add_file(self, file):
         headers = {
           'Authorization': 'Bearer ' + self.client.access_token,
-          'Accept': 'application/json',
+          'Accept': 'application/json'
         }
 
         if not isinstance(file, NewFile):
@@ -144,7 +142,7 @@ class Mod:
 
         file_d = file.__dict__
         files = {"filedata" : file_d.pop("file")}
-        r = requests.post(BASE_PATH + '/games/{}/mods/{}/files'.format(self.game_id, self.id), data = file_d, files=files, headers = headers)
+        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/files', data = file_d, files=files, headers = headers)
 
         return ModFile(**self.client._error_check(r))
 
@@ -154,7 +152,7 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.post(BASE_PATH + '/games/{}/mods/{}/media'.format(self.game_id, self.id), files = fields, headers = headers)
+        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/media', files = fields, headers = headers)
 
         return Message(**self.client._error_check(r))
 
@@ -165,12 +163,8 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/media'.format(self.game_id, self.id), headers = headers)
-
-        try:
-            r = self.client._error_check(r)
-        except json.JSONDecodeError:
-            pass
+        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/media', headers = headers)
+        r = self.client._error_check(r)
 
         return r
 
@@ -181,7 +175,7 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.post(BASE_PATH + '/games/{}/mods/{}/subscribe'.format(self.game_id, self.id), headers = headers)
+        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/subscribe', headers = headers)
 
         return Mod(self.client, **self.client._error_check(r))
 
@@ -192,13 +186,8 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/subscribe'.format(self.game_id, self.id), headers = headers)
-
-        try:
-            r = self.client._error_check(r)
-        except json.JSONDecodeError:
-            pass
-
+        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/subscribe', headers = headers)
+        r = self.client._error_check(r)
         return r
 
     def add_tags(self, *tags):
@@ -210,9 +199,9 @@ class Mod:
 
         fields = dict()
         for tag in tags:
-            fields["tags[{}]".format(tags.index(tag))] = tag
+            fields[f"tags[{tags.index(tag)}]"] = tag
 
-        r = requests.post(BASE_PATH + '/games/{}/mods/{}/tags'.format(self.game_id, self.id), data = fields, headers = headers)
+        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/tags', data = fields, headers = headers)
 
         message = self.client._error_check(r)
         for tag in tags:
@@ -229,14 +218,10 @@ class Mod:
 
         fields = dict()
         for tag in tags:
-            fields["tags[{}]".format(tags.index(tag))] = tag
+            fields[f"tags[{tags.index(tag)}]"] = tag
 
-        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/tags'.format(self.game_id, self.id), data = fields, headers = headers)
-
-        try:
-            r = self.client._error_check(r)
-        except json.JSONDecodeError:
-            pass
+        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/tags', data = fields, headers = headers)
+        r = self.client._error_check(r)
 
         for mod_tag in self.tags:
             if mod_tag.name in tags:
@@ -264,7 +249,7 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.post(BASE_PATH + '/games/{}/mods/{}/rating'.format(self.game_id, self.id), data={"rating":rating}, headers=headers)
+        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/rating', data={"rating":rating}, headers=headers)
 
         checked = self.client._error_check(r)
         self.rating_summary.total_rating += 1
@@ -292,7 +277,7 @@ class Mod:
             metadata["metadata[{}]".format(index)] = "{}:{}".format(data, fields[data])
             index += 1
 
-        r = requests.post(BASE_PATH + '/games/{}/mods/{}/metadatakvp'.format(self.game_id, self.id), data=metadata, headers=headers)
+        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', data=metadata, headers=headers)
         checked = self.client._error_check(r)
             
         return Message(**checked)
@@ -310,12 +295,8 @@ class Mod:
             metadata[f"metadata[{index}]"] = f"{data}:{fields[data]}"
             index += 1
 
-        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/metadatakvp'.format(self.game_id, self.id), data=metadata, headers=headers)
-
-        try:
-            r = self.client._error_check(r)
-        except json.JSONDecodeError:
-            pass
+        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', data=metadata, headers=headers)
+        r = self.client._error_check(r)
 
         return r
 
@@ -333,7 +314,7 @@ class Mod:
         #     for data in depend:
         #         dependecy["dependencies[{}]".format(depend.index(data))] = data
 
-        #     r = requests.post(BASE_PATH + '/games/{}/mods/{}/dependencies'.format(self.game_id, self.id), data=dependecy, headers=headers)
+        #     r = requests.post('/games/{self.game_id}/mods/{self.id}/dependencies'.format(self.game_id, self.id), data=dependecy, headers=headers)
         #     self.client._error_check(r)
 
         # return "all good"
@@ -343,9 +324,9 @@ class Mod:
 
         dependecy = dict()
         for data in dependencies:
-            dependecy["dependencies[{}]".format(dependencies.index(data))] = data
+            dependecy[f"dependencies[{dependencies.index(data)}]"] = data
 
-        r = requests.post(BASE_PATH + '/games/{}/mods/{}/dependencies'.format(self.game_id, self.id), data=dependecy, headers=headers)
+        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy, headers=headers)
 
         return Message(**self.client._error_check(r))
 
@@ -361,12 +342,8 @@ class Mod:
         for data in dependencies:
             dependecy[f"dependencies[{dependencies.index(data)}]"] = data
 
-        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/dependencies'.format(self.game_id, self.id), data=dependecy, headers=headers)
-
-        try:
-            r = self.client._error_check(r)
-        except json.JSONDecodeError:
-            pass
+        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy, headers=headers)
+        r = self.client._error_check(r)
 
         return r
 
@@ -377,7 +354,7 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.post(BASE_PATH + '/games/{}/mods/{}/team'.format(self.game_id, self.id), data=fields, headers=headers)
+        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/team', data=fields, headers=headers)
 
         return Message(**self.client._error_check(r))
 
@@ -390,7 +367,7 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.put(BASE_PATH + '/games/{}/mods/{}/team/{}'.format(self.game_id, self.id, id), data=fields, headers=headers)
+        r = requests.put(f'/games/{self.game_id}/mods/{self.id}/team/{id}', data=fields, headers=headers)
 
         return Message(**self.client._error_check(r))
 
@@ -401,12 +378,8 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/team/{}'.format(self.game_id, self.id, id), headers=headers)
-
-        try:
-            r = self.client._error_check(r)
-        except json.JSONDecodeError:
-            pass
+        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/team/{id}', headers=headers)
+        r = self.client._error_check(r)
 
         return r
 
@@ -417,11 +390,7 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        r = requests.delete(BASE_PATH + '/games/{}/mods/{}/comments/{}'.format(self.game_id, self.id, id), headers=headers)
-
-        try:
-            r = self.client._error_check(r)
-        except json.JSONDecodeError:
-            pass
+        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/comments/{id}', headers=headers)
+        r = self.client._error_check(r)
 
         return r
