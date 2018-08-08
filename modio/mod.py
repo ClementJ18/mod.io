@@ -1,4 +1,3 @@
-import requests
 from math import sqrt
 import time
 
@@ -7,187 +6,181 @@ from .objects import *
 from .errors import *
 
 class Mod:
+    """Represent a modio mod object.
+
+    Attributes
+    -----------
+    id : int
+        ID of the mod
+    status : int
+        Status of the mod.
+        0 : Not Accepted
+        1 : Accepted
+        2 : Archived (potentially out of date or incompatible)
+        3 : Deleted
+    visible : int
+        Visibility of the mod.
+        0 : Hidden
+        1 : Public
+    game : int
+        ID of the game the mod is for.
+    submitter : modio.User
+        Instance of the modio User that submitted the mod.
+    date_added : int
+        UNIX timestamp of the date the mod was registered
+    date_updated : int
+        UNIX timestamp of the date the mod was last updated
+    date_live : int
+        UNIX timestamp of the date the mod went live
+    logo : modio.Image
+        The mod logo
+    homepage : str
+        Link to the homepage of the mod, can be None.
+    name : str
+        Name of the mod
+    name_id : str
+        sub_domain mod for the game (https://game_name.mod.io/name_id)
+    summary : str
+        Summary of the mod
+    description :str
+        Detailed description of the mod, supports HTML.
+    metadata : str
+        Metadata stored by developers which may include properties on how information 
+        required. Can be None.
+    maturity : int
+        Maturity option of the mod. 
+        0 : None
+        1 : Alcohol
+        2 : Drugs
+        4 : Violence
+        8 : Explicit
+        ? : Above options can be added together to create custom settings (e.g 3 : 
+        alcohol and drugs present)
+    profile : str
+        URL of the mod's modio profile
+    file : modio.ModFile
+        Latest release instance
+    media : modio.ModMedia
+        Contains mod media data (links and images)
+    rating : modio.RatingSummary
+        Summary of all rating for this mod
+    tags : modio.ModTag
+        Tags for this mod.
+
+    """
     def __init__(self, client, **attrs):
-        self.id = attrs.pop("id", None)
-        self.status = attrs.pop("status", None)
-        self.visiable = attrs.pop("visible", None)
-        self.game_id = attrs.pop("game_id", None)
-        self.submitter = User(**attrs.pop("submitted_by", None))
-        self.date_added = attrs.pop("date_added", None)
-        self.date_updated = attrs.pop("date_updated", None)
-        self.date_live = attrs.pop("date_live", None)
-        self.logo = Image(**attrs.pop("logo", None))
+        self.id = attrs.pop("id")
+        self.status = attrs.pop("status")
+        self.visible = attrs.pop("visible")
+        self.game = attrs.pop("game_id")
+        self.submitter = User(**attrs.pop("submitted_by"))
+        self.date_added = attrs.pop("date_added")
+        self.date_updated = attrs.pop("date_updated")
+        self.date_live = attrs.pop("date_live")
+        self.logo = Image(**attrs.pop("logo"))
         self.homepage = attrs.pop("homepage_url", None)
-        self.name = attrs.pop("name", None)
-        self.name_id = attrs.pop("name_id", None)
-        self.summary = attrs.pop("summary", None)
-        self.description = attrs.pop("description", None)
-        self.metadata_blob = attrs.pop("metadata_blob", None)
-        self.profile_url = attrs.pop("profile_url", None)
-        self.modfile = ModFile(**attrs.pop("modfile", None), game_id=self.game_id, client=client)
-        self.media = ModMedia(**attrs.pop("media", None))
-        self.maturity_options = attrs.pop("maturity_options", None)
+        self.name = attrs.pop("name")
+        self.name_id = attrs.pop("name_id")
+        self.summary = attrs.pop("summary")
+        self.description = attrs.pop("description")
+        self.metadata = attrs.pop("metadata_blob")
+        self.profile = attrs.pop("profile_url")
+        self.file = ModFile(**attrs.pop("modfile"), game_id=self.game_id, client=client)
+        self.media = ModMedia(**attrs.pop("media"))
+        self.maturity = attrs.pop("maturity_options")
 
-        self.rating_summary = RatingSummary(**attrs.pop("rating_summary", None))
+        self.rating = RatingSummary(**attrs.pop("rating_summary"))
         self.client = client
-        
-        tags_list = list()
-        tags = attrs.pop("tags", None)
-        if not tags is None:
-            for tag in tags:
-                tags_list.append(ModTag(**tag))
-
-        self.tags = tags_list
+        self.tags = [ModTag(**tag) for tag in attrs.pop("tags", [])]
 
     def get_file(self, id : int):
+        """Get the Mod File with the following ID
+        
+        Parameters
+        -----------
+        id : int
+            ID of the mod file you wish to retrieve
+
+        Raises
+        -------
+        NotFound
+            A mod with that ID has not been found
+
+        Returns
+        -------
+        ModFile
+            The found modfile
+        """
         file_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/files/{id}")
         return ModFile(**file_json, game_id=self.game_id, client=self.client)
 
     def get_files(self, **fields):
+        """Get all mod files for this mod. Takes filtering arguments
+        
+        Returns
+        --------
+        list[ModFile]
+            List of all modfiles for this mod
+        """
         files_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/files", **fields)
-
-        file_list = list()
-        for file in files_json["data"]:
-            file_list.append(ModFile(**file, game_id=self.game_id, client=self.client))
-
-        return file_list
+        return [ModFile(**file, game_id=self.game_id, client=self.client) for file in files_json["data"]]
 
     def get_events(self, **fields):
         event_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/events", **fields)
-
-        event_list = list()
-        for event in event_json["data"]:
-            event_list.append(Event(**event))
-
-        return event_list
+        return [Event(**event) for event in event_json["data"]]
 
     def get_tags(self, **fields): #in common with game obj
         tag_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/tags", **fields)
-
-        tags_list = list()
-        for tag_option in tag_json["data"]:
-            tags_list.append(ModTag(**tag_option))
-
-        return tags_list
+        return [ModTag(**tag) for tag in tag_json["data"]]
 
     def get_meta(self):
         meta_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/metadatakvp")
-
-        meta_list = list()
-        for meta in meta_json["data"]:
-            meta_list.append(MetaData(**meta))
-
-        return meta_list
+        return {meta["key"] : meta["value"] for meta in meta_json["data"]}
 
     def get_dependencies(self, **fields):
         depen_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/dependencies", **fields)
-
-        depen_list = list()
-        for dependecy in depen_json["data"]:
-            depen_list.append(ModDependencies(**dependecy))
-
-        return depen_list
+        return {dependecy["mod_id"] : dependecy["date_added"] for dependecy in depen_json["data"]}
 
     def get_team(self):
         team_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/team")
-
-        team_list = list()
-        for member in team_json["data"]:
-            team_list.append(TeamMember(**member))
-
-        return team_list
+        return [TeamMember(**member) for member in team_json["data"]]
 
     def get_comments(self, **fields):
         comment_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/comments", **fields)
-
-        comment_list = list()
-        for comment in comment_json["data"]:
-            comment_list.append(Comment(**comment))
-
-        return comment_list
+        return [Comment(**comment) for comment in comment_json["data"]]
 
     def edit(self, **fields):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        if all(item in self.__dict__.items() for item in fields.items()):
-            return self
-
-        r = requests.put(f'/games/{self.game_id}/mods/{self.id}', data = fields, headers = headers)
-
-        return Mod(self.client, **self.client._error_check(r))
+        mod_json = self.client._put_request(f'/games/{self.game_id}/mods/{self.id}', h_type = 0, data = fields)
+        return self.__init__(self.client, **mod_json)
 
     def delete(self):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}', headers = headers)
-
-        return self.client._error_check(r)
+        r =self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}', h_type = 0)
+        return r
 
     def add_file(self, file):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Accept': 'application/json'
-        }
-
         if not isinstance(file, NewFile):
             raise modioException("mod argument must be type modio.NewFile")
 
         file_d = file.__dict__
         files = {"filedata" : file_d.pop("file")}
-        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/files', data = file_d, files=files, headers = headers)
+        file_json = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/files', h_type = 1, data = file_d, files=files)
 
-        return ModFile(**self.client._error_check(r))
+        return ModFile(**file_json)
 
     def add_media(self, **fields):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Accept': 'application/json'
-        }
-
-        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/media', files = fields, headers = headers)
-
-        return Message(**self.client._error_check(r))
+        media_json = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/media', h_type = 1, files = fields)
+        return Message(**media_json)
 
     def delete_media(self):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/media', headers = headers)
-        r = self.client._error_check(r)
-
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/media', h_type = 0)
         return r
 
     def subscribe(self):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/subscribe', headers = headers)
-
-        return Mod(self.client, **self.client._error_check(r))
+        mod_json = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/subscribe', h_type = 0)
+        return Mod(self.client, **mod_json)
 
     def unsubscribe(self):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/subscribe', headers = headers)
-        r = self.client._error_check(r)
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/subscribe', h_type = 0)
         return r
 
     def add_tags(self, *tags):
@@ -197,31 +190,22 @@ class Mod:
           'Accept': 'application/json'
         }
 
-        fields = dict()
+        fields = {}
         for tag in tags:
             fields[f"tags[{tags.index(tag)}]"] = tag
 
-        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/tags', data = fields, headers = headers)
-
-        message = self.client._error_check(r)
+        message = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/tags', h_type = 0, data = fields)
         for tag in tags:
-            self.tags.append(ModTag(name=tag, date_added=int(time.time())))
+            self.tags.append(ModTag(name=tag, date_added=time.time()))
 
         return Message(**message)
 
-    def del_tags(self, *tags):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        fields = dict()
+    def del_tags(self, tags):
+        fields = {}
         for tag in tags:
             fields[f"tags[{tags.index(tag)}]"] = tag
 
-        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/tags', data = fields, headers = headers)
-        r = self.client._error_check(r)
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/tags', h_type = 0, data = fields)
 
         for mod_tag in self.tags:
             if mod_tag.name in tags:
@@ -243,15 +227,8 @@ class Mod:
         if not rating == 1 or not rating == -1:
             raise modioException("rating is an argument that can only be 1 or -1")
 
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
+        checked = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/rating',  h_type=0, data={"rating":rating})
 
-        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/rating', data={"rating":rating}, headers=headers)
-
-        checked = self.client._error_check(r)
         self.rating_summary.total_rating += 1
         if rating == 1:
             self.rating_summary.positive_ratings += 1
@@ -265,48 +242,27 @@ class Mod:
         return Message(**checked)
 
     def add_meta(self, **fields):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        metadata = dict()
+        metadata = {}
         index = 0
         for data in fields:
             metadata["metadata[{}]".format(index)] = "{}:{}".format(data, fields[data])
             index += 1
 
-        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', data=metadata, headers=headers)
-        checked = self.client._error_check(r)
+        checked = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', h_type=0, data=metadata)
             
         return Message(**checked)
 
     def del_meta(self, **fields):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        metadata = dict()
+        metadata = {}
         index = 0
         for data in fields:
             metadata[f"metadata[{index}]"] = f"{data}:{fields[data]}"
             index += 1
 
-        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', data=metadata, headers=headers)
-        r = self.client._error_check(r)
-
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', h_type=0, data=metadata)
         return r
 
     def add_depen(self, dependencies : list):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
         #to add more than 5 depen at a time
         # composite_list = [dependencies[x:x+5] for x in range(0, len(dependencies)-5, 5)]
         # for depend in composite_list:
@@ -314,7 +270,7 @@ class Mod:
         #     for data in depend:
         #         dependecy["dependencies[{}]".format(depend.index(data))] = data
 
-        #     r = requests.post('/games/{self.game_id}/mods/{self.id}/dependencies'.format(self.game_id, self.id), data=dependecy, headers=headers)
+        #     r = self.client._post_request('/games/{self.game_id}/mods/{self.id}/dependencies'.format(self.game_id, self.id), data=dependecy, h_type=0)
         #     self.client._error_check(r)
 
         # return "all good"
@@ -322,75 +278,35 @@ class Mod:
         if len(dependencies) > 5:
             raise modioException("You can only submit 5 dependencies at a time")
 
-        dependecy = dict()
+        dependecy = {}
         for data in dependencies:
             dependecy[f"dependencies[{dependencies.index(data)}]"] = data
 
-        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy, headers=headers)
+        msg = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', h_type=0, data=dependecy)
 
-        return Message(**self.client._error_check(r))
+        return Message(**msg)
 
 
     def del_depen(self, dependencies : list):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
         dependecy = dict()
         for data in dependencies:
             dependecy[f"dependencies[{dependencies.index(data)}]"] = data
 
-        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy, headers=headers)
-        r = self.client._error_check(r)
-
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', h_type=0, data=dependecy)
         return r
 
     def add_team_member(self, **fields):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        r = requests.post(f'/games/{self.game_id}/mods/{self.id}/team', data=fields, headers=headers)
-
-        return Message(**self.client._error_check(r))
-
-
+        msg = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/team', h_type=0, data=fields)
+        return Message(**msg)
 
     def update_team_member(self, **fields):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        r = requests.put(f'/games/{self.game_id}/mods/{self.id}/team/{id}', data=fields, headers=headers)
-
-        return Message(**self.client._error_check(r))
+        msg = self.client._put_request(f'/games/{self.game_id}/mods/{self.id}/team/{fields.pop("id")}', h_type=0, data=fields)
+        return Message(**msg)
 
     def del_team_member(self, id : int):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/team/{id}', headers=headers)
-        r = self.client._error_check(r)
-
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/team/{id}', h_type=0)
         return r
 
     def del_comment(self, id):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
-        r = requests.delete(f'/games/{self.game_id}/mods/{self.id}/comments/{id}', headers=headers)
-        r = self.client._error_check(r)
-
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/comments/{id}', h_type=0)
         return r
