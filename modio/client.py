@@ -21,6 +21,11 @@ class Client:
         POST requests. This can either be generated using the library's oauth2 functions
         or through the mod.io website. This is referred as an access token in the rest of
         the documentation.
+    lang : Optional[str]
+        The mod.io API provides localization for a collection of languages. To specify 
+        responses from the API to be in a particular language, simply provide the lang 
+        parameter with an ISO 639 compliant language code. Else the language of the authenticated
+        user will be used, default is US English.
 
     Attributes
     -----------
@@ -39,6 +44,7 @@ class Client:
     def __init__(self, **fields):
         self.api_key = fields.pop("api_key")
         self.access_token = fields.pop("auth", None)
+        self.lang = fields.pop("lang", "en")
         self.rate_limit = None
         self.rate_remain = None
         self.rate_retry = None
@@ -102,25 +108,27 @@ class Client:
     def _get_request(self, url, **fields):
         """Contains the code for basic GET request. Adapts the given search terms to 
         fit the API requirements."""
-        extra = dict()
-        if "limit" in fields:
-            extra["_limit"] = int(fields.pop("limit"))
+        # extra = dict()
+        # if "limit" in fields:
+        #     extra["_limit"] = int(fields.pop("limit"))
 
-        if "offset" in fields:
-            extra["_offset"] = int(fields.pop("offset"))
+        # if "offset" in fields:
+        #     extra["_offset"] = int(fields.pop("offset"))
 
-        if "name" in fields:
-            extra["_q"] = fields.pop("name")
+        # if "name" in fields:
+        #     extra["_q"] = fields.pop("name")
 
-        if "sort" in fields:
-            extra["_sort"] = fields.pop("sort")
+        # if "sort" in fields:
+        #     extra["_sort"] = fields.pop("sort")
 
-        fields = {k.replace("_", "-") : v for k, v in fields.items()}
-        extra = {**extra, **fields}
+        # fields = {k.replace("_", "-") : v for k, v in fields.items()}
+        # extra = {**extra, **fields}
+        extra = fields.pop("filter", Filter()).__dict__
 
         if self.access_token is None:
             headers = {
-              'Accept': 'application/json'
+              'Accept': 'application/json',
+              'Accept-Language': self.lang
             }
 
             r = requests.get(url, params={
@@ -130,7 +138,8 @@ class Client:
         else:
             headers = {
               'Accept': 'application/json',
-              'Authorization': "Bearer " + self.access_token
+              'Authorization': "Bearer " + self.access_token,
+              'Accept-Language': self.lang
             }
 
             r = requests.get(self.BASE_PATH + url, 
@@ -144,18 +153,21 @@ class Client:
             headers = {
               'Authorization': 'Bearer ' + self.access_token,
               'Content-Type': 'application/x-www-form-urlencoded',
-              'Accept': 'application/json'
+              'Accept': 'application/json',
+              'Accept-Language': self.lang
             }
         elif h_type == 1:
             headers = {
               'Authorization': 'Bearer ' + self.access_token,
-              'Accept': 'application/json'
+              'Accept': 'application/json',
+              'Accept-Language': self.lang
             }
         else:
             headers = {
               'Authorization': 'Bearer ' + self.access_token,
               'Accept': 'application/json',
-              'Content-Type': 'multipart/form-data'
+              'Content-Type': 'multipart/form-data',
+              'Accept-Language': self.lang
             }
 
         return headers

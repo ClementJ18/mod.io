@@ -89,7 +89,7 @@ class Mod:
         self.media = ModMedia(**attrs.pop("media"))
         self.maturity = attrs.pop("maturity_options")
 
-        self.rating = RatingSummary(**attrs.pop("rating_summary"))
+        self.rating = RatingSummary(**attrs.pop("rating"))
         self.client = client
         self.tags = [ModTag(**tag) for tag in attrs.pop("tags", [])]
 
@@ -126,6 +126,14 @@ class Mod:
         return [ModFile(**file, game_id=self.game_id, client=self.client) for file in files_json["data"]]
 
     def get_events(self, **fields):
+        """Get all events for that mod sorted by latest. Takes filtering arguments.
+
+        Returns
+        --------
+        list[Events]
+            List of all the events for this mod
+
+        """
         event_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/events", **fields)
         return [Event(**event) for event in event_json["data"]]
 
@@ -184,12 +192,6 @@ class Mod:
         return r
 
     def add_tags(self, *tags):
-        headers = {
-          'Authorization': 'Bearer ' + self.client.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
         fields = {}
         for tag in tags:
             fields[f"tags[{tags.index(tag)}]"] = tag
@@ -229,14 +231,14 @@ class Mod:
 
         checked = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/rating',  h_type=0, data={"rating":rating})
 
-        self.rating_summary.total_rating += 1
+        self.rating.total += 1
         if rating == 1:
-            self.rating_summary.positive_ratings += 1
+            self.rating.positive += 1
         else:
-            self.rating_summary.negative_ratings += 1
+            self.rating.negative += 1
 
-        self.rating_summary.percentage_positive = int((self.rating_summary.positive_ratings / self.rating_summary.total_rating)*100)
-        self.rating_summary.weighted_aggregate = confidence(self.rating_summary.positive_ratings, self.rating_summary.negative_ratings)
+        self.rating.percentage = int((self.rating.positive / self.rating.total)*100)
+        self.rating.weighted = confidence(self.rating.positive, self.rating.negative)
         #need to recalculate mod message
 
         return Message(**checked)
@@ -245,7 +247,7 @@ class Mod:
         metadata = {}
         index = 0
         for data in fields:
-            metadata["metadata[{}]".format(index)] = "{}:{}".format(data, fields[data])
+            metadata[f"metadata[{index}]"] = f"{data}:{fields[data]}"
             index += 1
 
         checked = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', h_type=0, data=metadata)
@@ -268,9 +270,9 @@ class Mod:
         # for depend in composite_list:
         #     dependecy = dict()
         #     for data in depend:
-        #         dependecy["dependencies[{}]".format(depend.index(data))] = data
+        #         dependecy[f"dependencies[{depend.index(data)}]"] = data
 
-        #     r = self.client._post_request('/games/{self.game_id}/mods/{self.id}/dependencies'.format(self.game_id, self.id), data=dependecy, h_type=0)
+        #     r = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy, h_type=0)
         #     self.client._error_check(r)
 
         # return "all good"

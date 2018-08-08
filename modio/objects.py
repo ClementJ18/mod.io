@@ -535,6 +535,182 @@ class NewFile:
 
         return self
 
+class Filter:
+    """This class is unique to the library and is an attempt to make filtering
+    modio data easier. Instead of passing filter keywords directly you can pass
+    an instance of this class which you have previously fine tuned through the
+    various methods. For advanced users it is also possible to pass filtering
+    arguments directly to the class given that they are already in modio format.
+    If you don't know the modio format simply use the methods, all method return
+    self for fluid chaining. This is also used for sorting and pagination.
+
+    Parameters
+    ----------
+    filter : dict
+        A dict which contains modio filter keyword and the appropriate value.
+
+    """
+    def __init__(self, filter={}):
+        for key, value in filter:
+            self.__setattr__(key, value)
+
+    def text(self, query):
+        """Full-text search is a lenient search filter that is only available if
+        the endpoint you are querying contains a name column.
+
+        Parameters
+        -----------
+        query : str
+            The words to identify. filter.text("The Lord of the Rings") - This will return every 
+            result where the name column contains any of the following words: 'The', 
+            'Lord', 'of', 'the', 'Rings'.
+
+        """
+        self._q = query
+        return self
+
+    def equals(self, **kwargs):
+        """The simpliest filter you can apply is columnname equals. This will return all rows which 
+        contain a column matching the value provided. There are not set parameters, this methods takes
+        any named keywords and transforms them into arguments that will be passed to the request. E.g.
+        'id=10' or 'name="Best Mod"'
+        """
+        for key, value in kwargs:
+            self.__setattr__(key, value)
+        return self
+
+    def not_equals(self, **kwargs):
+        """Where the preceding column value does not equal the value specified. There are not set parameters, 
+        this methods takes any named keywords and transforms them into arguments that will be passed to 
+        the request. E.g. 'id=10' or 'name="Best Mod"'
+        """
+        for key, value in kwargs:
+            self.__setattr__(f"{key}-not", value)
+        return self
+
+    def like(self, **kwargs):
+        """Where the string supplied matches the preceding column value. This is equivalent to SQL's LIKE. 
+        Consider using wildcard's * for the best chance of results as described below. There are not set parameters, 
+        this methods takes any named keywords and transforms them into arguments that will be passed to 
+        the request. E.g. 'id=10' or 'name="Best Mod"'
+        """
+        for key, value in kwargs:
+            self.__setattr__(f"{key}-lk", value)
+        return self
+
+    def not_like(self, **kwargs):
+        """Where the string supplied does not match the preceding column value. This is equivalent to SQL's 
+        NOT LIKE. This is equivalent to SQL's LIKE. Consider using wildcard's * for the best chance of results 
+        as described below. There are not set parameters, this methods takes any named keywords and transforms 
+        them into arguments that will be passed to the request. E.g. 'id=10' or 'name="Best Mod"'
+        """
+        for key, value in kwargs:
+            self.__setattr__(f"{key}-not-lk", value)
+        return self
+
+    def in_text(self, **kwargs):
+        """Where the supplied list of values appears in the preceding column value. This is equivalent 
+        to SQL's IN. There are not set parameters, this methods takes any named keywords and transforms 
+        them into arguments that will be passed to the request. E.g. 'id=10' or 'name="Best Mod"
+        """
+        for key, value in kwargs:
+            self.__setattr__(f"{key}-in", value)
+        return self
+
+    def not_in_text(self, **kwargs):
+        """Where the supplied list of values does not equal the preceding column value. This is equivalent 
+        to SQL's NOT IN. There are not set parameters, this methods takes any named keywords and transforms 
+        them into arguments that will be passed to the request. E.g. 'id=10' or 'name="Best Mod"
+        """
+        for key, value in kwargs:
+            self.__setattr__(f"{key}-not-in", value)
+        return self
+
+    def max(self, **kwargs):
+        """Where the preceding column value is smaller than or equal to the value specified. There are not set 
+        parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
+        to the request. E.g. 'game=40'
+        """
+        for key, value in kwargs:
+            self.__setattr__(f"{key}-max", value)
+        return self
+
+    def min(self, **kwargs):
+        """Where the preceding column value is greater than or equal to the value specified. There are not set 
+        parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
+        to the request. E.g. 'game=40'
+        """
+        for key, value in kwargs:
+            self.__setattr__(f"{key}-min", value)
+        return self
+
+    def smaller_than(self, **kwargs):
+        """Where the preceding column value is smaller than the value specified. There are not set 
+        parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
+        to the request. E.g. 'game=40'
+        """
+        for key, value in kwargs:
+            self.__setattr__(f"{key}-st", value)
+        return self
+
+    def greater_than(self, **kwargs):
+        """Where the preceding column value is greater than the value specified. There are not set 
+        parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
+        to the request. E.g. 'game=40'
+        """
+        for key, value in kwargs:
+            self.__setattr__(f"{key}-gt", value)
+        return self
+
+    def bitwise(self, **kwargs):
+        """Some columns are stored as bits within an integer. You can combine any number of options for the column
+        of the object you are querying. This is dependent on which item is being queried. These can be added together
+        to check for multiple options at once. E.g if Option A: 1 and Option B: 2 then submitting 3 will return items
+        that have both option A and B enabled.
+        """
+        for key, value in kwargs:
+            self.__setattr__(f"{key}-bitwise-and", value)
+        return self
+
+    def sort(self, key, reverse=False):
+        """Allows you to sort the results by the value of a top level column with a single value.
+
+        Paramters
+        ----------
+        key : str
+            The column by which to sort the results
+        reverse : bool
+            Optional, defaults to False. Whether to sort by ascending (False) or descending (True)
+            order.
+
+        """
+        self._sort = text if not reverse else f"-{text}"
+        return self
+
+    def limit(self, limit):
+        """Allows to limit the amount of results returned per query.
+
+        Parameters
+        -----------
+        limit : int
+            Limit of returned results for the query
+        """
+        self._limit = limit
+        return self
+
+    def offset(self, offset):
+        """Allows to offset the first result by a certain amount.
+
+        Paramters
+        ----------
+        offset : int
+            The number of results to skip.
+        """
+        self._offset = offset
+        return self
+
+
+
 class Object:
     """A dud class that can be used to replace other classes, keyword arguments
     passed will become attributes.
