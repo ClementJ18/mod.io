@@ -107,12 +107,12 @@ class Game:
         self.homepage = attrs.pop("homepage", None)
         self.name = attrs.pop("name")
         self.name_id = attrs.pop("name_id")
-        self.summary = attrs.pop("summary", None)
+        self.summary = attrs.pop("summary")
         self.instructions = attrs.pop("instructions", None)
         self.instructions_url = attrs.pop("instructions_url", None)
-        self.profile_url = attrs.pop("profile_url", None)
+        self.profile_url = attrs.pop("profile_url")
         self.tag_options = [GameTag(**tag) for tag in attrs.pop("tag_options", [])]
-        self.maturity = attrs.pop("maturity_options", None)
+        self.maturity = attrs.pop("maturity_options")
         self.client = client
 
     def __str__(self):
@@ -262,6 +262,8 @@ class Game:
         -------
         modioException
             Not instance of modio.NewMod or submissions from 3rd party disabled
+        ValueError
+            One of the requirements for a parameter has not been met.
 
         Returns
         --------

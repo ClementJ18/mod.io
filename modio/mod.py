@@ -17,7 +17,7 @@ class Mod:
         self.date_updated = attrs.pop("date_updated", None)
         self.date_live = attrs.pop("date_live", None)
         self.logo = Image(**attrs.pop("logo", None))
-        self.homepage = attrs.pop("homepage", None)
+        self.homepage = attrs.pop("homepage_url", None)
         self.name = attrs.pop("name", None)
         self.name_id = attrs.pop("name_id", None)
         self.summary = attrs.pop("summary", None)

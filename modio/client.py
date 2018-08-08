@@ -32,8 +32,8 @@ class Client:
         rejected and the library will sleep until the limit resets then raise 429 TooManyRequests. 
         Is None until first request is made
     rate_retry : int
-        Number of minutes until the rate limits are reset for this API Key/access token.
-        Is None until the rate_remain is 0. 
+        Number of seconds until the rate limits are reset for this API Key/access token.
+        Is None until the rate_remain is 0 and become None again once the rate limit is reset. 
     """
 
     def __init__(self, **fields):
@@ -43,6 +43,19 @@ class Client:
         self.rate_remain = None
         self.rate_retry = None
         self.BASE_PATH = "https://api.test.mod.io/v1"
+
+        #check o auth 2 token
+        if self.access_token:
+            try:
+                self.get_me()
+            except Forbidden:
+                raise Forbidden("O Auth 2 token invalid")
+
+        #check api key
+        try:
+            self.get_games()
+        except Forbidden:
+            raise Forbidden("API key invalid")
 
     def _error_check(self, r):
         """Updates the rate-limit attributes and check validity of the request."""
@@ -79,7 +92,7 @@ class Client:
                     errors = None
                 raise UnprocessableEntity(msg, errors)
             elif code == 429:
-                time.sleep(rate_retry)
+                time.sleep(self.rate_retry) #feeble attempt at handling rate limits
                 raise TooManyRequests(msg, self.rate_retry)
             else:
                 raise modioException(msg)
@@ -419,7 +432,7 @@ class Client:
         Parameters
         -----------
         resource : Union[modio.Game, modio.User, modio.Mod, modio.Object]
-            The resource to report, if it is an instnace of a modio.Object it must have an `id`
+            The resource to report, if it is an instance of a modio.Object it must have an `id`
             attribute (the id of the resource) and a `resource_name`  atttribute which can be either 
             'games', 'mods' or 'users'
         type : int
@@ -443,12 +456,6 @@ class Client:
 
 
         """
-        headers = {
-          'Authorization': 'Bearer ' + self.access_token,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-
         resource_name = resource.__class__.__name__.lower()
 
         fields = {
@@ -462,7 +469,7 @@ class Client:
         if fields["resource"] not in ["games", "mods", "users"]:
             raise modioException("You cannot report this type of resources")
 
-        r = requests.post(self.BASE_PATH + '/report', data = fields, headers = headers)
+        msg = self._post_request('/report', h_type = 0, data = fields)
 
-        return Message(**self._error_check(r))
+        return Message(msg)
         
