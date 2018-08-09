@@ -123,13 +123,13 @@ class Client:
         # extra = {**extra, **fields}
         extra = fields.pop("filter", Filter()).__dict__
 
-        if self.access_token is None:
+        if not self.access_token:
             headers = {
               'Accept': 'application/json',
               'Accept-Language': self.lang
             }
 
-            r = requests.get(url, params={
+            r = requests.get(self.BASE_PATH + url, params={
               'api_key': self.api_key,
               **extra
             }, headers = headers)
