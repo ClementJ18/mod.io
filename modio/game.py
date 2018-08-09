@@ -1,7 +1,6 @@
-import requests
 from .mod import Mod
 from .objects import *
-from .errors import *
+from .errors import modioException
 
 class Game:
     """Represents an instance of a modio.Game. Do not create manually.
@@ -115,7 +114,7 @@ class Game:
         self.maturity = attrs.pop("maturity_options")
         self.client = client
 
-    def __str__(self):
+    def __repr__(self):
         return f'<{self.__class__.__name__} id={self.id} name={self.name}>'
 
     def get_mod(self, id : int):

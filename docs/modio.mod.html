@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module modio.mod</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="modio.html"><font color="#ffffff">modio</font></a>.mod</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cclement%5Cdesktop%5Cmod.io%5Cmodio%5Cmod.py">c:\users\clement\desktop\mod.io\modio\mod.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="enum.html">enum</a><br>
+</td><td width="25%" valign=top><a href="hashlib.html">hashlib</a><br>
+</td><td width="25%" valign=top><a href="time.html">time</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="modio.mod.html#Mod">Mod</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Mod">class <strong>Mod</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Represent&nbsp;a&nbsp;modio&nbsp;mod&nbsp;<a href="builtins.html#object">object</a>.<br>
+&nbsp;<br>
+Attributes<br>
+-----------<br>
+id&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;mod<br>
+status&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Status&nbsp;of&nbsp;the&nbsp;mod.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;:&nbsp;Not&nbsp;Accepted<br>
+&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;:&nbsp;Accepted<br>
+&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;:&nbsp;Archived&nbsp;(potentially&nbsp;out&nbsp;of&nbsp;date&nbsp;or&nbsp;incompatible)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;3&nbsp;:&nbsp;Deleted<br>
+visible&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Visibility&nbsp;of&nbsp;the&nbsp;mod.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;:&nbsp;Hidden<br>
+&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;:&nbsp;Public<br>
+game&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;game&nbsp;the&nbsp;mod&nbsp;is&nbsp;for.<br>
+submitter&nbsp;:&nbsp;modio.User<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Instance&nbsp;of&nbsp;the&nbsp;modio&nbsp;User&nbsp;that&nbsp;submitted&nbsp;the&nbsp;mod.<br>
+date_added&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;mod&nbsp;was&nbsp;registered<br>
+date_updated&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;mod&nbsp;was&nbsp;last&nbsp;updated<br>
+date_live&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;mod&nbsp;went&nbsp;live<br>
+logo&nbsp;:&nbsp;modio.Image<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;mod&nbsp;logo<br>
+homepage&nbsp;:&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Link&nbsp;to&nbsp;the&nbsp;homepage&nbsp;of&nbsp;the&nbsp;mod,&nbsp;can&nbsp;be&nbsp;None.<br>
+name&nbsp;:&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;of&nbsp;the&nbsp;mod<br>
+name_id&nbsp;:&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sub_domain&nbsp;mod&nbsp;for&nbsp;the&nbsp;game&nbsp;(https://game_name.mod.io/name_id)<br>
+summary&nbsp;:&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Summary&nbsp;of&nbsp;the&nbsp;mod<br>
+description&nbsp;:str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Detailed&nbsp;description&nbsp;of&nbsp;the&nbsp;mod,&nbsp;supports&nbsp;HTML.<br>
+metadata&nbsp;:&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Metadata&nbsp;stored&nbsp;by&nbsp;developers&nbsp;which&nbsp;may&nbsp;include&nbsp;properties&nbsp;on&nbsp;how&nbsp;information&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;required.&nbsp;Can&nbsp;be&nbsp;None.<br>
+maturity&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Maturity&nbsp;option&nbsp;of&nbsp;the&nbsp;mod.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;:&nbsp;None<br>
+&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;:&nbsp;Alcohol<br>
+&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;:&nbsp;Drugs<br>
+&nbsp;&nbsp;&nbsp;&nbsp;4&nbsp;:&nbsp;Violence<br>
+&nbsp;&nbsp;&nbsp;&nbsp;8&nbsp;:&nbsp;Explicit<br>
+&nbsp;&nbsp;&nbsp;&nbsp;?&nbsp;:&nbsp;Above&nbsp;options&nbsp;can&nbsp;be&nbsp;added&nbsp;together&nbsp;to&nbsp;create&nbsp;custom&nbsp;settings&nbsp;(e.g&nbsp;3&nbsp;:&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;alcohol&nbsp;and&nbsp;drugs&nbsp;present)<br>
+profile&nbsp;:&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;URL&nbsp;of&nbsp;the&nbsp;mod's&nbsp;modio&nbsp;profile<br>
+file&nbsp;:&nbsp;modio.ModFile<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Latest&nbsp;release&nbsp;instance<br>
+media&nbsp;:&nbsp;modio.ModMedia<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Contains&nbsp;mod&nbsp;media&nbsp;data&nbsp;(links&nbsp;and&nbsp;images)<br>
+rating&nbsp;:&nbsp;modio.RatingSummary<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Summary&nbsp;of&nbsp;all&nbsp;rating&nbsp;for&nbsp;this&nbsp;mod<br>
+tags&nbsp;:&nbsp;modio.ModTag<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Tags&nbsp;for&nbsp;this&nbsp;mod.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Mod-__init__"><strong>__init__</strong></a>(self, client, **attrs)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<dl><dt><a name="Mod-add_depen"><strong>add_depen</strong></a>(self, dependencies:list)</dt></dl>
+
+<dl><dt><a name="Mod-add_file"><strong>add_file</strong></a>(self, file)</dt></dl>
+
+<dl><dt><a name="Mod-add_media"><strong>add_media</strong></a>(self, **fields)</dt></dl>
+
+<dl><dt><a name="Mod-add_meta"><strong>add_meta</strong></a>(self, **fields)</dt></dl>
+
+<dl><dt><a name="Mod-add_rating"><strong>add_rating</strong></a>(self, rating)</dt></dl>
+
+<dl><dt><a name="Mod-add_tags"><strong>add_tags</strong></a>(self, *tags)</dt></dl>
+
+<dl><dt><a name="Mod-add_team_member"><strong>add_team_member</strong></a>(self, **fields)</dt></dl>
+
+<dl><dt><a name="Mod-del_comment"><strong>del_comment</strong></a>(self, id)</dt></dl>
+
+<dl><dt><a name="Mod-del_depen"><strong>del_depen</strong></a>(self, dependencies:list)</dt></dl>
+
+<dl><dt><a name="Mod-del_meta"><strong>del_meta</strong></a>(self, **fields)</dt></dl>
+
+<dl><dt><a name="Mod-del_tags"><strong>del_tags</strong></a>(self, tags)</dt></dl>
+
+<dl><dt><a name="Mod-del_team_member"><strong>del_team_member</strong></a>(self, id:int)</dt></dl>
+
+<dl><dt><a name="Mod-delete"><strong>delete</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Mod-delete_media"><strong>delete_media</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Mod-edit"><strong>edit</strong></a>(self, **fields)</dt></dl>
+
+<dl><dt><a name="Mod-get_comments"><strong>get_comments</strong></a>(self, **fields)</dt></dl>
+
+<dl><dt><a name="Mod-get_dependencies"><strong>get_dependencies</strong></a>(self, **fields)</dt></dl>
+
+<dl><dt><a name="Mod-get_events"><strong>get_events</strong></a>(self, **fields)</dt><dd><tt>Get&nbsp;all&nbsp;events&nbsp;for&nbsp;that&nbsp;mod&nbsp;sorted&nbsp;by&nbsp;latest.&nbsp;Takes&nbsp;filtering&nbsp;arguments.<br>
+&nbsp;<br>
+Returns<br>
+--------<br>
+list[Events]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;List&nbsp;of&nbsp;all&nbsp;the&nbsp;events&nbsp;for&nbsp;this&nbsp;mod</tt></dd></dl>
+
+<dl><dt><a name="Mod-get_file"><strong>get_file</strong></a>(self, id:int)</dt><dd><tt>Get&nbsp;the&nbsp;<a href="#Mod">Mod</a>&nbsp;File&nbsp;with&nbsp;the&nbsp;following&nbsp;ID<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+id&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;mod&nbsp;file&nbsp;you&nbsp;wish&nbsp;to&nbsp;retrieve<br>
+&nbsp;<br>
+Raises<br>
+-------<br>
+NotFound<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;mod&nbsp;with&nbsp;that&nbsp;ID&nbsp;has&nbsp;not&nbsp;been&nbsp;found<br>
+&nbsp;<br>
+Returns<br>
+-------<br>
+ModFile<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;found&nbsp;modfile</tt></dd></dl>
+
+<dl><dt><a name="Mod-get_files"><strong>get_files</strong></a>(self, **fields)</dt><dd><tt>Get&nbsp;all&nbsp;mod&nbsp;files&nbsp;for&nbsp;this&nbsp;mod.&nbsp;Takes&nbsp;filtering&nbsp;arguments<br>
+&nbsp;<br>
+Returns<br>
+--------<br>
+list[ModFile]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;List&nbsp;of&nbsp;all&nbsp;modfiles&nbsp;for&nbsp;this&nbsp;mod</tt></dd></dl>
+
+<dl><dt><a name="Mod-get_meta"><strong>get_meta</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Mod-get_stats"><strong>get_stats</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Mod-get_tags"><strong>get_tags</strong></a>(self, **fields)</dt></dl>
+
+<dl><dt><a name="Mod-get_team"><strong>get_team</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Mod-subscribe"><strong>subscribe</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Mod-unsubscribe"><strong>unsubscribe</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Mod-update_team_member"><strong>update_team_member</strong></a>(self, **fields)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-sqrt"><strong>sqrt</strong></a>(...)</dt><dd><tt><a href="#-sqrt">sqrt</a>(x)<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;square&nbsp;root&nbsp;of&nbsp;x.</tt></dd></dl>
+</td></tr></table>
+</body></html>

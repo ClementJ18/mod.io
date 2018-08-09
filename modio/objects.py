@@ -18,7 +18,7 @@ class Message:
         self.code = attrs.pop("code")
         self.message =attrs.pop("message")
 
-    def __str__(self):
+    def __repr__(self):
         return f"{self.code} : {self.message}"
 
 class Image:
@@ -52,13 +52,13 @@ class Image:
         self.large = list(attrs.values())[4] if len(attrs) > 4 else None    
 
 class EventType(enum.Enum):
-    0 = file_changed
-    1 = available
-    2 = unavailable
-    3 = edited
-    4 = deleted
-    5 = team_changed
-    6 = other    
+    file_changed  = 0
+    available     = 1
+    unavailable   = 2
+    edited        = 3
+    deleted       = 4
+    team_changed  = 5
+    other         = 6    
 
 class Event:
     """Represents a mod event. 
@@ -217,9 +217,11 @@ class MeModFile:
         self.download = attrs.pop("download")
 
     def edit(self, **fields):
+        """Endpoint cannot be called from this object"""
         raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
 
     def delete(self):
+        """Endpoint cannot be called from this object"""
         raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
 
 class ModFile(MeModFile):
@@ -237,11 +239,32 @@ class ModFile(MeModFile):
         self.client = attrs.pop("client")
 
     def edit(self, **fields):
-        
+        """Edit the file's details
+
+        Parameters
+        -----------
+        version : str
+            Change the release version of the file
+        changelog : str
+            Change the changelog of this release
+        active : bool
+            Change whether or not this is the active version.
+        metadata_blob : str
+            Metadata stored by the game developer which may include 
+            properties such as what version of the game this file is compatible with.
+        """
         file_json = self.client._put_request(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}', data = fields)
         self.__init__(client=self.client, game_id=self.game, **file_json)
 
     def delete(self):
+        """Deletes the modfile, this will raise an error if the
+        file is the active release for the mod
+
+        Raises
+        -------
+        Forbidden
+            You cannot delete the active release of a mod
+        """
         r = requests.delete(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}')
         return r
 
@@ -279,7 +302,7 @@ class ModTag:
         self.date = attrs.pop("date_added")
         self.__dict__ = {self.name : self.date_added}
 
-    def __str__(self):
+    def __repr__(self):
         return self.name    
 
 class GameTag:
@@ -307,7 +330,7 @@ class GameTag:
         self.hidden = attrs.pop("hidden")
         self.tags = attrs.pop("tags", [])
 
-    def __str__(self):
+    def __repr__(self):
         return self.name
 
 class MetaData:
@@ -748,6 +771,6 @@ class Object:
     def __init__(self, **attrs):
         self.__dict__.update(attrs)
 
-    def __str__(self):
+    def __repr__(self):
         return str(self.__dict__)
 

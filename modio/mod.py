@@ -1,9 +1,8 @@
 from math import sqrt
 import time
 
-from .utils import find
 from .objects import *
-from .errors import *
+from .errors import modioException
 
 class Mod:
     """Represent a modio mod object.
@@ -85,7 +84,7 @@ class Mod:
         self.description = attrs.pop("description")
         self.metadata = attrs.pop("metadata_blob")
         self.profile = attrs.pop("profile_url")
-        self.file = ModFile(**attrs.pop("modfile"), game_id=self.game_id, client=client)
+        self.file = ModFile(**attrs.pop("modfile"), game_id=self.game, client=client)
         self.media = ModMedia(**attrs.pop("media"))
         self.maturity = attrs.pop("maturity_options")
 
@@ -111,8 +110,8 @@ class Mod:
         ModFile
             The found modfile
         """
-        file_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/files/{id}")
-        return ModFile(**file_json, game_id=self.game_id, client=self.client)
+        file_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/files/{id}")
+        return ModFile(**file_json, game_id=self.game, client=self.client)
 
     def get_files(self, **fields):
         """Get all mod files for this mod. Takes filtering arguments
@@ -122,8 +121,8 @@ class Mod:
         list[ModFile]
             List of all modfiles for this mod
         """
-        files_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/files", **fields)
-        return [ModFile(**file, game_id=self.game_id, client=self.client) for file in files_json["data"]]
+        files_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/files", **fields)
+        return [ModFile(**file, game_id=self.game, client=self.client) for file in files_json["data"]]
 
     def get_events(self, **fields):
         """Get all events for that mod sorted by latest. Takes filtering arguments.
@@ -134,39 +133,39 @@ class Mod:
             List of all the events for this mod
 
         """
-        event_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/events", **fields)
+        event_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/events", **fields)
         return [Event(**event) for event in event_json["data"]]
 
     def get_tags(self, **fields): #in common with game obj
-        tag_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/tags", **fields)
+        tag_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/tags", **fields)
         return [ModTag(**tag) for tag in tag_json["data"]]
 
     def get_meta(self):
-        meta_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/metadatakvp")
+        meta_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/metadatakvp")
         return {meta["key"] : meta["value"] for meta in meta_json["data"]}
 
     def get_dependencies(self, **fields):
-        depen_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/dependencies", **fields)
+        depen_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/dependencies", **fields)
         return {dependecy["mod_id"] : dependecy["date_added"] for dependecy in depen_json["data"]}
 
     def get_team(self):
-        team_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/team")
+        team_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/team")
         return [TeamMember(**member) for member in team_json["data"]]
 
     def get_comments(self, **fields):
-        comment_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/comments", **fields)
+        comment_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/comments", **fields)
         return [Comment(**comment) for comment in comment_json["data"]]
 
     def get_stats(self):
-        stats_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/stats")
-        return Stats(**stats_json["data"])
+        stats_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/stats")
+        return Stats(**stats_json)
 
     def edit(self, **fields):
-        mod_json = self.client._put_request(f'/games/{self.game_id}/mods/{self.id}', data = fields)
+        mod_json = self.client._put_request(f'/games/{self.game}/mods/{self.id}', data = fields)
         return self.__init__(self.client, **mod_json)
 
     def delete(self):
-        r =self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}')
+        r =self.client._delete_request(f'/games/{self.game}/mods/{self.id}')
         return r
 
     def add_file(self, file):
@@ -175,24 +174,24 @@ class Mod:
 
         file_d = file.__dict__
         files = {"filedata" : file_d.pop("file")}
-        file_json = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/files', h_type = 1, data = file_d, files=files)
+        file_json = self.client._post_request(f'/games/{self.game}/mods/{self.id}/files', h_type = 1, data = file_d, files=files)
 
         return ModFile(**file_json)
 
     def add_media(self, **fields):
-        media_json = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/media', h_type = 1, files = fields)
+        media_json = self.client._post_request(f'/games/{self.game}/mods/{self.id}/media', h_type = 1, files = fields)
         return Message(**media_json)
 
     def delete_media(self):
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/media')
+        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/media')
         return r
 
     def subscribe(self):
-        mod_json = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/subscribe')
+        mod_json = self.client._post_request(f'/games/{self.game}/mods/{self.id}/subscribe')
         return Mod(self.client, **mod_json)
 
     def unsubscribe(self):
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/subscribe')
+        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/subscribe')
         return r
 
     def add_tags(self, *tags):
@@ -200,7 +199,7 @@ class Mod:
         for tag in tags:
             fields[f"tags[{tags.index(tag)}]"] = tag
 
-        message = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/tags', data = fields)
+        message = self.client._post_request(f'/games/{self.game}/mods/{self.id}/tags', data = fields)
         for tag in tags:
             self.tags.append(ModTag(name=tag, date_added=time.time()))
 
@@ -211,7 +210,7 @@ class Mod:
         for tag in tags:
             fields[f"tags[{tags.index(tag)}]"] = tag
 
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/tags', data = fields)
+        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/tags', data = fields)
 
         for mod_tag in self.tags:
             if mod_tag.name in tags:
@@ -233,7 +232,7 @@ class Mod:
         if not rating == 1 or not rating == -1:
             raise modioException("rating is an argument that can only be 1 or -1")
 
-        checked = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/rating', data={"rating":rating})
+        checked = self.client._post_request(f'/games/{self.game}/mods/{self.id}/rating', data={"rating":rating})
 
         self.rating.total += 1
         if rating == 1:
@@ -254,7 +253,7 @@ class Mod:
             metadata[f"metadata[{index}]"] = f"{data}:{fields[data]}"
             index += 1
 
-        checked = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', data=metadata)
+        checked = self.client._post_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata)
             
         return Message(**checked)
 
@@ -265,7 +264,7 @@ class Mod:
             metadata[f"metadata[{index}]"] = f"{data}:{fields[data]}"
             index += 1
 
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', data=metadata)
+        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata)
         return r
 
     def add_depen(self, dependencies : list):
@@ -276,7 +275,7 @@ class Mod:
         #     for data in depend:
         #         dependecy[f"dependencies[{depend.index(data)}]"] = data
 
-        #     r = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy)
+        #     r = self.client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependecy)
         #     self.client._error_check(r)
 
         # return "all good"
@@ -288,7 +287,7 @@ class Mod:
         for data in dependencies:
             dependecy[f"dependencies[{dependencies.index(data)}]"] = data
 
-        msg = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy)
+        msg = self.client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependecy)
 
         return Message(**msg)
 
@@ -298,21 +297,21 @@ class Mod:
         for data in dependencies:
             dependecy[f"dependencies[{dependencies.index(data)}]"] = data
 
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy)
+        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependecy)
         return r
 
     def add_team_member(self, **fields):
-        msg = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/team', data=fields)
+        msg = self.client._post_request(f'/games/{self.game}/mods/{self.id}/team', data=fields)
         return Message(**msg)
 
     def update_team_member(self, **fields):
-        msg = self.client._put_request(f'/games/{self.game_id}/mods/{self.id}/team/{fields.pop("id")}', data=fields)
+        msg = self.client._put_request(f'/games/{self.game}/mods/{self.id}/team/{fields.pop("id")}', data=fields)
         return Message(**msg)
 
     def del_team_member(self, id : int):
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/team/{id}')
+        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/team/{id}')
         return r
 
     def del_comment(self, id):
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/comments/{id}')
+        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/comments/{id}')
         return r

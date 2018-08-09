@@ -56,12 +56,12 @@ class Client:
                 self.get_me()
             except Forbidden:
                 raise Forbidden("O Auth 2 token invalid")
-
-        #check api key
-        try:
-            self.get_games()
-        except Forbidden:
-            raise Forbidden("API key invalid")
+        else:
+            #check api key if no o auth 2
+            try:
+                self.get_games()
+            except Forbidden:
+                raise Forbidden("API key invalid")
 
     def _error_check(self, r):
         """Updates the rate-limit attributes and check validity of the request."""
@@ -106,8 +106,6 @@ class Client:
             return request_json
 
     def _get_request(self, url, **fields):
-        """Contains the code for basic GET request. Adapts the given search terms to 
-        fit the API requirements."""
         # extra = dict()
         # if "limit" in fields:
         #     extra["_limit"] = int(fields.pop("limit"))

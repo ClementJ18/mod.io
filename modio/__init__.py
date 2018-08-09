@@ -1,4 +1,6 @@
+"""
+The module
+"""
+
 from .client import Client
-from .objects import NewMod
-from .objects import NewFile
-from .objects import Object
+from .objects import NewMod, NewFile, Object, Filter
