@@ -172,19 +172,19 @@ class Client:
 
         return headers
 
-    def _post_request(self, url, *, h_type, **fields):
+    def _post_request(self, url, *, h_type=0, **fields):
         r = requests.post(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
         r = self._error_check(r)
 
         return r
 
-    def _put_request(self, url, *, h_type, **fields):
+    def _put_request(self, url, *, h_type=0, **fields):
         r = requests.put(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
         r = self._error_check(r)
 
         return r
 
-    def _delete_request(self, url, *, h_type, **fields):
+    def _delete_request(self, url, *, h_type=0, **fields):
         r = requests.delete(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
         r = self._error_check(r)
 

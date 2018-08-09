@@ -186,6 +186,18 @@ class Game:
 
         return [GameTag(**tag_option) for tag_option in tag_json["data"]]
 
+    def get_stats(self, **fields):
+        """Gets the stat objects for all the mods of this game. Takes 
+        filtering arguments
+
+        Returns
+        --------
+        list[modio.Stats]
+            List of all the mod stats
+        """
+        stats_json = self.client._get_request(f"/games/{self.id}/mods/stats")
+        return [Stats(**stats) for stats in stats_json["data"]]
+
     def edit(self, **fields):
         """Used to edit the game details. For editing the icon, logo or header use :func:`add_media`.
         Sucessful editing will update the game instance.
@@ -246,7 +258,7 @@ class Game:
             1 : Allow mod developpers to decide whether or not to flag their mod as 
             containing mature content"""
 
-        game_json = self.client._put_request(f'/games/{self.id}', h_type = 0, data = fields)
+        game_json = self.client._put_request(f'/games/{self.id}', data = fields)
 
         self.__init__(self.client, **game_json)
 
@@ -316,7 +328,7 @@ class Game:
             field[image] = open(field[image])
 
         message = self.client._post_request(f'/games/{self.id}/media', h_type = 1, files = fields)
-        self.__int__(self.client, self.client._get_request(f"/games/{self.id}", h_type = 0))
+        self.__int__(self.client, self.client._get_request(f"/games/{self.id}"))
         
         return Message(**message)
 
@@ -342,7 +354,7 @@ class Game:
             for tag in tags:
                 fields[f"tags[{tags.index(tag)}]"] = tag
 
-        message = self.client._post_request(f'/games/{self.id}/tags', h_type = 0, data = {"input_json" : fields})
+        message = self.client._post_request(f'/games/{self.id}/tags', data = {"input_json" : fields})
 
         self.tag_options.append(GameTag(**fields))
         return Message(**message)
@@ -362,7 +374,7 @@ class Game:
         for tag in tags:
             fields[f"tags[{tags.index(tag)}]"] = tag
 
-        r = self.client._delete_request(f'/games/{self.id}/tags', h_type = 0, data = fields)
+        r = self.client._delete_request(f'/games/{self.id}/tags', data = fields)
         if len(tags) > 0:
             self.tags[fields["name"]] -= tags
         else:

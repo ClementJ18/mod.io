@@ -89,7 +89,7 @@ class Mod:
         self.media = ModMedia(**attrs.pop("media"))
         self.maturity = attrs.pop("maturity_options")
 
-        self.rating = RatingSummary(**attrs.pop("rating"))
+        self.rating = Stats(**attrs.pop("rating"))
         self.client = client
         self.tags = [ModTag(**tag) for tag in attrs.pop("tags", [])]
 
@@ -157,12 +157,16 @@ class Mod:
         comment_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/comments", **fields)
         return [Comment(**comment) for comment in comment_json["data"]]
 
+    def get_stats(self):
+        stats_json = self.client._get_request(f"/games/{self.game_id}/mods/{self.id}/stats")
+        return Stats(**stats_json["data"])
+
     def edit(self, **fields):
-        mod_json = self.client._put_request(f'/games/{self.game_id}/mods/{self.id}', h_type = 0, data = fields)
+        mod_json = self.client._put_request(f'/games/{self.game_id}/mods/{self.id}', data = fields)
         return self.__init__(self.client, **mod_json)
 
     def delete(self):
-        r =self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}', h_type = 0)
+        r =self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}')
         return r
 
     def add_file(self, file):
@@ -180,15 +184,15 @@ class Mod:
         return Message(**media_json)
 
     def delete_media(self):
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/media', h_type = 0)
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/media')
         return r
 
     def subscribe(self):
-        mod_json = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/subscribe', h_type = 0)
+        mod_json = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/subscribe')
         return Mod(self.client, **mod_json)
 
     def unsubscribe(self):
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/subscribe', h_type = 0)
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/subscribe')
         return r
 
     def add_tags(self, *tags):
@@ -196,7 +200,7 @@ class Mod:
         for tag in tags:
             fields[f"tags[{tags.index(tag)}]"] = tag
 
-        message = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/tags', h_type = 0, data = fields)
+        message = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/tags', data = fields)
         for tag in tags:
             self.tags.append(ModTag(name=tag, date_added=time.time()))
 
@@ -207,7 +211,7 @@ class Mod:
         for tag in tags:
             fields[f"tags[{tags.index(tag)}]"] = tag
 
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/tags', h_type = 0, data = fields)
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/tags', data = fields)
 
         for mod_tag in self.tags:
             if mod_tag.name in tags:
@@ -229,7 +233,7 @@ class Mod:
         if not rating == 1 or not rating == -1:
             raise modioException("rating is an argument that can only be 1 or -1")
 
-        checked = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/rating',  h_type=0, data={"rating":rating})
+        checked = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/rating', data={"rating":rating})
 
         self.rating.total += 1
         if rating == 1:
@@ -250,7 +254,7 @@ class Mod:
             metadata[f"metadata[{index}]"] = f"{data}:{fields[data]}"
             index += 1
 
-        checked = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', h_type=0, data=metadata)
+        checked = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', data=metadata)
             
         return Message(**checked)
 
@@ -261,7 +265,7 @@ class Mod:
             metadata[f"metadata[{index}]"] = f"{data}:{fields[data]}"
             index += 1
 
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', h_type=0, data=metadata)
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/metadatakvp', data=metadata)
         return r
 
     def add_depen(self, dependencies : list):
@@ -272,7 +276,7 @@ class Mod:
         #     for data in depend:
         #         dependecy[f"dependencies[{depend.index(data)}]"] = data
 
-        #     r = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy, h_type=0)
+        #     r = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy)
         #     self.client._error_check(r)
 
         # return "all good"
@@ -284,7 +288,7 @@ class Mod:
         for data in dependencies:
             dependecy[f"dependencies[{dependencies.index(data)}]"] = data
 
-        msg = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', h_type=0, data=dependecy)
+        msg = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy)
 
         return Message(**msg)
 
@@ -294,21 +298,21 @@ class Mod:
         for data in dependencies:
             dependecy[f"dependencies[{dependencies.index(data)}]"] = data
 
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', h_type=0, data=dependecy)
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/dependencies', data=dependecy)
         return r
 
     def add_team_member(self, **fields):
-        msg = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/team', h_type=0, data=fields)
+        msg = self.client._post_request(f'/games/{self.game_id}/mods/{self.id}/team', data=fields)
         return Message(**msg)
 
     def update_team_member(self, **fields):
-        msg = self.client._put_request(f'/games/{self.game_id}/mods/{self.id}/team/{fields.pop("id")}', h_type=0, data=fields)
+        msg = self.client._put_request(f'/games/{self.game_id}/mods/{self.id}/team/{fields.pop("id")}', data=fields)
         return Message(**msg)
 
     def del_team_member(self, id : int):
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/team/{id}', h_type=0)
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/team/{id}')
         return r
 
     def del_comment(self, id):
-        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/comments/{id}', h_type=0)
+        r = self.client._delete_request(f'/games/{self.game_id}/mods/{self.id}/comments/{id}')
         return r

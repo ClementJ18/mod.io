@@ -238,11 +238,11 @@ class ModFile(MeModFile):
 
     def edit(self, **fields):
         
-        file_json = self.client._put_request(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}', h_type = 0, data = fields)
+        file_json = self.client._put_request(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}', data = fields)
         self.__init__(client=self.client, game_id=self.game, **file_json)
 
     def delete(self):
-        r = requests.delete(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}', h_type = 0)
+        r = requests.delete(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}')
         return r
 
 class ModMedia:
@@ -326,11 +326,21 @@ class MetaData:
         self.value = attrs.pop("metavalue")
         self.__dict__ = {self.key : self.value}
 
-class RatingSummary:
-    """Represents a summary of all the ratings by the users on the mod
+class Stats:
+    """Represents a summary of stats for a mod
 
     Attributes
     -----------
+    id : int
+        Mod ID of the stats
+    rank : int
+        Current rank of the mod
+    rank_total : int
+        Number of ranking spots the current rank is measured against
+    downloads : int
+        Amount of times the mod was downloaded
+    subscribers : int
+        Amount of subscribers
     total : int
         Number of times this item has been rated
     positive : int
@@ -347,14 +357,33 @@ class RatingSummary:
     text : str
         Textual representation of the rating in format. This is currently not updated
         by the lib so you'll have to poll the resource's endpoint again.
+    date : int
+        Unix timestamp until this mods's statistics are considered stale. Endpoint
+        should be polled again when this expires.
     """
     def __init__(self, **attrs):
+        self.id = kwargs.pop("mod_id")
+        self.rank = kwargs.pop("popularity_rank_position")
+        self.rank_total = kwargs.pop("popularity_rank_total_mods")
+        self.downloads = kwargs.pop("downloads_total")
+        self.subscribers = kwargs.pop("subscribers_total")
+        self.date = kwargs.pop("date_expires")
         self.total = attrs.pop("total_ratings")
         self.positive = attrs.pop("positive_ratings")
         self.negative = attrs.pop("negative_ratings")
         self.percentage = attrs.pop("percentage_positive")
         self.weighted = attrs.pop("weighted_aggregate")
         self.text = attrs.pop("display_text")
+
+    def is_stale(self):
+        """Returns a bool depending on whether or not the stats are considered stale.
+
+        Returns
+        --------
+        bool
+            True if stats are expired, False else.
+        """
+        return time.time() <= self.date
 
 class User:
     """Represents a modio user.
