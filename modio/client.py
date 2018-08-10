@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+from typing import Union
 
 from .game import Game
 from .mod import Mod
@@ -26,6 +27,8 @@ class Client:
         responses from the API to be in a particular language, simply provide the lang 
         parameter with an ISO 639 compliant language code. Else the language of the authenticated
         user will be used, default is US English.
+    test : Optional[bool]
+        Whether or not to use the mod.io test environment. If not included will default to False.
 
     Attributes
     -----------
@@ -48,7 +51,9 @@ class Client:
         self.rate_limit = None
         self.rate_remain = None
         self.rate_retry = None
-        self.BASE_PATH = "https://api.test.mod.io/v1"
+
+        test = fields.pop("test", False)
+        self.BASE_PATH = "https://api.test.mod.io/v1" if test else "https://api.mod.io/v1"
 
         #check o auth 2 token
         if self.access_token:
@@ -62,6 +67,7 @@ class Client:
                 self.get_games()
             except Forbidden:
                 raise Forbidden("API key invalid")
+    
 
     def _error_check(self, r):
         """Updates the rate-limit attributes and check validity of the request."""
@@ -106,22 +112,9 @@ class Client:
             return request_json
 
     def _get_request(self, url, **fields):
-        # extra = dict()
-        # if "limit" in fields:
-        #     extra["_limit"] = int(fields.pop("limit"))
+        extra = fields.pop("filter", Filter()).__dict__.copy()
 
-        # if "offset" in fields:
-        #     extra["_offset"] = int(fields.pop("offset"))
 
-        # if "name" in fields:
-        #     extra["_q"] = fields.pop("name")
-
-        # if "sort" in fields:
-        #     extra["_sort"] = fields.pop("sort")
-
-        # fields = {k.replace("_", "-") : v for k, v in fields.items()}
-        # extra = {**extra, **fields}
-        extra = fields.pop("filter", Filter()).__dict__
 
         if not self.access_token:
             headers = {
@@ -228,7 +221,7 @@ class Client:
 
         return game_list
 
-    def get_user(self, id):
+    def get_user(self, id : int):
         """Gets a user with the specified ID.
 
         Parameters
@@ -268,7 +261,7 @@ class Client:
 
         return user_list
 
-    def get_me(self):
+    def get_my_user(self):
         """Gets the authenticated user's details (aka the user who created the API key/access token)
         Raises
         -------
@@ -285,7 +278,7 @@ class Client:
 
         return User(**me_json)
 
-    def get_me_sub(self, **fields):
+    def get_my_subs(self, **fields):
         """Gets all the mods the authenticated user is subscribed to.  Takes
         filtering arguments.
 
@@ -307,7 +300,7 @@ class Client:
 
         return mod_list
 
-    def get_me_games(self, **fields):
+    def get_my_games(self, **fields):
         """Get all the games the authenticated user added or is a team member of. Takes
         filtering arguments.
 
@@ -329,7 +322,7 @@ class Client:
 
         return game_list
 
-    def get_me_mods(self, **fields):
+    def get_my_mods(self, **fields):
         """Get all the mods the authenticated user added or is a team member of. Takes
         filtering arguments.
 
@@ -351,7 +344,7 @@ class Client:
 
         return mod_list
 
-    def get_me_modfiles(self, **fields):
+    def get_my_modfiles(self, **fields):
         """Get all the mods the authenticated user uploaded. The returned modfile objects cannot be
         edited or deleted and do not have a `game_idè attribute. Takes filtering arguments.
 
@@ -363,17 +356,17 @@ class Client:
         Returns
         -------
         list
-            A list of modio.MeModFile instances representing all modfiles the user added.
+            A list of modio.ModFile instances representing all modfiles the user added.
         """
         files_json = self._get_request("/me/files", **fields)
 
         file_list = list()
         for file in files_json["data"]:
-            file_list.append(MeModFile(**file))
+            file_list.append(ModFile(**file))
 
         return file_list
 
-    def email_request(self, email):
+    def email_request(self, email : str):
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address
         which can then be entered into :func:`email_exchange`.
         
@@ -435,7 +428,7 @@ class Client:
 
         return r["access_token"]
 
-    def report(self, *, resource, type=0, name, summary):
+    def report(self, *, resource : Union[Game, User, Mod, Object], type : int = 0, name : str, summary : str):
         """Used to report for any resource on mod.io. Make sure to read mod.io's ToU to understand
         what is and isn't acceptable
 

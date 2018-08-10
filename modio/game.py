@@ -16,7 +16,7 @@ class Game:
         3 : Deleted
     submitter : modio.User
         Instance of the modio user having submitted the game
-    date_added : int
+    date : int
         UNIX timestamp of the date the game was registered
     date_updated : int
         UNIX timestamp of the date the game was last updated
@@ -55,12 +55,12 @@ class Game:
         ? : Above options can be added together to create custom settings (e.g 3 : 
         allow 3rd parties to access this games API endpoints and allow mods to be
         downloaded directly)
-    maturity : int
+    maturity_options : int
         0 : Don't allow mod developpers to decide whether or not to flag their mod as 
         containing mature content (if game devs wish to handle it)
         1 : Allow mod developpers to decide whether or not to flag their mod as 
         containing mature content
-    ugc_name : str
+    ugc : str
         Word used to describe user-generated content (mods, items, addons etc).
     icon : modio.Image
         The game icon
@@ -80,9 +80,9 @@ class Game:
     instructions_url : str
         Link to a mod.io guide, your modding wiki or a page where modders can learn how to 
         make and submit mods to your games profile.
-    profile_url : str
+    profile : str
         URL to the game's mod.io page.
-    tag_options : list[modio.GameTag]
+    tag_options : list[modio.TagOption]
         List of tags from which mods can pick
 
     """
@@ -90,7 +90,7 @@ class Game:
         self.id = attrs.pop("id")
         self.status = attrs.pop("status")
         self.submitter = User(**attrs.pop("submitted_by"))
-        self.date_added = attrs.pop("date_added")
+        self.date = attrs.pop("date_added")
         self.date_updated = attrs.pop("date_updated")
         self.date_live = attrs.pop("date_live")
         self.presentation = attrs.pop("presentation_option")
@@ -99,7 +99,7 @@ class Game:
         self.community = attrs.pop("community_options")
         self.revenue = attrs.pop("revenue_options")
         self.api = attrs.pop("api_access_options", )
-        self.ugc_name = attrs.pop("ugc_name")
+        self.ugc = attrs.pop("ugc_name")
         self.icon = Image(**attrs.pop("icon", None))
         self.logo = Image(**attrs.pop("logo", None))
         self.header = Image(**attrs.pop("header", None))
@@ -109,9 +109,9 @@ class Game:
         self.summary = attrs.pop("summary")
         self.instructions = attrs.pop("instructions", None)
         self.instructions_url = attrs.pop("instructions_url", None)
-        self.profile_url = attrs.pop("profile_url")
-        self.tag_options = [GameTag(**tag) for tag in attrs.pop("tag_options", [])]
-        self.maturity = attrs.pop("maturity_options")
+        self.profile = attrs.pop("profile_url")
+        self.tag_options = [TagOption(**tag) for tag in attrs.pop("tag_options", [])]
+        self.maturity_options = attrs.pop("maturity_options")
         self.client = client
 
     def __repr__(self):
@@ -173,17 +173,18 @@ class Game:
         return [Event(**event) for event in event_json["data"]]
 
     def get_tags(self, **fields):
-        """Gets all the game tags available for this game.
+        """Gets all the game tags available for this game. Takes filtering
+        arguments.
 
         Returns
         --------
         list
-            A list of modio.GameTag instances
+            A list of modio.TagOption instances
                
         """
         tag_json = self.client._get_request(f"/games/{self.id}/tags")
 
-        return [GameTag(**tag_option) for tag_option in tag_json["data"]]
+        return [TagOption(**tag_option) for tag_option in tag_json["data"]]
 
     def get_stats(self, **fields):
         """Gets the stat objects for all the mods of this game. Takes 
@@ -343,7 +344,7 @@ class Game:
             dropdown : Mods can select only one tag from this group, dropdown menu shown on site profile.
             checkboxes : Mods can select multiple tags from this group, checkboxes shown on site profile.
         hidden : bool
-            Whether or not this group of tagas should be hidden from users and mod devs.
+            Whether or not this group of tags should be hidden from users and mod devs.
         tags : list[str]
             Array of tags that mod creators can apply to their mod
 
@@ -355,7 +356,7 @@ class Game:
 
         message = self.client._post_request(f'/games/{self.id}/tags', data = {"input_json" : fields})
 
-        self.tag_options.append(GameTag(**fields))
+        self.tag_options.append(TagOption(**fields))
         return Message(**message)
 
     def del_tags(self, **fields):

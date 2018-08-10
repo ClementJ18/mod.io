@@ -16,7 +16,7 @@ class Message:
     """
     def __init__(self, **attrs):
         self.code = attrs.pop("code")
-        self.message =attrs.pop("message")
+        self.message = attrs.pop("message")
 
     def __repr__(self):
         return f"{self.code} : {self.message}"
@@ -154,12 +154,11 @@ class ModDependencies:
     """
     def __init__(self, **attrs):
         self.id = attrs.pop("mod_id")
-        self.date = attrs.pop("date")
+        self.date = attrs.pop("date_addedy")
 
-class MeModFile:
-    """A object to represent modfiles that are returned from the me/modfiles endpoint.
-    Equivalent to the regular ModFile object except that you cannot call the delete or
-    edit function from it as it lacks a game_id.
+class ModFile:
+    """A object to represents modfiles. If the modfile has been returned for the me/modfile endpoint
+    then edit() and delete() cannot be called as a game_id is lacking.
 
     Attributes
     -----------
@@ -167,9 +166,9 @@ class MeModFile:
         ID of the modfile
     mod : int
         ID of the mod it was added for
-    date_added : int
+    date : int
         UNIX timestamp of the date the modfile was submitted
-    date_scanned : int
+    scanned : int
         UNIX timestamp of the date the file was virus scanned
     status : int
         Current status of the virus scan for the file. 
@@ -199,12 +198,15 @@ class MeModFile:
         Contains download data
         'binary_url' : url to download file
         'date_expires' : UNIX timestamp of when the url expires
+    game : int
+        ID of the game of the mod this file belongs to. Can be None if this file
+        was returned from the me/modfiles endpoint.
     """
     def __init__(self,**attrs):
         self.id = attrs.pop("id")
         self.mod = attrs.pop("mod_id")
-        self.date_added = attrs.pop("date_added")
-        self.date_scanned = attrs.pop("date_scanned")
+        self.date = attrs.pop("date_added")
+        self.scanned = attrs.pop("date_scanned")
         self.status = attrs.pop("virus_status")
         self.virus = bool(attrs.pop("virus_positive"))
         self.virus_hash = attrs.pop("virustotal_hash")
@@ -215,28 +217,8 @@ class MeModFile:
         self.changelog = attrs.pop("changelog")
         self.metadata = attrs.pop("metadata_blob")
         self.download = attrs.pop("download")
-
-    def edit(self, **fields):
-        """Endpoint cannot be called from this object"""
-        raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
-
-    def delete(self):
-        """Endpoint cannot be called from this object"""
-        raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
-
-class ModFile(MeModFile):
-    """Inherits from MeModFile
-
-    Attributes
-    -----------
-    game : int
-        ID of the game of the mod this file belongs to.
-    
-    """
-    def __init__(self, **attrs):
-        super().__init__(**attrs)
-        self.game = attrs.pop("game_id")
-        self.client = attrs.pop("client")
+        self.game = attrs.pop("game_id", None)
+        self.client = attrs.pop("client", None)
 
     def edit(self, **fields):
         """Edit the file's details
@@ -253,6 +235,9 @@ class ModFile(MeModFile):
             Metadata stored by the game developer which may include 
             properties such as what version of the game this file is compatible with.
         """
+        if not self.game:
+            raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
+
         file_json = self.client._put_request(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}', data = fields)
         self.__init__(client=self.client, game_id=self.game, **file_json)
 
@@ -265,8 +250,21 @@ class ModFile(MeModFile):
         Forbidden
             You cannot delete the active release of a mod
         """
+        if not self.game:
+            raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
+            
         r = requests.delete(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}')
         return r
+
+    def url_expired(self):
+        """Check if the url is still valid for this modfile
+
+        Returns
+        -------
+        bool
+            True if it's still valid, else False
+        """
+        return self.download["binary_url"] <= time.time()
 
 class ModMedia:
     """Represents all the media for a mod.
@@ -286,7 +284,7 @@ class ModMedia:
         self.sketchfab = attrs.pop("sketchfab")
         self.images = [Image(**image) for image in attrs.pop("images", [])]
 
-class ModTag:
+class Tag:
     """Represents a tag
     
     Attributes
@@ -305,7 +303,7 @@ class ModTag:
     def __repr__(self):
         return self.name    
 
-class GameTag:
+class TagOption:
     """Represents a game tag gropup, a category of tags from which a 
     mod may pick one or more.
 
@@ -391,12 +389,12 @@ class Stats:
         self.downloads = kwargs.pop("downloads_total")
         self.subscribers = kwargs.pop("subscribers_total")
         self.date = kwargs.pop("date_expires")
-        self.total = attrs.pop("total_ratings")
-        self.positive = attrs.pop("positive_ratings")
-        self.negative = attrs.pop("negative_ratings")
-        self.percentage = attrs.pop("percentage_positive")
-        self.weighted = attrs.pop("weighted_aggregate")
-        self.text = attrs.pop("display_text")
+        self.total = attrs.pop("ratings_total")
+        self.positive = attrs.pop("ratings_positive")
+        self.negative = attrs.pop("ratings_negative")
+        self.percentage = attrs.pop("ratings_percentage_positive")
+        self.weighted = attrs.pop("ratings_weighted_aggregate")
+        self.text = attrs.pop("ratings_display_text")
 
     def is_stale(self):
         """Returns a bool depending on whether or not the stats are considered stale.
@@ -446,7 +444,7 @@ class User:
 
         self.tz = attrs.pop("timezone")
         self.lang = attrs.pop("language")
-        self.url = attrs.pop("profile_url")
+        self.profile = attrs.pop("profile_url")
 
 class TeamMember(User):
     """Inherits from modio.User. Represents a user as part of a team.
@@ -543,7 +541,7 @@ class NewMod:
 
         return self
 
-class NewFile:
+class NewModFile:
     """This class is unique to the library and represents a file to be submitted. The class
     must be instantiated and then passed to mod.add_file().
 
@@ -598,13 +596,46 @@ class Filter:
 
     Parameters
     ----------
-    filter : dict
+    filters : Optional[dict]
         A dict which contains modio filter keyword and the appropriate value.
 
     """
     def __init__(self, filter={}):
-        for key, value in filter:
+        for key, value in filters.items():
             self.__setattr__(key, value)
+
+        self._lib_to_api = {
+            "date" : "date_added",
+            "metadata" : "metadata_blob",
+            "key" : "metakey",
+            "value" : "metavalue",
+            "maturity": "maturity_option",
+            "type" : "event_type",
+            "presentation" : "presentation_option",
+            "curation" : "curation_option",
+            "community" : "community_options",
+            "submission" : "submission_option",
+            "revenue" : "revenue_options",
+            "api" : "api_access_options",
+            "ugc" : "ugc_name",
+            "profile" : "profile_url",
+            "homepage" : "homepage_url",
+            "submitter" : "submitted_by",
+            "game" : "game_id"
+
+
+        }
+
+    def _set(self, key, value):
+        try:
+            key = self._lib_to_api[key]
+        except KeyError:
+            pass
+
+        if key == "event_type":
+            value = f"MOD{'_' if value != EventType.file_changed else ''}{value.name.upper()}"
+
+        self.__setattr__(key, value)
 
     def text(self, query):
         """Full-text search is a lenient search filter that is only available if
@@ -627,8 +658,8 @@ class Filter:
         any named keywords and transforms them into arguments that will be passed to the request. E.g.
         'id=10' or 'name="Best Mod"'
         """
-        for key, value in kwargs:
-            self.__setattr__(key, value)
+        for key, value in kwargs.items():
+            self._set(key, value)
         return self
 
     def not_equals(self, **kwargs):
@@ -636,8 +667,8 @@ class Filter:
         this methods takes any named keywords and transforms them into arguments that will be passed to 
         the request. E.g. 'id=10' or 'name="Best Mod"'
         """
-        for key, value in kwargs:
-            self.__setattr__(f"{key}-not", value)
+        for key, value in kwargs.items():
+            self._set(f"{key}-not", value)
         return self
 
     def like(self, **kwargs):
@@ -646,8 +677,8 @@ class Filter:
         this methods takes any named keywords and transforms them into arguments that will be passed to 
         the request. E.g. 'id=10' or 'name="Best Mod"'
         """
-        for key, value in kwargs:
-            self.__setattr__(f"{key}-lk", value)
+        for key, value in kwargs.items():
+            self._set(f"{key}-lk", value)
         return self
 
     def not_like(self, **kwargs):
@@ -656,8 +687,8 @@ class Filter:
         as described below. There are not set parameters, this methods takes any named keywords and transforms 
         them into arguments that will be passed to the request. E.g. 'id=10' or 'name="Best Mod"'
         """
-        for key, value in kwargs:
-            self.__setattr__(f"{key}-not-lk", value)
+        for key, value in kwargs.items():
+            self._set(f"{key}-not-lk", value)
         return self
 
     def in_text(self, **kwargs):
@@ -665,8 +696,8 @@ class Filter:
         to SQL's IN. There are not set parameters, this methods takes any named keywords and transforms 
         them into arguments that will be passed to the request. E.g. 'id=10' or 'name="Best Mod"
         """
-        for key, value in kwargs:
-            self.__setattr__(f"{key}-in", value)
+        for key, value in kwargs.items():
+            self._set(f"{key}-in", value)
         return self
 
     def not_in_text(self, **kwargs):
@@ -674,8 +705,8 @@ class Filter:
         to SQL's NOT IN. There are not set parameters, this methods takes any named keywords and transforms 
         them into arguments that will be passed to the request. E.g. 'id=10' or 'name="Best Mod"
         """
-        for key, value in kwargs:
-            self.__setattr__(f"{key}-not-in", value)
+        for key, value in kwargs.items():
+            self._set(f"{key}-not-in", value)
         return self
 
     def max(self, **kwargs):
@@ -683,8 +714,8 @@ class Filter:
         parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
         to the request. E.g. 'game=40'
         """
-        for key, value in kwargs:
-            self.__setattr__(f"{key}-max", value)
+        for key, value in kwargs.items():
+            self._set(f"{key}-max", value)
         return self
 
     def min(self, **kwargs):
@@ -692,8 +723,8 @@ class Filter:
         parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
         to the request. E.g. 'game=40'
         """
-        for key, value in kwargs:
-            self.__setattr__(f"{key}-min", value)
+        for key, value in kwargs.items():
+            self._set(f"{key}-min", value)
         return self
 
     def smaller_than(self, **kwargs):
@@ -701,8 +732,8 @@ class Filter:
         parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
         to the request. E.g. 'game=40'
         """
-        for key, value in kwargs:
-            self.__setattr__(f"{key}-st", value)
+        for key, value in kwargs.items():
+            self._set(f"{key}-st", value)
         return self
 
     def greater_than(self, **kwargs):
@@ -710,8 +741,8 @@ class Filter:
         parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
         to the request. E.g. 'game=40'
         """
-        for key, value in kwargs:
-            self.__setattr__(f"{key}-gt", value)
+        for key, value in kwargs.items():
+            self._set(f"{key}-gt", value)
         return self
 
     def bitwise(self, **kwargs):
@@ -720,8 +751,8 @@ class Filter:
         to check for multiple options at once. E.g if Option A: 1 and Option B: 2 then submitting 3 will return items
         that have both option A and B enabled.
         """
-        for key, value in kwargs:
-            self.__setattr__(f"{key}-bitwise-and", value)
+        for key, value in kwargs.items():
+            self._set(f"{key}-bitwise-and", value)
         return self
 
     def sort(self, key, reverse=False):
@@ -760,7 +791,6 @@ class Filter:
         """
         self._offset = offset
         return self
-
 
 
 class Object:
