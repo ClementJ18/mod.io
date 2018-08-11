@@ -48,19 +48,22 @@
 &nbsp;<br>
 Parameters<br>
 -----------<br>
-api_key&nbsp;:&nbsp;str<br>
+api_key&nbsp;:&nbsp;Optional[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;api&nbsp;key&nbsp;that&nbsp;will&nbsp;be&nbsp;used&nbsp;to&nbsp;authenticate&nbsp;the&nbsp;bot&nbsp;while&nbsp;it&nbsp;makes&nbsp;most&nbsp;of&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;its&nbsp;GET&nbsp;requests.&nbsp;This&nbsp;can&nbsp;be&nbsp;generated&nbsp;on&nbsp;the&nbsp;mod.io&nbsp;website.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;its&nbsp;GET&nbsp;requests.&nbsp;This&nbsp;can&nbsp;be&nbsp;generated&nbsp;on&nbsp;the&nbsp;mod.io&nbsp;website.&nbsp;Optional&nbsp;if&nbsp;an&nbsp;access&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;token&nbsp;is&nbsp;supplied.<br>
 auth&nbsp;:&nbsp;Optional[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;O&nbsp;Auth&nbsp;2&nbsp;token&nbsp;that&nbsp;will&nbsp;be&nbsp;used&nbsp;to&nbsp;make&nbsp;more&nbsp;complex&nbsp;GET&nbsp;requests&nbsp;and&nbsp;to&nbsp;make<br>
 &nbsp;&nbsp;&nbsp;&nbsp;POST&nbsp;requests.&nbsp;This&nbsp;can&nbsp;either&nbsp;be&nbsp;generated&nbsp;using&nbsp;the&nbsp;library's&nbsp;oauth2&nbsp;functions<br>
 &nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;through&nbsp;the&nbsp;mod.io&nbsp;website.&nbsp;This&nbsp;is&nbsp;referred&nbsp;as&nbsp;an&nbsp;access&nbsp;token&nbsp;in&nbsp;the&nbsp;rest&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;documentation.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;documentation.&nbsp;If&nbsp;an&nbsp;access&nbsp;token&nbsp;is&nbsp;supplied&nbsp;it&nbsp;will&nbsp;be&nbsp;used&nbsp;for&nbsp;all&nbsp;requests.<br>
 lang&nbsp;:&nbsp;Optional[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;mod.io&nbsp;API&nbsp;provides&nbsp;localization&nbsp;for&nbsp;a&nbsp;collection&nbsp;of&nbsp;languages.&nbsp;To&nbsp;specify&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;responses&nbsp;from&nbsp;the&nbsp;API&nbsp;to&nbsp;be&nbsp;in&nbsp;a&nbsp;particular&nbsp;language,&nbsp;simply&nbsp;provide&nbsp;the&nbsp;lang&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;parameter&nbsp;with&nbsp;an&nbsp;ISO&nbsp;639&nbsp;compliant&nbsp;language&nbsp;code.&nbsp;Else&nbsp;the&nbsp;language&nbsp;of&nbsp;the&nbsp;authenticated<br>
 &nbsp;&nbsp;&nbsp;&nbsp;user&nbsp;will&nbsp;be&nbsp;used,&nbsp;default&nbsp;is&nbsp;US&nbsp;English.<br>
+test&nbsp;:&nbsp;Optional[bool]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Whether&nbsp;or&nbsp;not&nbsp;to&nbsp;use&nbsp;the&nbsp;mod.io&nbsp;test&nbsp;environment.&nbsp;If&nbsp;not&nbsp;included&nbsp;will&nbsp;default&nbsp;to&nbsp;False.<br>
 &nbsp;<br>
 Attributes<br>
 -----------<br>
@@ -98,7 +101,7 @@ str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;access&nbsp;code.&nbsp;The&nbsp;access&nbsp;code&nbsp;will&nbsp;also&nbsp;be&nbsp;added&nbsp;directly&nbsp;to&nbsp;the&nbsp;<a href="#Client">Client</a>'s&nbsp;`access_token`&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;attribute.</tt></dd></dl>
 
-<dl><dt><a name="Client-email_request"><strong>email_request</strong></a>(self, email)</dt><dd><tt>Posts&nbsp;an&nbsp;email&nbsp;request&nbsp;for&nbsp;an&nbsp;OAuth2&nbsp;token.&nbsp;A&nbsp;code&nbsp;will&nbsp;be&nbsp;sent&nbsp;to&nbsp;the&nbsp;given&nbsp;email&nbsp;address<br>
+<dl><dt><a name="Client-email_request"><strong>email_request</strong></a>(self, email:str)</dt><dd><tt>Posts&nbsp;an&nbsp;email&nbsp;request&nbsp;for&nbsp;an&nbsp;OAuth2&nbsp;token.&nbsp;A&nbsp;code&nbsp;will&nbsp;be&nbsp;sent&nbsp;to&nbsp;the&nbsp;given&nbsp;email&nbsp;address<br>
 which&nbsp;can&nbsp;then&nbsp;be&nbsp;entered&nbsp;into&nbsp;:func:`email_exchange`.<br>
 &nbsp;<br>
 Parameters<br>
@@ -124,26 +127,41 @@ Returns<br>
 :class:&nbsp;`Game`<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;game&nbsp;with&nbsp;the&nbsp;given&nbsp;ID</tt></dd></dl>
 
-<dl><dt><a name="Client-get_games"><strong>get_games</strong></a>(self, **fields)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;games&nbsp;available&nbsp;on&nbsp;mod.io.&nbsp;Takes&nbsp;filtering&nbsp;arguments.<br>
+<dl><dt><a name="Client-get_games"><strong>get_games</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;games&nbsp;available&nbsp;on&nbsp;mod.io.&nbsp;Takes&nbsp;filtering&nbsp;arguments.<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
 list<br>
 &nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.Game&nbsp;instances</tt></dd></dl>
 
-<dl><dt><a name="Client-get_me"><strong>get_me</strong></a>(self)</dt><dd><tt>Gets&nbsp;the&nbsp;authenticated&nbsp;user's&nbsp;details&nbsp;(aka&nbsp;the&nbsp;user&nbsp;who&nbsp;created&nbsp;the&nbsp;API&nbsp;key/access&nbsp;token)<br>
-Raises<br>
--------<br>
-Forbidden<br>
-&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;access&nbsp;token&nbsp;is&nbsp;invalid/missing<br>
+<dl><dt><a name="Client-get_my_events"><strong>get_my_events</strong></a>(self, *, filter=None)</dt><dd><tt>Get&nbsp;events&nbsp;that&nbsp;have&nbsp;been&nbsp;fired&nbsp;specifically&nbsp;for&nbsp;the&nbsp;authenticated&nbsp;user.&nbsp;Takes<br>
+filtering&nbsp;argmuments<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Returns<br>
--------<br>
-User<br>
-&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;authenticated&nbsp;user</tt></dd></dl>
+--------<br>
+list&nbsp;:&nbsp;Events<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;events&nbsp;related&nbsp;to&nbsp;the&nbsp;user</tt></dd></dl>
 
-<dl><dt><a name="Client-get_me_games"><strong>get_me_games</strong></a>(self, **fields)</dt><dd><tt>Get&nbsp;all&nbsp;the&nbsp;games&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;added&nbsp;or&nbsp;is&nbsp;a&nbsp;team&nbsp;member&nbsp;of.&nbsp;Takes<br>
+<dl><dt><a name="Client-get_my_games"><strong>get_my_games</strong></a>(self, filter=None)</dt><dd><tt>Get&nbsp;all&nbsp;the&nbsp;games&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;added&nbsp;or&nbsp;is&nbsp;a&nbsp;team&nbsp;member&nbsp;of.&nbsp;Takes<br>
 filtering&nbsp;arguments.<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Raises<br>
 -------<br>
@@ -155,8 +173,14 @@ Returns<br>
 list<br>
 &nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.Game&nbsp;instances&nbsp;representing&nbsp;all&nbsp;games&nbsp;the&nbsp;user&nbsp;is&nbsp;added&nbsp;or&nbsp;is&nbsp;team&nbsp;member&nbsp;of</tt></dd></dl>
 
-<dl><dt><a name="Client-get_me_modfiles"><strong>get_me_modfiles</strong></a>(self, **fields)</dt><dd><tt>Get&nbsp;all&nbsp;the&nbsp;mods&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;uploaded.&nbsp;The&nbsp;returned&nbsp;modfile&nbsp;objects&nbsp;cannot&nbsp;be<br>
-edited&nbsp;or&nbsp;deleted&nbsp;and&nbsp;do&nbsp;not&nbsp;have&nbsp;a&nbsp;`game_idè&nbsp;attribute.&nbsp;Takes&nbsp;filtering&nbsp;arguments.<br>
+<dl><dt><a name="Client-get_my_modfiles"><strong>get_my_modfiles</strong></a>(self, *, filter=None)</dt><dd><tt>Get&nbsp;all&nbsp;the&nbsp;mods&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;uploaded.&nbsp;The&nbsp;returned&nbsp;modfile&nbsp;objects&nbsp;cannot&nbsp;be<br>
+edited&nbsp;or&nbsp;deleted&nbsp;and&nbsp;do&nbsp;not&nbsp;have&nbsp;a&nbsp;`game_id`&nbsp;attribute.&nbsp;Takes&nbsp;filtering&nbsp;arguments.<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Raises<br>
 -------<br>
@@ -166,10 +190,16 @@ Forbidden<br>
 Returns<br>
 -------<br>
 list<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.MeModFile&nbsp;instances&nbsp;representing&nbsp;all&nbsp;modfiles&nbsp;the&nbsp;user&nbsp;added.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.ModFile&nbsp;instances&nbsp;representing&nbsp;all&nbsp;modfiles&nbsp;the&nbsp;user&nbsp;added.</tt></dd></dl>
 
-<dl><dt><a name="Client-get_me_mods"><strong>get_me_mods</strong></a>(self, **fields)</dt><dd><tt>Get&nbsp;all&nbsp;the&nbsp;mods&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;added&nbsp;or&nbsp;is&nbsp;a&nbsp;team&nbsp;member&nbsp;of.&nbsp;Takes<br>
+<dl><dt><a name="Client-get_my_mods"><strong>get_my_mods</strong></a>(self, *, filter=None)</dt><dd><tt>Get&nbsp;all&nbsp;the&nbsp;mods&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;added&nbsp;or&nbsp;is&nbsp;a&nbsp;team&nbsp;member&nbsp;of.&nbsp;Takes<br>
 filtering&nbsp;arguments.<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Raises<br>
 -------<br>
@@ -181,8 +211,14 @@ Returns<br>
 list<br>
 &nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.Mod&nbsp;instances&nbsp;representing&nbsp;all&nbsp;mods&nbsp;the&nbsp;user&nbsp;is&nbsp;added&nbsp;or&nbsp;is&nbsp;team&nbsp;member&nbsp;of</tt></dd></dl>
 
-<dl><dt><a name="Client-get_me_sub"><strong>get_me_sub</strong></a>(self, **fields)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;mods&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;is&nbsp;subscribed&nbsp;to.&nbsp;&nbsp;Takes<br>
+<dl><dt><a name="Client-get_my_subs"><strong>get_my_subs</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;mods&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;is&nbsp;subscribed&nbsp;to.&nbsp;&nbsp;Takes<br>
 filtering&nbsp;arguments.<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Raises<br>
 -------<br>
@@ -194,7 +230,18 @@ Returns<br>
 list<br>
 &nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.Mod&nbsp;instances&nbsp;representing&nbsp;all&nbsp;mods&nbsp;the&nbsp;user&nbsp;is&nbsp;subscribed&nbsp;to</tt></dd></dl>
 
-<dl><dt><a name="Client-get_user"><strong>get_user</strong></a>(self, id)</dt><dd><tt>Gets&nbsp;a&nbsp;user&nbsp;with&nbsp;the&nbsp;specified&nbsp;ID.<br>
+<dl><dt><a name="Client-get_my_user"><strong>get_my_user</strong></a>(self)</dt><dd><tt>Gets&nbsp;the&nbsp;authenticated&nbsp;user's&nbsp;details&nbsp;(aka&nbsp;the&nbsp;user&nbsp;who&nbsp;created&nbsp;the&nbsp;API&nbsp;key/access&nbsp;token)<br>
+Raises<br>
+-------<br>
+Forbidden<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;access&nbsp;token&nbsp;is&nbsp;invalid/missing<br>
+&nbsp;<br>
+Returns<br>
+-------<br>
+User<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;authenticated&nbsp;user</tt></dd></dl>
+
+<dl><dt><a name="Client-get_user"><strong>get_user</strong></a>(self, id:int)</dt><dd><tt>Gets&nbsp;a&nbsp;user&nbsp;with&nbsp;the&nbsp;specified&nbsp;ID.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -211,14 +258,20 @@ Returns<br>
 :class:&nbsp;`User`<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;user&nbsp;with&nbsp;the&nbsp;given&nbsp;ID</tt></dd></dl>
 
-<dl><dt><a name="Client-get_users"><strong>get_users</strong></a>(self, **fields)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;users&nbsp;availaible&nbsp;on&nbsp;mod.io.&nbsp;Takes&nbsp;filtering&nbsp;arguments.<br>
+<dl><dt><a name="Client-get_users"><strong>get_users</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;users&nbsp;availaible&nbsp;on&nbsp;mod.io.&nbsp;Takes&nbsp;filtering&nbsp;arguments.<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
 list<br>
 &nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.User&nbsp;instances</tt></dd></dl>
 
-<dl><dt><a name="Client-report"><strong>report</strong></a>(self, *, resource, type=0, name, summary)</dt><dd><tt>Used&nbsp;to&nbsp;report&nbsp;for&nbsp;any&nbsp;resource&nbsp;on&nbsp;mod.io.&nbsp;Make&nbsp;sure&nbsp;to&nbsp;read&nbsp;mod.io's&nbsp;ToU&nbsp;to&nbsp;understand<br>
+<dl><dt><a name="Client-report"><strong>report</strong></a>(self, *, resource:Union[modio.game.Game, modio.objects.User, modio.mod.Mod, modio.objects.Object], type:int=0, name:str, summary:str)</dt><dd><tt>Used&nbsp;to&nbsp;report&nbsp;for&nbsp;any&nbsp;resource&nbsp;on&nbsp;mod.io.&nbsp;Make&nbsp;sure&nbsp;to&nbsp;read&nbsp;mod.io's&nbsp;ToU&nbsp;to&nbsp;understand<br>
 what&nbsp;is&nbsp;and&nbsp;isn't&nbsp;acceptable<br>
 &nbsp;<br>
 Parameters<br>
@@ -254,5 +307,12 @@ Data descriptors defined here:<br>
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
-</td></tr></table></td></tr></table>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>Union</strong> = typing.Union</td></tr></table>
 </body></html>

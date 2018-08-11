@@ -1,5 +1,5 @@
 """
-The module
+modio is a python wrapper to interact with the mod.io API.
 """
 
 from .client import Client

@@ -1,4 +1,5 @@
 from .errors import modioException
+
 import hashlib
 import enum
 
@@ -58,7 +59,11 @@ class EventType(enum.Enum):
     edited        = 3
     deleted       = 4
     team_changed  = 5
-    other         = 6    
+    team_join     = 6
+    team_leave    = 7
+    subscribe     = 8
+    unsubscribe   = 9
+    other         = 10    
 
 class Event:
     """Represents a mod event. 
@@ -71,7 +76,7 @@ class Event:
         ID of the mod this event is from
     user : int
         ID of the user that made the change
-    data : int
+    date : int
         UNIX timestamp of the event occurrence
     type : enum.EventType
         Type of the event.
@@ -86,20 +91,25 @@ class Event:
 
     @property
     def type(self):
-        if self._raw_type == "MODFILE_CHANGED":
-            return EventType.file_changed
-        elif self._raw_type == "MOD_AVAILABLE":
-            return EventType.available
-        elif self._raw_type == "MOD_UNAVAILABLE":
-            return EventType.unavailable
-        elif self._raw_type == "MOD_EDITED":
-            return EventType.edited
-        elif self._raw_type == "MOD_DELETED":
-            return EventType.deleted
-        elif self._raw_type == "MOD_TEAM_CHANGED":
-            return EventType.team_changed
+        if self._raw_type.startswith("MOD"):
+            return EventType[self._raw_type.replace("MOD", "").replace("_", "").lower()]
         else:
-            return EventType.other
+            return EventType[self._raw_type.replace("USER_", "").lower()]
+
+        # if self._raw_type == "MODFILE_CHANGED":
+        #     return EventType.file_changed
+        # elif self._raw_type == "MOD_AVAILABLE":
+        #     return EventType.available
+        # elif self._raw_type == "MOD_UNAVAILABLE":
+        #     return EventType.unavailable
+        # elif self._raw_type == "MOD_EDITED":
+        #     return EventType.edited
+        # elif self._raw_type == "MOD_DELETED":
+        #     return EventType.deleted
+        # elif self._raw_type == "MOD_TEAM_CHANGED":
+        #     return EventType.team_changed
+        # else:
+        #     return EventType.other
 
 class Comment:
     """Represents a comment on a mod page.
@@ -110,7 +120,7 @@ class Comment:
         ID of the comment
     mod : id
         ID of the mod this comment is from
-    author : modio.User
+    submitter : modio.User
         Istance of the user that submitted the comment
     date : int
         Unix timestamp of date the comment was posted.
@@ -133,28 +143,20 @@ class Comment:
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.mod = attrs.pop("mod_id")
-        self.author = User(**attrs.pop("submitter"))
+        self.submitter = User(**attrs.pop("submitter"))
         self.date = attrs.pop("date_added")
         self.parent = attrs.pop("reply_id")
         self.position = attrs.pop("reply_position")
         self.karma = attrs.pop("karma")
         self.karma_guest = attrs.pop("karma_guest")
         self.content = attrs.pop("content")
+        self.client = attrs.pop("client")
+        self.mod = attrs.pop("mod")
 
-class ModDependencies:
-    """Represents a mod dependency, a mod that this mod relies on to be installed correctly
-
-    Attributes
-    -----------
-    id : int
-        ID of the dependency mod
-    date : int
-        UNIX timestamp of the moment the dependency was added
-
-    """
-    def __init__(self, **attrs):
-        self.id = attrs.pop("mod_id")
-        self.date = attrs.pop("date_addedy")
+        def delete(self):
+            """Remove a comment"""
+            r = self.client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}')
+            return r
 
 class ModFile:
     """A object to represents modfiles. If the modfile has been returned for the me/modfile endpoint
@@ -282,26 +284,7 @@ class ModMedia:
     def __init__(self, **attrs):
         self.youtube = attrs.pop("youtube")
         self.sketchfab = attrs.pop("sketchfab")
-        self.images = [Image(**image) for image in attrs.pop("images", [])]
-
-class Tag:
-    """Represents a tag
-    
-    Attributes
-    -----------
-    name : str
-        Name fo the tag
-    date : int
-        UNIX timestamp of when the tag was added
-
-    """
-    def __init__(self, **attrs):
-        self.name = attrs.pop("name")
-        self.date = attrs.pop("date_added")
-        self.__dict__ = {self.name : self.date_added}
-
-    def __repr__(self):
-        return self.name    
+        self.images = [Image(**image) for image in attrs.pop("images", [])] 
 
 class TagOption:
     """Represents a game tag gropup, a category of tags from which a 
@@ -331,21 +314,9 @@ class TagOption:
     def __repr__(self):
         return self.name
 
-class MetaData:
-    """Represents the data left by the devs on the game. Can be retrieved
-    as a dict {key : value}
-    
-    Attributes
-    -----------
-    key : str
-        The key of the key-value pair.
-    value : str
-        The value of the key-value pair.
-    """
-    def __init__(self, **attrs):
-        self.key = attrs.pop("metakey")
-        self.value = attrs.pop("metavalue")
-        self.__dict__ = {self.key : self.value}
+class RatingType(enum.Enum):
+    good = 1
+    bad = -1
 
 class Stats:
     """Represents a summary of stats for a mod
@@ -471,6 +442,32 @@ class TeamMember(User):
         self.level = attrs.pop("level")
         self.date = attrs.pop("date_added")
         self.position = attrs.pop("position")
+        self.client = attrs.pop("client")
+        self.mod = attrs.pop("mod")
+
+    def edit(self, *, level=None, position=None):
+        """Edit a team member's details.
+
+        Parameters
+        -----------
+        level : Optional[int]
+            Level of permissions the user has
+            1 : Moderator
+            4 : Creator
+            8 : Administrator
+        position : Optional[str]
+            Custom title given to the user in this team.
+
+        """
+        data = {"level" : level, "position" : position}
+        msg = self.client._put_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}', data=data)
+        return Message(**msg)
+
+    def delete(self):
+        """Remove the user from the team. Fires a MOD_TEAM_CHANGED event"""
+        r = self.client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}')
+        return r
+    
 
 class NewMod:
     """This class is unique to the library, it represents a mod to be submitted. The class
@@ -592,7 +589,8 @@ class Filter:
     various methods. For advanced users it is also possible to pass filtering
     arguments directly to the class given that they are already in modio format.
     If you don't know the modio format simply use the methods, all method return
-    self for fluid chaining. This is also used for sorting and pagination.
+    self for fluid chaining. This is also used for sorting and pagination. These
+    instances can be save and reused at will.
 
     Parameters
     ----------
@@ -602,7 +600,7 @@ class Filter:
     """
     def __init__(self, filter={}):
         for key, value in filters.items():
-            self.__setattr__(key, value)
+            self._set(key, value)
 
         self._lib_to_api = {
             "date" : "date_added",
@@ -621,9 +619,11 @@ class Filter:
             "profile" : "profile_url",
             "homepage" : "homepage_url",
             "submitter" : "submitted_by",
-            "game" : "game_id"
-
-
+            "game" : "game_id",
+            "live" : "date_live",
+            "updated" : "date_updated",
+            "team_id" : "id",
+            "kvp" : "metadata_kvp"
         }
 
     def _set(self, key, value):
@@ -633,7 +633,10 @@ class Filter:
             pass
 
         if key == "event_type":
-            value = f"MOD{'_' if value != EventType.file_changed else ''}{value.name.upper()}"
+            if value.value < 6:
+                value = f"MOD{'_' if value != EventType.file_changed else ''}{value.name.upper()}"
+            else:
+                value = f"USER_{value.name.upper()}"
 
         self.__setattr__(key, value)
 

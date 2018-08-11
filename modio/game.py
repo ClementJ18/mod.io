@@ -18,9 +18,9 @@ class Game:
         Instance of the modio user having submitted the game
     date : int
         UNIX timestamp of the date the game was registered
-    date_updated : int
+    updated : int
         UNIX timestamp of the date the game was last updated
-    date_live : int
+    live : int
         UNIX timestamp of the date the game went live
     presentation : int
         0 : Display mods for that game in a grid on mod.io
@@ -91,8 +91,8 @@ class Game:
         self.status = attrs.pop("status")
         self.submitter = User(**attrs.pop("submitted_by"))
         self.date = attrs.pop("date_added")
-        self.date_updated = attrs.pop("date_updated")
-        self.date_live = attrs.pop("date_live")
+        self.updated = attrs.pop("date_updated")
+        self.live = attrs.pop("date_live")
         self.presentation = attrs.pop("presentation_option")
         self.submission = attrs.pop("submission_option")
         self.curation = attrs.pop("curation_option")
@@ -116,6 +116,14 @@ class Game:
 
     def __repr__(self):
         return f'<{self.__class__.__name__} id={self.id} name={self.name}>'
+
+    def _all_tags(self):
+        tag_list = []
+        for tag in self.tag_options:
+            tag_list.extend(tag.tags)
+
+        return tag_list
+
 
     def get_mod(self, id : int):
         """Queries the mod.io API for the given mod ID and if found returns it as a 
@@ -141,8 +149,14 @@ class Game:
 
         return Mod(self.client, **mod_json)
 
-    def get_mods(self, **fields):
-        """Gets all the mods available for mods. Takes filtering arguments.
+    def get_mods(self, filter=None):
+        """Gets all the mods available for the game. Takes filtering arguments.
+
+        Parameters
+        -----------
+        filter : Optional[modio.Filter]
+            A instance of modio.Filter to be used for filtering, paginating and sorting 
+            results
 
         Returns
         --------
@@ -150,7 +164,7 @@ class Game:
             A list of modio.Mod instances
                
         """
-        mod_json = self.client._get_request(f"/games/{self.id}/mods")
+        mod_json = self.client._get_request(f"/games/{self.id}/mods", filter=filter)
 
         mod_list = list()
         for mod in mod_json["data"]:
@@ -158,9 +172,15 @@ class Game:
 
         return mod_list
 
-    def get_mod_events(self, **fields):
+    def get_mod_events(self, *, filter=None):
         """Gets all the mod events available for this game sorted by latest event first. Takes 
         filtering arguments.
+
+        Parameters
+        -----------
+        filter : Optional[modio.Filter]
+            A instance of modio.Filter to be used for filtering, paginating and sorting 
+            results
 
         Returns
         --------
@@ -168,13 +188,19 @@ class Game:
             A list of modio.Event instances
                
         """
-        event_json = self.client._get_request(f"/games/{self.id}/mods/events")
+        event_json = self.client._get_request(f"/games/{self.id}/mods/events", filter=filter)
 
         return [Event(**event) for event in event_json["data"]]
 
-    def get_tags(self, **fields):
+    def get_tags(self, *, filter=None):
         """Gets all the game tags available for this game. Takes filtering
         arguments.
+
+        Parameters
+        -----------
+        filter : Optional[modio.Filter]
+            A instance of modio.Filter to be used for filtering, paginating and sorting 
+            results
 
         Returns
         --------
@@ -182,20 +208,26 @@ class Game:
             A list of modio.TagOption instances
                
         """
-        tag_json = self.client._get_request(f"/games/{self.id}/tags")
+        tag_json = self.client._get_request(f"/games/{self.id}/tags", filter=filter)
 
         return [TagOption(**tag_option) for tag_option in tag_json["data"]]
 
-    def get_stats(self, **fields):
+    def get_stats(self, *, filter=None):
         """Gets the stat objects for all the mods of this game. Takes 
         filtering arguments
+
+        Parameters
+        -----------
+        filter : Optional[modio.Filter]
+            A instance of modio.Filter to be used for filtering, paginating and sorting 
+            results
 
         Returns
         --------
         list[modio.Stats]
             List of all the mod stats
         """
-        stats_json = self.client._get_request(f"/games/{self.id}/mods/stats")
+        stats_json = self.client._get_request(f"/games/{self.id}/mods/stats", filter=filter)
         return [Stats(**stats) for stats in stats_json["data"]]
 
     def edit(self, **fields):
@@ -259,7 +291,6 @@ class Game:
             containing mature content"""
 
         game_json = self.client._put_request(f'/games/{self.id}', data = fields)
-
         self.__init__(self.client, **game_json)
 
     def add_mod(self, mod):
@@ -327,8 +358,11 @@ class Game:
         for image in field:
             field[image] = open(field[image])
 
-        message = self.client._post_request(f'/games/{self.id}/media', h_type = 1, files = fields)
-        self.__int__(self.client, self.client._get_request(f"/games/{self.id}"))
+        try:
+            message = self.client._post_request(f'/games/{self.id}/media', h_type = 1, files = fields)
+        finally:
+            for image in field.values():
+                image.close()
         
         return Message(**message)
 
@@ -349,17 +383,14 @@ class Game:
             Array of tags that mod creators can apply to their mod
 
         """
-        if "tags" in fields:
-            tags = fields.pop("tags")
-            for tag in tags:
-                fields[f"tags[{tags.index(tag)}]"] = tag
-
+        tags = fields.pop("tags", [])
+        fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
         message = self.client._post_request(f'/games/{self.id}/tags', data = {"input_json" : fields})
 
         self.tag_options.append(TagOption(**fields))
         return Message(**message)
 
-    def del_tags(self, **fields):
+    def delete_tags(self, **fields):
         """Delete one or more tags from a tag option
         
         Parameters
@@ -371,9 +402,7 @@ class Game:
             deleted
         """
         tags = fields.pop("tags", [])
-        for tag in tags:
-            fields[f"tags[{tags.index(tag)}]"] = tag
-
+        fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
         r = self.client._delete_request(f'/games/{self.id}/tags', data = fields)
         if len(tags) > 0:
             self.tags[fields["name"]] -= tags

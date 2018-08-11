@@ -7,21 +7,21 @@ from .game import Game
 from .mod import Mod
 from .errors import *
 from .objects import *
-from .utils import *
 
 class Client:
     """Represents the base-level client to make requests to the mod.io API with.
 
     Parameters
     -----------
-    api_key : str
+    api_key : Optional[str]
         The api key that will be used to authenticate the bot while it makes most of 
-        its GET requests. This can be generated on the mod.io website.
+        its GET requests. This can be generated on the mod.io website. Optional if an access 
+        token is supplied.
     auth : Optional[str]
         The O Auth 2 token that will be used to make more complex GET requests and to make
         POST requests. This can either be generated using the library's oauth2 functions
         or through the mod.io website. This is referred as an access token in the rest of
-        the documentation.
+        the documentation. If an access token is supplied it will be used for all requests.
     lang : Optional[str]
         The mod.io API provides localization for a collection of languages. To specify 
         responses from the API to be in a particular language, simply provide the lang 
@@ -45,7 +45,7 @@ class Client:
     """
 
     def __init__(self, **fields):
-        self.api_key = fields.pop("api_key")
+        self.api_key = fields.pop("api_key", None)
         self.access_token = fields.pop("auth", None)
         self.lang = fields.pop("lang", "en")
         self.rate_limit = None
@@ -58,7 +58,7 @@ class Client:
         #check o auth 2 token
         if self.access_token:
             try:
-                self.get_me()
+                self.get_my_user()
             except Forbidden:
                 raise Forbidden("O Auth 2 token invalid")
         else:
@@ -106,6 +106,7 @@ class Client:
             elif code == 429:
                 time.sleep(self.rate_retry) #feeble attempt at handling rate limits
                 raise TooManyRequests(msg, self.rate_retry)
+                self.rate_retry = None
             else:
                 raise modioException(msg)
         else:
@@ -113,8 +114,6 @@ class Client:
 
     def _get_request(self, url, **fields):
         extra = fields.pop("filter", Filter()).__dict__.copy()
-
-
 
         if not self.access_token:
             headers = {
@@ -204,8 +203,14 @@ class Client:
         game_json = self._get_request(f'/games/{id}')
         return Game(self, **game_json)
 
-    def get_games(self, **fields):
+    def get_games(self, *, filter=None):
         """Gets all the games available on mod.io. Takes filtering arguments.
+
+        Parameters
+        -----------
+        filter : Optional[modio.Filter]
+            A instance of modio.Filter to be used for filtering, paginating and sorting 
+            results
 
         Returns
         --------
@@ -213,13 +218,8 @@ class Client:
             A list of modio.Game instances
                
         """
-        game_json = self._get_request('/games', **fields)
-
-        game_list = list()
-        for game in game_json["data"]:
-            game_list.append(Game(self, **game))
-
-        return game_list
+        game_json = self._get_request('/games', filter=filter)
+        return [Game(self, **game) for game in game_json["data"]]
 
     def get_user(self, id : int):
         """Gets a user with the specified ID.
@@ -241,11 +241,16 @@ class Client:
 
         """
         user_json = self._get_request(f"/users/{id}")
-
         return User(**user_json)
 
-    def get_users(self, **fields):
+    def get_users(self, *, filter=None):
         """Gets all the users availaible on mod.io. Takes filtering arguments.
+
+        Parameters
+        -----------
+        filter : Optional[modio.Filter]
+            A instance of modio.Filter to be used for filtering, paginating and sorting 
+            results
 
         Returns
         --------
@@ -253,13 +258,8 @@ class Client:
             A list of modio.User instances
                
         """
-        user_json = self._get_request("/users", **fields)
-
-        user_list = list()
-        for user in user_json["data"]:
-            user_list.append(User(**user))
-
-        return user_list
+        user_json = self._get_request("/users", filter=filter)
+        return [User(**user) for user in user_json["data"]]
 
     def get_my_user(self):
         """Gets the authenticated user's details (aka the user who created the API key/access token)
@@ -275,12 +275,17 @@ class Client:
         
         """
         me_json = self._get_request("/me")
-
         return User(**me_json)
 
-    def get_my_subs(self, **fields):
+    def get_my_subs(self, *, filter=None):
         """Gets all the mods the authenticated user is subscribed to.  Takes
         filtering arguments.
+
+        Parameters
+        -----------
+        filter : Optional[modio.Filter]
+            A instance of modio.Filter to be used for filtering, paginating and sorting 
+            results
 
         Raises
         -------
@@ -292,17 +297,36 @@ class Client:
         list
             A list of modio.Mod instances representing all mods the user is subscribed to
         """
-        mod_json = self._get_request("/me/subscribed", **fields)
+        mod_json = self._get_request("/me/subscribed", filter=filter)
+        return [Mod(self, **mod) for mod in mod_json["data"]]
 
-        mod_list = list()
-        for mod in mod_json["data"]:
-            mod_list.append(Mod(self, **mod))
+    def get_my_events(self, *, filter=None):
+        """Get events that have been fired specifically for the authenticated user. Takes
+        filtering argmuments
 
-        return mod_list
+        Parameters
+        -----------
+        filter : Optional[modio.Filter]
+            A instance of modio.Filter to be used for filtering, paginating and sorting 
+            results
 
-    def get_my_games(self, **fields):
+        Returns
+        --------
+        list : Events
+            list of events related to the user
+        """
+        events_json = self._get_request("/me/events", filter=filter)
+        return [Event(**event) for event in events_json["data"]]
+
+    def get_my_games(self, filter=None):
         """Get all the games the authenticated user added or is a team member of. Takes
         filtering arguments.
+
+        Parameters
+        -----------
+        filter : Optional[modio.Filter]
+            A instance of modio.Filter to be used for filtering, paginating and sorting 
+            results
 
         Raises
         -------
@@ -314,17 +338,18 @@ class Client:
         list
             A list of modio.Game instances representing all games the user is added or is team member of
         """
-        game_json = self._get_request("/me/games", **fields)
+        game_json = self._get_request("/me/games", filter=filter)
+        return [Game(self, **game) for game in game_json["data"]]
 
-        game_list = list()
-        for game in game_json["data"]:
-            game_list.append(Game(self, **game))
-
-        return game_list
-
-    def get_my_mods(self, **fields):
+    def get_my_mods(self, *, filter=None):
         """Get all the mods the authenticated user added or is a team member of. Takes
         filtering arguments.
+
+        Parameters
+        -----------
+        filter : Optional[modio.Filter]
+            A instance of modio.Filter to be used for filtering, paginating and sorting 
+            results
 
         Raises
         -------
@@ -336,17 +361,18 @@ class Client:
         list
             A list of modio.Mod instances representing all mods the user is added or is team member of
         """
-        mod_json = self._get_request("/me/mods", **fields)
+        mod_json = self._get_request("/me/mods", filter=filter)
+        return [Mod(self, **mod) for mod in mod_json["data"]]
 
-        mod_list = list()
-        for mod in mod_json["data"]:
-            mod_list.append(Mod(self, **mod))
-
-        return mod_list
-
-    def get_my_modfiles(self, **fields):
+    def get_my_modfiles(self, *, filter=None):
         """Get all the mods the authenticated user uploaded. The returned modfile objects cannot be
-        edited or deleted and do not have a `game_idè attribute. Takes filtering arguments.
+        edited or deleted and do not have a `game_id` attribute. Takes filtering arguments.
+
+        Parameters
+        -----------
+        filter : Optional[modio.Filter]
+            A instance of modio.Filter to be used for filtering, paginating and sorting 
+            results
 
         Raises
         -------
@@ -358,14 +384,9 @@ class Client:
         list
             A list of modio.ModFile instances representing all modfiles the user added.
         """
-        files_json = self._get_request("/me/files", **fields)
-
-        file_list = list()
-        for file in files_json["data"]:
-            file_list.append(ModFile(**file))
-
-        return file_list
-
+        files_json = self._get_request("/me/files", filter=filter)
+        return [ModFile(**file) for file in files_json]
+        
     def email_request(self, email : str):
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address
         which can then be entered into :func:`email_exchange`.

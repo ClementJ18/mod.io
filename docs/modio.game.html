@@ -54,11 +54,11 @@ status&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;3&nbsp;:&nbsp;Deleted<br>
 submitter&nbsp;:&nbsp;modio.User<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Instance&nbsp;of&nbsp;the&nbsp;modio&nbsp;user&nbsp;having&nbsp;submitted&nbsp;the&nbsp;game<br>
-date_added&nbsp;:&nbsp;int<br>
+date&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;game&nbsp;was&nbsp;registered<br>
-date_updated&nbsp;:&nbsp;int<br>
+updated&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;game&nbsp;was&nbsp;last&nbsp;updated<br>
-date_live&nbsp;:&nbsp;int<br>
+live&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;game&nbsp;went&nbsp;live<br>
 presentation&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;:&nbsp;Display&nbsp;mods&nbsp;for&nbsp;that&nbsp;game&nbsp;in&nbsp;a&nbsp;grid&nbsp;on&nbsp;mod.io<br>
@@ -93,12 +93,12 @@ api&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?&nbsp;:&nbsp;Above&nbsp;options&nbsp;can&nbsp;be&nbsp;added&nbsp;together&nbsp;to&nbsp;create&nbsp;custom&nbsp;settings&nbsp;(e.g&nbsp;3&nbsp;:&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;allow&nbsp;3rd&nbsp;parties&nbsp;to&nbsp;access&nbsp;this&nbsp;games&nbsp;API&nbsp;endpoints&nbsp;and&nbsp;allow&nbsp;mods&nbsp;to&nbsp;be<br>
 &nbsp;&nbsp;&nbsp;&nbsp;downloaded&nbsp;directly)<br>
-maturity&nbsp;:&nbsp;int<br>
+maturity_options&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;:&nbsp;Don't&nbsp;allow&nbsp;mod&nbsp;developpers&nbsp;to&nbsp;decide&nbsp;whether&nbsp;or&nbsp;not&nbsp;to&nbsp;flag&nbsp;their&nbsp;mod&nbsp;as&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;containing&nbsp;mature&nbsp;content&nbsp;(if&nbsp;game&nbsp;devs&nbsp;wish&nbsp;to&nbsp;handle&nbsp;it)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;:&nbsp;Allow&nbsp;mod&nbsp;developpers&nbsp;to&nbsp;decide&nbsp;whether&nbsp;or&nbsp;not&nbsp;to&nbsp;flag&nbsp;their&nbsp;mod&nbsp;as&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;containing&nbsp;mature&nbsp;content<br>
-ugc_name&nbsp;:&nbsp;str<br>
+ugc&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Word&nbsp;used&nbsp;to&nbsp;describe&nbsp;user-generated&nbsp;content&nbsp;(mods,&nbsp;items,&nbsp;addons&nbsp;etc).<br>
 icon&nbsp;:&nbsp;modio.Image<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;game&nbsp;icon<br>
@@ -118,9 +118,9 @@ instructions&nbsp;:&nbsp;str<br>
 instructions_url&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Link&nbsp;to&nbsp;a&nbsp;mod.io&nbsp;guide,&nbsp;your&nbsp;modding&nbsp;wiki&nbsp;or&nbsp;a&nbsp;page&nbsp;where&nbsp;modders&nbsp;can&nbsp;learn&nbsp;how&nbsp;to&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;make&nbsp;and&nbsp;submit&nbsp;mods&nbsp;to&nbsp;your&nbsp;games&nbsp;profile.<br>
-profile_url&nbsp;:&nbsp;str<br>
+profile&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;URL&nbsp;to&nbsp;the&nbsp;game's&nbsp;mod.io&nbsp;page.<br>
-tag_options&nbsp;:&nbsp;list[modio.GameTag]<br>
+tag_options&nbsp;:&nbsp;list[modio.TagOption]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;List&nbsp;of&nbsp;tags&nbsp;from&nbsp;which&nbsp;mods&nbsp;can&nbsp;pick<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
@@ -183,11 +183,11 @@ type&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;dropdown&nbsp;:&nbsp;Mods&nbsp;can&nbsp;select&nbsp;only&nbsp;one&nbsp;tag&nbsp;from&nbsp;this&nbsp;group,&nbsp;dropdown&nbsp;menu&nbsp;shown&nbsp;on&nbsp;site&nbsp;profile.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;checkboxes&nbsp;:&nbsp;Mods&nbsp;can&nbsp;select&nbsp;multiple&nbsp;tags&nbsp;from&nbsp;this&nbsp;group,&nbsp;checkboxes&nbsp;shown&nbsp;on&nbsp;site&nbsp;profile.<br>
 hidden&nbsp;:&nbsp;bool<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Whether&nbsp;or&nbsp;not&nbsp;this&nbsp;group&nbsp;of&nbsp;tagas&nbsp;should&nbsp;be&nbsp;hidden&nbsp;from&nbsp;users&nbsp;and&nbsp;mod&nbsp;devs.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Whether&nbsp;or&nbsp;not&nbsp;this&nbsp;group&nbsp;of&nbsp;tags&nbsp;should&nbsp;be&nbsp;hidden&nbsp;from&nbsp;users&nbsp;and&nbsp;mod&nbsp;devs.<br>
 tags&nbsp;:&nbsp;list[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Array&nbsp;of&nbsp;tags&nbsp;that&nbsp;mod&nbsp;creators&nbsp;can&nbsp;apply&nbsp;to&nbsp;their&nbsp;mod</tt></dd></dl>
 
-<dl><dt><a name="Game-del_tags"><strong>del_tags</strong></a>(self, **fields)</dt><dd><tt>Delete&nbsp;one&nbsp;or&nbsp;more&nbsp;tags&nbsp;from&nbsp;a&nbsp;tag&nbsp;option<br>
+<dl><dt><a name="Game-delete_tags"><strong>delete_tags</strong></a>(self, **fields)</dt><dd><tt>Delete&nbsp;one&nbsp;or&nbsp;more&nbsp;tags&nbsp;from&nbsp;a&nbsp;tag&nbsp;option<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -274,35 +274,60 @@ Returns<br>
 :class:&nbsp;`Mod`<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;mod&nbsp;with&nbsp;the&nbsp;given&nbsp;ID</tt></dd></dl>
 
-<dl><dt><a name="Game-get_mod_events"><strong>get_mod_events</strong></a>(self, **fields)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;mod&nbsp;events&nbsp;available&nbsp;for&nbsp;this&nbsp;game&nbsp;sorted&nbsp;by&nbsp;latest&nbsp;event&nbsp;first.&nbsp;Takes&nbsp;<br>
+<dl><dt><a name="Game-get_mod_events"><strong>get_mod_events</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;mod&nbsp;events&nbsp;available&nbsp;for&nbsp;this&nbsp;game&nbsp;sorted&nbsp;by&nbsp;latest&nbsp;event&nbsp;first.&nbsp;Takes&nbsp;<br>
 filtering&nbsp;arguments.<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
 list<br>
 &nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.Event&nbsp;instances</tt></dd></dl>
 
-<dl><dt><a name="Game-get_mods"><strong>get_mods</strong></a>(self, **fields)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;mods&nbsp;available&nbsp;for&nbsp;mods.&nbsp;Takes&nbsp;filtering&nbsp;arguments.<br>
+<dl><dt><a name="Game-get_mods"><strong>get_mods</strong></a>(self, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;mods&nbsp;available&nbsp;for&nbsp;the&nbsp;game.&nbsp;Takes&nbsp;filtering&nbsp;arguments.<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
 list<br>
 &nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.Mod&nbsp;instances</tt></dd></dl>
 
-<dl><dt><a name="Game-get_stats"><strong>get_stats</strong></a>(self, **fields)</dt><dd><tt>Gets&nbsp;the&nbsp;stat&nbsp;objects&nbsp;for&nbsp;all&nbsp;the&nbsp;mods&nbsp;of&nbsp;this&nbsp;game.&nbsp;Takes&nbsp;<br>
+<dl><dt><a name="Game-get_stats"><strong>get_stats</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;the&nbsp;stat&nbsp;objects&nbsp;for&nbsp;all&nbsp;the&nbsp;mods&nbsp;of&nbsp;this&nbsp;game.&nbsp;Takes&nbsp;<br>
 filtering&nbsp;arguments<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
 list[modio.Stats]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;List&nbsp;of&nbsp;all&nbsp;the&nbsp;mod&nbsp;stats</tt></dd></dl>
 
-<dl><dt><a name="Game-get_tags"><strong>get_tags</strong></a>(self, **fields)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;game&nbsp;tags&nbsp;available&nbsp;for&nbsp;this&nbsp;game.<br>
+<dl><dt><a name="Game-get_tags"><strong>get_tags</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;game&nbsp;tags&nbsp;available&nbsp;for&nbsp;this&nbsp;game.&nbsp;Takes&nbsp;filtering<br>
+arguments.<br>
+&nbsp;<br>
+Parameters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
 list<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.GameTag&nbsp;instances</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.TagOption&nbsp;instances</tt></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>
