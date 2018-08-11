@@ -222,6 +222,17 @@ class ModFile:
         self.game = attrs.pop("game_id", None)
         self.client = attrs.pop("client", None)
 
+    def get_owner(self):
+        """Returns the original submitter of the resource
+
+        Returns
+        --------
+        User
+            User that submitted the resource
+        """
+        user_json = self.client._get_request(f"/general/ownership", data={"resource_type" : "files", "resource_id" : self.id})
+        return User(**user_json)
+
     def edit(self, **fields):
         """Edit the file's details
 
@@ -266,7 +277,7 @@ class ModFile:
         bool
             True if it's still valid, else False
         """
-        return self.download["binary_url"] <= time.time()
+        return self.download["date_expires"] <= time.time()
 
 class ModMedia:
     """Represents all the media for a mod.
@@ -349,7 +360,7 @@ class Stats:
     text : str
         Textual representation of the rating in format. This is currently not updated
         by the lib so you'll have to poll the resource's endpoint again.
-    date : int
+    expires : int
         Unix timestamp until this mods's statistics are considered stale. Endpoint
         should be polled again when this expires.
     """
@@ -359,7 +370,7 @@ class Stats:
         self.rank_total = kwargs.pop("popularity_rank_total_mods")
         self.downloads = kwargs.pop("downloads_total")
         self.subscribers = kwargs.pop("subscribers_total")
-        self.date = kwargs.pop("date_expires")
+        self.expires = kwargs.pop("date_expires")
         self.total = attrs.pop("ratings_total")
         self.positive = attrs.pop("ratings_positive")
         self.negative = attrs.pop("ratings_negative")
@@ -375,7 +386,7 @@ class Stats:
         bool
             True if stats are expired, False else.
         """
-        return time.time() <= self.date
+        return time.time() <= self.expires
 
 class User:
     """Represents a modio user.
@@ -623,7 +634,9 @@ class Filter:
             "live" : "date_live",
             "updated" : "date_updated",
             "team_id" : "id",
-            "kvp" : "metadata_kvp"
+            "kvp" : "metadata_kvp",
+            "expires" : "date_expires",
+            "mod" : "mod_id"
         }
 
     def _set(self, key, value):

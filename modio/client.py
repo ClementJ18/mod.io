@@ -132,9 +132,7 @@ class Client:
               'Accept-Language': self.lang
             }
 
-            r = requests.get(self.BASE_PATH + url, 
-                headers = headers, params=extra)
-            
+            r = requests.get(self.BASE_PATH + url, headers = headers, params=extra)
 
         return self._error_check(r)
 

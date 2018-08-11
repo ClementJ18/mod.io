@@ -230,6 +230,17 @@ class Game:
         stats_json = self.client._get_request(f"/games/{self.id}/mods/stats", filter=filter)
         return [Stats(**stats) for stats in stats_json["data"]]
 
+    def get_owner(self):
+        """Returns the original submitter of the resource
+
+        Returns
+        --------
+        User
+            User that submitted the resource
+        """
+        user_json = self.client._get_request(f"/general/ownership", data={"resource_type" : "games", "resource_id" : self.id})
+        return User(**user_json)
+
     def edit(self, **fields):
         """Used to edit the game details. For editing the icon, logo or header use :func:`add_media`.
         Sucessful editing will update the game instance.
@@ -325,8 +336,11 @@ class Game:
         for tag in tags:
             mod_d[f"tags[{tags.index(tag)}]"] = tag
 
-        mod_json = self.client._post_request(f'/games/{self.id}/mods', h_type = 1, data = mod_d, files=files)
-        
+        try:
+            mod_json = self.client._post_request(f'/games/{self.id}/mods', h_type = 1, data = mod_d, files=files)
+        finally:
+            mod.logo.close()
+
         return Mod(self.client, **mod_json)
 
     def add_media(self, **fields):

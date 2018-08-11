@@ -254,6 +254,17 @@ class Mod:
         stats_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/stats")
         return Stats(**stats_json)
 
+    def get_owner(self):
+        """Returns the original submitter of the resource
+
+        Returns
+        --------
+        User
+            User that submitted the resource
+        """
+        user_json = self.client._get_request(f"/general/ownership", data={"resource_type" : "mods", "resource_id" : self.id})
+        return User(**user_json)
+
     def edit(self, **fields):
         """Used to edit the mod details. Sucessful editing will update the mod instance.
 
@@ -328,7 +339,10 @@ class Mod:
 
         file_d = file.__dict__
         files = {"filedata" : file_d.pop("file")}
-        file_json = self.client._post_request(f'/games/{self.game}/mods/{self.id}/files', h_type = 1, data = file_d, files=files)
+        try:
+            file_json = self.client._post_request(f'/games/{self.game}/mods/{self.id}/files', h_type = 1, data = file_d, files=files)
+        finally:
+            file.file.close()
 
         return ModFile(**file_json)
 
@@ -454,7 +468,7 @@ class Mod:
 
         return Message(**message)
 
-    def del_tags(self, tags : list = None):
+    def delete_tags(self, tags : list = None):
         """Delete tags from the mod, tags are case insensitive and duplicates will be removed. Providing
         no arguments will remove every tag from the mod.
 
@@ -524,7 +538,7 @@ class Mod:
 
         return Message(**checked)
 
-    def add_meta(self, **fields):
+    def add_metadata(self, **fields):
         """Add metadate key-value pairs to the mod. To submit new meta data, mass meta data keys
         as keyword arguments and meta data value as a list of values. E.g pistol_dmg = [800, 400].
         Keys support alphanumeric, '-' and '_'. Total lengh of key and values cannot exceed 255
@@ -546,7 +560,7 @@ class Mod:
             
         return Message(**checked)
 
-    def del_meta(self, **fields):
+    def delete_metadata(self, **fields):
         """Deletes metadata from a mod. To do so pass the meta-key as a keyword argument and the
         meta-values you wish to delete as a list. You can pass an empty list in which case all
         meta-values for the meta-key will be deleted.
