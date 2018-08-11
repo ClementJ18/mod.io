@@ -1,7 +1,6 @@
 @echo off
 python -m pydoc -w modio
-xcopy /y modio.html docs\index.html
-move modio.html docs\modio.html
+move modio.html docs\index.html
 python -m pydoc -w modio.client
 move modio.client.html docs\modio.client.html
 python -m pydoc -w modio.game

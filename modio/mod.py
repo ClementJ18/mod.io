@@ -346,7 +346,7 @@ class Mod:
 
         return ModFile(**file_json)
 
-    def add_media(self, **fields):
+    def add_media(self, **media):
         """Upload new media to the mod.
 
         Parameters
@@ -372,35 +372,35 @@ class Mod:
         Message
             A message confirming the submission of the media
         """
-        logo = fields.pop("logo", None)
+        logo = media.pop("logo", None)
         if logo:
-            fields["logo"] = open(logo)
+            media["logo"] = open(logo)
 
-        images = fields.pop("images", None)
+        images = media.pop("images", None)
         if isinstance(images, str):
             images = {"images" : ("image.zip", open(images))}
         elif isinstance(images, list):
             images = {f"images[{images.index(image)}]" : open(image) for image in images}
             
-        yt = fields.pop("youtube", [])
+        yt = media.pop("youtube", [])
         yt = {f"youtube[{yt.index(link)}]" : link for link in yt}
 
-        sketch = fields.pop("sketchfab", [])
+        sketch = media.pop("sketchfab", [])
         sketch = {f"sketchfab[{yt.index(link)}]" : link for link in sketch}
 
-        fields = {**fields, **yt, **sketch, **images}
+        media = {**media, **yt, **sketch, **images}
 
         try:
-            media_json = self.client._post_request(f'/games/{self.game}/mods/{self.id}/media', h_type = 1, files = fields)
+            media_json = self.client._post_request(f'/games/{self.game}/mods/{self.id}/media', h_type = 1, files = media)
         finally:
-            fields["logo"].close()
+            media["logo"].close()
             for image in images.values():
                 image.close()
 
 
         return Message(**media_json)
 
-    def delete_media(self, **fields):
+    def delete_media(self, **media):
         """Delete media from the mod page. 
 
         Parameters
@@ -412,13 +412,13 @@ class Mod:
         sketchfab : list[str]
             Optional. List sketchfab links that you want to delete
         """
-        images = fields.pop("images", [])
+        images = media.pop("images", [])
         images = {f"images[{images.index(image)}]" : image for image in images}
 
-        yt = fields.pop("youtube", [])
+        yt = media.pop("youtube", [])
         yt = {f"youtube[{yt.index(link)}]" : link for link in yt}
 
-        sketch = fields.pop("sketchfab", [])
+        sketch = media.pop("sketchfab", [])
         sketch = {f"sketchfab[{sketch.index(link)}]" : link for link in sketch}
 
         r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/media')
@@ -538,7 +538,7 @@ class Mod:
 
         return Message(**checked)
 
-    def add_metadata(self, **fields):
+    def add_metadata(self, **metadata):
         """Add metadate key-value pairs to the mod. To submit new meta data, mass meta data keys
         as keyword arguments and meta data value as a list of values. E.g pistol_dmg = [800, 400].
         Keys support alphanumeric, '-' and '_'. Total lengh of key and values cannot exceed 255
@@ -552,15 +552,15 @@ class Mod:
         """
         metadata = {}
         index = 0
-        for data in fields:
-            metadata[f"metadata[{index}]"] = f"{data}:{':'.join(fields[data])}"
+        for data in metadata:
+            metadata[f"metadata[{index}]"] = f"{data}:{':'.join(metadata[data])}"
             index += 1
 
         checked = self.client._post_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata)
             
         return Message(**checked)
 
-    def delete_metadata(self, **fields):
+    def delete_metadata(self, **metadata):
         """Deletes metadata from a mod. To do so pass the meta-key as a keyword argument and the
         meta-values you wish to delete as a list. You can pass an empty list in which case all
         meta-values for the meta-key will be deleted.
@@ -568,8 +568,8 @@ class Mod:
         """
         metadata = {}
         index = 0
-        for data in fields:
-            metadata[f"metadata[{index}]"] = f"{data}{':' if len(fields[data]) > 0 else ''}{':'.join(fields[data])}"
+        for data in metadata:
+            metadata[f"metadata[{index}]"] = f"{data}{':' if len(metadata[data]) > 0 else ''}{':'.join(metadata[data])}"
             index += 1
 
         r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata)

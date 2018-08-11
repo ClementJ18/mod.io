@@ -609,11 +609,12 @@ class Filter:
         A dict which contains modio filter keyword and the appropriate value.
 
     """
-    def __init__(self, filter={}):
+    def __init__(self, filters={}):
         for key, value in filters.items():
             self._set(key, value)
 
-        self._lib_to_api = {
+    def _set(self, key, value):
+        _lib_to_api = {
             "date" : "date_added",
             "metadata" : "metadata_blob",
             "key" : "metakey",
@@ -639,9 +640,8 @@ class Filter:
             "mod" : "mod_id"
         }
 
-    def _set(self, key, value):
         try:
-            key = self._lib_to_api[key]
+            key = _lib_to_api[key]
         except KeyError:
             pass
 

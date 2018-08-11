@@ -343,7 +343,7 @@ class Game:
 
         return Mod(self.client, **mod_json)
 
-    def add_media(self, **fields):
+    def add_media(self, **media):
         """Upload new media to to the game. This function can take between 1 to 3 arguments
         depending on what media you desire to upload/update
         
@@ -369,18 +369,18 @@ class Game:
         Message
             A message containing the result of the query if successful.
         """
-        for image in field:
-            field[image] = open(field[image])
+        for image in media:
+            media[image] = open(media[image])
 
         try:
             message = self.client._post_request(f'/games/{self.id}/media', h_type = 1, files = fields)
         finally:
-            for image in field.values():
+            for image in media.values():
                 image.close()
         
         return Message(**message)
 
-    def add_tags(self, **fields):
+    def add_tags(self, **tags):
         """Add tags which mods can apply to their profiles. If the tag name already exists it will
         overwrite it.
 
@@ -397,14 +397,14 @@ class Game:
             Array of tags that mod creators can apply to their mod
 
         """
-        tags = fields.pop("tags", [])
-        fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
-        message = self.client._post_request(f'/games/{self.id}/tags', data = {"input_json" : fields})
+        tags = tags.pop("tags", [])
+        tags = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
+        message = self.client._post_request(f'/games/{self.id}/tags', data = {"input_json" : tags})
 
-        self.tag_options.append(TagOption(**fields))
+        self.tag_options.append(TagOption(**tags))
         return Message(**message)
 
-    def delete_tags(self, **fields):
+    def delete_tags(self, **tags):
         """Delete one or more tags from a tag option
         
         Parameters
@@ -415,13 +415,15 @@ class Game:
             Optional. Tags to delete from group. If left blank the entire group will be
             deleted
         """
-        tags = fields.pop("tags", [])
-        fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
-        r = self.client._delete_request(f'/games/{self.id}/tags', data = fields)
+        tags = tags.pop("tags", [])
+        tags = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
+        r = self.client._delete_request(f'/games/{self.id}/tags', data = tags)
         if len(tags) > 0:
-            self.tags[fields["name"]] -= tags
+            for tag in tags:
+                if tag in self.tags[tags["name"]]:
+                    self.tags[tags["name"]].remove(tag)
         else:
-            del self.tags[fields["name"]]
+            del self.tags[tags["name"]]
 
         return r
 
