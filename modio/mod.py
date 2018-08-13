@@ -10,44 +10,45 @@ class Mod:
     Attributes
     -----------
     id : int
-        ID of the mod
+        ID of the mod. Filter attribute.
     status : int
-        Status of the mod.
+        Status of the mod. Filter attribute.
         0 : Not Accepted
         1 : Accepted
         2 : Archived (potentially out of date or incompatible)
         3 : Deleted
     visible : int
-        Visibility of the mod.
+        Visibility of the mod. Filter attribute.
         0 : Hidden
         1 : Public
     game : int
-        ID of the game the mod is for.
+        ID of the game the mod is for. Filter attribute.
     submitter : modio.User
-        Instance of the modio User that submitted the mod.
+        Instance of the modio User that submitted the mod. Filter attribute.
     date : int
-        UNIX timestamp of the date the mod was registered
+        UNIX timestamp of the date the mod was registered. Filter attribute.
     updated : int
-        UNIX timestamp of the date the mod was last updated
+        UNIX timestamp of the date the mod was last updated. Filter attribute.
     live : int
-        UNIX timestamp of the date the mod went live
+        UNIX timestamp of the date the mod went live. Filter attribute.
     logo : modio.Image
         The mod logo
     homepage : str
-        Link to the homepage of the mod, can be None.
+        Link to the homepage of the mod, can be None. Filter attribute.
     name : str
-        Name of the mod
+        Name of the mod. Filter attribute.
     name_id : str
-        sub_domain mod for the game (https://game_name.mod.io/name_id)
+        sub_domain mod for the game (https://game_name.mod.io/name_id). Filter 
+        attribute.
     summary : str
-        Summary of the mod
+        Summary of the mod. Filter attribute.
     description :str
-        Detailed description of the mod, supports HTML.
+        Detailed description of the mod, supports HTML. Filter attribute.
     metadata : str
         Metadata stored by developers which may include properties on how information 
-        required. Can be None.
+        required. Can be None. Filter attribute.
     maturity : int
-        Maturity option of the mod. 
+        Maturity option of the mod. Filter attribute.
         0 : None
         1 : Alcohol
         2 : Drugs
@@ -58,15 +59,34 @@ class Mod:
     profile : str
         URL of the mod's modio profile
     file : modio.ModFile
-        Latest release instance. Can be None.
+        Latest release instance. Can be None. Filter attribute.
     media : modio.ModMedia
         Contains mod media data (links and images)
     rating : modio.Stats
         Summary of all rating for this mod
     tags : dict
-        Tags for this mod.
+        Tags for this mod. Filter attribute.
     kvp : dict
-        Contains key-value metadata.
+        Contains key-value metadata. Filter attribute.
+
+    Filter-Only Attributes
+    -----------------------
+    These attributes can only be used at endpoints which return instances
+    of this class and takes filter arguments. They are not attached to the
+    object itself and trying to access them will cause an AttributeError
+
+    sort_downloads : str
+        Sort argument, provide to sort function to sort by most/least
+        downloaded
+    sort_popular : str
+        Sort argument, provide to sort function to sort by most/least
+        popular
+    sort_rating : str
+        Sort argument, provide to sort function to sort by weighed
+        rating
+    sort_subscribers : str
+        Sort argument, provide to sort function to sort by most/least
+        subscribers 
 
     """
     def __init__(self, client, **attrs):

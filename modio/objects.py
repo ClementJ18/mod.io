@@ -72,15 +72,28 @@ class Event:
     Attributes
     -----------
     id : int
-        Unique ID of the event
+        Unique ID of the event. Filter attribute.
     mod : int
-        ID of the mod this event is from
+        ID of the mod this event is from. Filter attribute.
     user : int
-        ID of the user that made the change
+        ID of the user that made the change. Filter attribute.
     date : int
-        UNIX timestamp of the event occurrence
+        UNIX timestamp of the event occurrence. Filter attribute.
     type : enum.EventType
-        Type of the event.
+        Type of the event. Filter attribute.
+
+    Filter-Only Attributes
+    -----------------------
+    These attributes can only be used at endpoints which return instances
+    of this class and takes filter arguments. They are not attached to the
+    object itself and trying to access them will cause an AttributeError
+
+    latest : bool
+        Returns only the latest unique events, which is useful for checking 
+        if the primary modfile has changed.
+    subscribed : bool
+        Returns only events connected to mods the authenticated user is 
+        subscribed to, which is useful for keeping the users mods up-to-date.
 
     """
     def __init__(self, **attrs):
@@ -118,28 +131,28 @@ class Comment:
     Attributes
     -----------
     id : int
-        ID of the comment
+        ID of the comment. Filter attribute.
     mod : id
-        ID of the mod this comment is from
+        ID of the mod this comment is from. Filter attribute.
     submitter : modio.User
-        Istance of the user that submitted the comment
+        Istance of the user that submitted the comment. Filter attribute.
     date : int
-        Unix timestamp of date the comment was posted.
+        Unix timestamp of date the comment was posted. Filter attribute.
     parent : int
         ID of the parent this comment is replying to. 0 if comment
-        is not a reply
+        is not a reply. Filter attribute.
     position : str
-        Level of nesting. How it works:
+        Level of nesting. Filter attribute. How it works:
         - The first comment will have the position '01'.
         - The second comment will have the position '02'.
         - If someone responds to the second comment the position will be '02.01'.
         - A maximum of 3 levels is supported.
     karma : int
-        Total karma received for the comment.
+        Total karma received for the comment. Filter attribute.
     karma_guest : int
         Total karma received from guests for this comment
     content : str
-        Content of the comment
+        Content of the comment. Filter attribute.
     """
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
@@ -147,7 +160,7 @@ class Comment:
         self.submitter = User(**attrs.pop("submitter"))
         self.date = attrs.pop("date_added")
         self.parent = attrs.pop("reply_id")
-        self.position = attrs.pop("reply_position")
+        self.position = attrs.pop("thread_position")
         self.karma = attrs.pop("karma")
         self.karma_guest = attrs.pop("karma_guest")
         self.content = attrs.pop("content")
@@ -166,15 +179,15 @@ class ModFile:
     Attributes
     -----------
     id : int
-        ID of the modfile
+        ID of the modfile. Filter attribute.
     mod : int
-        ID of the mod it was added for
+        ID of the mod it was added for. Filter attribute.
     date : int
-        UNIX timestamp of the date the modfile was submitted
+        UNIX timestamp of the date the modfile was submitted. Filter attribute.
     scanned : int
-        UNIX timestamp of the date the file was virus scanned
-    status : int
-        Current status of the virus scan for the file. 
+        UNIX timestamp of the date the file was virus scanned. Filter attribute.
+    virus_status : int
+        Current status of the virus scan for the file. Filter attribute.
         0 : Not scanned
         1 : Scan complete
         2 : In progress
@@ -182,21 +195,21 @@ class ModFile:
         4 : File not found
         5 : Error Scanning
     virus : bool
-        True if a virus was detected, False if it wasn't.
+        True if a virus was detected, False if it wasn't. Filter attribute.
     virus_hash : str
         VirusTotal proprietary hash to view the scan results.
     size : int
-        Size of the file in bytes
+        Size of the file in bytes. Filter attribute.
     hash : str
-        MD5 hash of the file.
-    name : str
-        Name of the file
+        MD5 hash of the file. Filter attribute.
+    filename : str
+        Name of the file. Filter attribute.
     version : str
-        Version of the file
+        Version of the file. Filter attribute.
     changelog : str
-        Changelog for the file
+        Changelog for the file. Filter attribute.
     metadata : str
-        Metadata stored by the game developer for this file.
+        Metadata stored by the game developer for this file. Filter attribute.
     download : dict
         Contains download data
         'binary_url' : url to download file
@@ -210,12 +223,12 @@ class ModFile:
         self.mod = attrs.pop("mod_id")
         self.date = attrs.pop("date_added")
         self.scanned = attrs.pop("date_scanned")
-        self.status = attrs.pop("virus_status")
+        self.virus_status = attrs.pop("virus_status")
         self.virus = bool(attrs.pop("virus_positive"))
         self.virus_hash = attrs.pop("virustotal_hash")
         self.size = attrs.pop("filesize")
         self.hash = attrs.pop("filehash")["md5"]
-        self.name = attrs.pop("filename")
+        self.filename = attrs.pop("filename")
         self.version = attrs.pop("version")
         self.changelog = attrs.pop("changelog")
         self.metadata = attrs.pop("metadata_blob")
@@ -336,21 +349,21 @@ class Stats:
     Attributes
     -----------
     id : int
-        Mod ID of the stats
+        Mod ID of the stats. Filter attribute.
     rank : int
-        Current rank of the mod
+        Current rank of the mod. Filter attribute.
     rank_total : int
-        Number of ranking spots the current rank is measured against
+        Number of ranking spots the current rank is measured against. Filter attribute
     downloads : int
-        Amount of times the mod was downloaded
+        Amount of times the mod was downloaded. Filter attribute
     subscribers : int
-        Amount of subscribers
+        Amount of subscribers. Filter attribute
     total : int
-        Number of times this item has been rated
+        Number of times this item has been rated. 
     positive : int
-        Number of positive ratings
+        Number of positive ratings. Filter attribute
     negative : int
-        Number of negative ratings
+        Number of negative ratings. Filter attribute
     percentage : int
         Percentage of positive rating (positive/total)
     weighted : int
@@ -389,33 +402,68 @@ class Stats:
         """
         return time.time() <= self.expires
 
+class Tag:
+    """mod.io Tag objects are represented as dictionnaries and are returned
+    as such by the function of this library, each entry of in the dictionnary
+    is composed of the tag name as the key and the date_added as the value. Use
+    dict.keys() to access tags as a list.
+
+    Filter-Only Attributes
+    -----------------------
+    These attributes can only be used at endpoints which return instances
+    of this class and takes filter arguments. They are not attached to the
+    object itself and trying to access them will cause an AttributeError
+
+    date : int
+        Unix timestamp of date tag was added.
+    tag : str
+        String representation of the tag.
+    """
+    pass
+
+class MetaData:
+    """mod.io MetaData objects are represented as dictionnaries and are returned
+    as such by the function of this library, each entry of in the dictionnary
+    is composed of the metakey as the key and the metavalue as the value.
+    """
+    pass
+
+class Dependencies:
+    """mod.io Depedencies objects are represented as dictionnaries and are returned
+    as such by the function of this library, each entry of in the dictionnary
+    is composed of the dependency (mod) id as the key and the date_added as the value. User
+    dict.keys() to access dependencies as a list.
+
+    """
+    pass
+
 class User:
     """Represents a modio user.
 
     Attributes
     ----------
     id : int
-        ID of the user
+        ID of the user. Filter attribute.
     name_id : str
-        Subdomain name of the user. For example: https://mod.io/members/username-id-here
-    name : str
-        Name of the user
+        Subdomain name of the user. For example: https://mod.io/members/username-id-here. Filter attribute.
+    username : str
+        Name of the user. Filter attribute.
     last_online : int
         Unix timestamp of date the user was last online.
     avatar : modio.Image
         Contains avatar data
     tz : str
-        Timezone of the user, format is country/city.
+        Timezone of the user, format is country/city. Filter attribute.
     lang : str
-        Users language preference. See localization for the supported languages.
-    url : str
+        Users language preference. See localization for the supported languages. Filter attribute.
+    profile : str
         URL to the user's mod.io profile.
 
     """
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.name_id = attrs.pop("name_id")
-        self.name = attrs.pop("username")
+        self.username = attrs.pop("username")
         self.last_online = attrs.pop("date_online")
 
         avatar = attrs.pop("avatar")
@@ -436,16 +484,27 @@ class TeamMember(User):
     -----------
     member_id : int
         The id of the user in the context of their team, not the same as
-        user id
+        user id. Filter attribute.
     level : int
-        Level of permissions the user has
+        Level of permissions the user has. Filter attribute.
         1 : Moderator
         4 : Creator
         8 : Administrator
     date : int
-        Unix timestamp of the date the user was added to the team.
+        Unix timestamp of the date the user was added to the team. Filter attribute.
     position : str
-        Custom title given to the user in this team.
+        Custom title given to the user in this team. Filter attribute.
+
+    Filter-Only Attributes
+    -----------------------
+    These attributes can only be used at endpoints which return instances
+    of this class and takes filter arguments. They are not attached to the
+    object itself and trying to access them will cause an AttributeError
+
+    user_id : int
+        Unique id of the user.  
+    username : str
+        Username of the user. 
 
     """
     def __init__(self, **attrs):
@@ -602,7 +661,10 @@ class Filter:
     arguments directly to the class given that they are already in modio format.
     If you don't know the modio format simply use the methods, all method return
     self for fluid chaining. This is also used for sorting and pagination. These
-    instances can be save and reused at will.
+    instances can be save and reused at will. Attributes which can be used as filters
+    will be marked as "Filter attributes" in the docs for the class the endpoint 
+    returns. E.g. ID is marked as a filter argument for in the class Game and therefore
+    in get_games() it can be used a filter.
 
     Parameters
     ----------
@@ -638,7 +700,26 @@ class Filter:
             "team_id" : "id",
             "kvp" : "metadata_kvp",
             "expires" : "date_expires",
-            "mod" : "mod_id"
+            "mod" : "mod_id",
+            "file" : "modfile",
+            "virus" : "virus_positive",
+            "size" : "filesize",
+            "hash" : "filehash",
+            "rank" : "popularity_rank_position",
+            "rank_total" : "popularity_rank_position",
+            "downloads" : "downloads_total",
+            "subscribers" : "subscribers_total",
+            "positive" : "ratings_positive",
+            "negative": "ratings_negative",
+            "sort_downloads" : "downloads",
+            "sort_popular" : "popular",
+            "sort_subscribers" : "subscribers",
+            "sort_rating" : "rating",
+            "member_id" : "id",
+            "parent" : "reply_id",
+            "position": "thread_position",
+            "tz" : "timezone",
+            "lang": "language"
         }
 
         try:

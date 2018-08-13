@@ -8,38 +8,45 @@ class Game:
     Attributes
     -----------
     id : int
-        ID of the game
+        ID of the game. Filter attribute.
     status : int
+        Status of the game. Filter attribute.
         0 : Not accepted
         1 : Accepted (default)
         2 : Archived (default)
         3 : Deleted
     submitter : modio.User
-        Instance of the modio user having submitted the game
+        Instance of the modio user having submitted the game. Filter 
+        attribute.
     date : int
-        UNIX timestamp of the date the game was registered
+        UNIX timestamp of the date the game was registered. Filter attribute.
     updated : int
-        UNIX timestamp of the date the game was last updated
+        UNIX timestamp of the date the game was last updated. Filter attribute.
     live : int
-        UNIX timestamp of the date the game went live
+        UNIX timestamp of the date the game went live. Filter attribute.
     presentation : int
+        Filter attribute.
         0 : Display mods for that game in a grid on mod.io
         1 : Display mods for that game in a table on mod.io
     submission : int
+        Filter attribute.
         0 : Mod uploads must occur via a tool created by the game developers
         1 : Mod uploads can occur from anywhere, including the website and API
     curation : int
+        Filter attribute.
         0 : No curation: Mods are immediately available to play
         1 : Paid curation: Mods are immediately available to play unless 
         they choose to receive donations. These mods must be accepted to be listed
         2 : Full curation: All mods must be accepted by someone to be listed
     community : int
+        Filter attribute.
         0 : All of the options below are disabled
         1 : Discussion board enabled
         2 : Guides and news enabled
         ? : Above options can be added together to create custom settings (e.g 3 : 
         discussion board, guides and news enabled)
     revenue : int
+        Filter attribute.
         0 : All of the options below are disabled
         1 : Allow mods to be sold
         2 : Allow mods to receive donations
@@ -48,6 +55,7 @@ class Game:
         ? : Above options can be added together to create custom settings (e.g 3 :
         allow mods to be sold and receive donations)
     api : int
+        Filter attribute.
         0 : All of the options below are disabled
         1 : Allow 3rd parties to access this games API endpoints
         2 : Allow mods to be downloaded directly (if disabled all download URLs will 
@@ -56,12 +64,14 @@ class Game:
         allow 3rd parties to access this games API endpoints and allow mods to be
         downloaded directly)
     maturity_options : int
+        Filter attribute.
         0 : Don't allow mod developpers to decide whether or not to flag their mod as 
         containing mature content (if game devs wish to handle it)
         1 : Allow mod developpers to decide whether or not to flag their mod as 
         containing mature content
     ugc : str
         Word used to describe user-generated content (mods, items, addons etc).
+        Filter attribute.
     icon : modio.Image
         The game icon
     logo : modio.Image
@@ -69,17 +79,17 @@ class Game:
     header : modio.Image
         The game header
     name : str
-        Name of the game
+        Name of the game. Filter attribute.
     name_id : str
-        sub_domain name for the game (https://name_id.mod.io)
+        sub_domain name for the game (https://name_id.mod.io). Filter attribute.
     summary : str
-        Summary of the game
+        Summary of the game. Filter attribute.
     instructions : str
         Instructions on uploading mods for this game, only applicable
         if :attr:`submissions` equals 0
     instructions_url : str
         Link to a mod.io guide, your modding wiki or a page where modders can learn how to 
-        make and submit mods to your games profile.
+        make and submit mods to your games profile. Filter attribute.
     profile : str
         URL to the game's mod.io page.
     tag_options : list[modio.TagOption]

@@ -8,3 +8,4 @@ archive/objects.py
 archive/oo_layout.txt
 *.pyc
 test.py
+raw_docs

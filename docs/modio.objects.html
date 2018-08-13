@@ -61,28 +61,41 @@ Represents&nbsp;a&nbsp;comment&nbsp;on&nbsp;a&nbsp;mod&nbsp;page.<br>
 Attributes<br>
 -----------<br>
 id&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;comment<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;comment.&nbsp;Filter&nbsp;attribute.<br>
 mod&nbsp;:&nbsp;id<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;mod&nbsp;this&nbsp;comment&nbsp;is&nbsp;from<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;mod&nbsp;this&nbsp;comment&nbsp;is&nbsp;from.&nbsp;Filter&nbsp;attribute.<br>
 submitter&nbsp;:&nbsp;modio.<a href="#User">User</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;Istance&nbsp;of&nbsp;the&nbsp;user&nbsp;that&nbsp;submitted&nbsp;the&nbsp;comment<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Istance&nbsp;of&nbsp;the&nbsp;user&nbsp;that&nbsp;submitted&nbsp;the&nbsp;comment.&nbsp;Filter&nbsp;attribute.<br>
 date&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Unix&nbsp;timestamp&nbsp;of&nbsp;date&nbsp;the&nbsp;comment&nbsp;was&nbsp;posted.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Unix&nbsp;timestamp&nbsp;of&nbsp;date&nbsp;the&nbsp;comment&nbsp;was&nbsp;posted.&nbsp;Filter&nbsp;attribute.<br>
 parent&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;parent&nbsp;this&nbsp;comment&nbsp;is&nbsp;replying&nbsp;to.&nbsp;0&nbsp;if&nbsp;comment<br>
-&nbsp;&nbsp;&nbsp;&nbsp;is&nbsp;not&nbsp;a&nbsp;reply<br>
+&nbsp;&nbsp;&nbsp;&nbsp;is&nbsp;not&nbsp;a&nbsp;reply.&nbsp;Filter&nbsp;attribute.<br>
 position&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Level&nbsp;of&nbsp;nesting.&nbsp;How&nbsp;it&nbsp;works:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Level&nbsp;of&nbsp;nesting.&nbsp;Filter&nbsp;attribute.&nbsp;How&nbsp;it&nbsp;works:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;The&nbsp;first&nbsp;comment&nbsp;will&nbsp;have&nbsp;the&nbsp;position&nbsp;'01'.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;The&nbsp;second&nbsp;comment&nbsp;will&nbsp;have&nbsp;the&nbsp;position&nbsp;'02'.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;If&nbsp;someone&nbsp;responds&nbsp;to&nbsp;the&nbsp;second&nbsp;comment&nbsp;the&nbsp;position&nbsp;will&nbsp;be&nbsp;'02.01'.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;A&nbsp;maximum&nbsp;of&nbsp;3&nbsp;levels&nbsp;is&nbsp;supported.<br>
 karma&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Total&nbsp;karma&nbsp;received&nbsp;for&nbsp;the&nbsp;comment.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Total&nbsp;karma&nbsp;received&nbsp;for&nbsp;the&nbsp;comment.&nbsp;Filter&nbsp;attribute.<br>
 karma_guest&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Total&nbsp;karma&nbsp;received&nbsp;from&nbsp;guests&nbsp;for&nbsp;this&nbsp;comment<br>
 content&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Content&nbsp;of&nbsp;the&nbsp;comment<br>&nbsp;</tt></td></tr>
+&nbsp;&nbsp;&nbsp;&nbsp;Content&nbsp;of&nbsp;the&nbsp;comment.&nbsp;Filter&nbsp;attribute.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Dependencies">class <strong>Dependencies</strong></a>(builtins.object)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>mod.io&nbsp;Depedencies&nbsp;objects&nbsp;are&nbsp;represented&nbsp;as&nbsp;dictionnaries&nbsp;and&nbsp;are&nbsp;returned<br>
+as&nbsp;such&nbsp;by&nbsp;the&nbsp;function&nbsp;of&nbsp;this&nbsp;library,&nbsp;each&nbsp;entry&nbsp;of&nbsp;in&nbsp;the&nbsp;dictionnary<br>
+is&nbsp;composed&nbsp;of&nbsp;the&nbsp;dependency&nbsp;(mod)&nbsp;id&nbsp;as&nbsp;the&nbsp;key&nbsp;and&nbsp;the&nbsp;date_added&nbsp;as&nbsp;the&nbsp;value.&nbsp;Use<br>
+dict.keys()&nbsp;to&nbsp;access&nbsp;dependencies&nbsp;as&nbsp;a&nbsp;list.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">
 </td></tr></table> <p>
@@ -99,15 +112,28 @@ Represents&nbsp;a&nbsp;mod&nbsp;event.&nbsp;<br>
 Attributes<br>
 -----------<br>
 id&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Unique&nbsp;ID&nbsp;of&nbsp;the&nbsp;event<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Unique&nbsp;ID&nbsp;of&nbsp;the&nbsp;event.&nbsp;Filter&nbsp;attribute.<br>
 mod&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;mod&nbsp;this&nbsp;event&nbsp;is&nbsp;from<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;mod&nbsp;this&nbsp;event&nbsp;is&nbsp;from.&nbsp;Filter&nbsp;attribute.<br>
 user&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;user&nbsp;that&nbsp;made&nbsp;the&nbsp;change<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;user&nbsp;that&nbsp;made&nbsp;the&nbsp;change.&nbsp;Filter&nbsp;attribute.<br>
 date&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;event&nbsp;occurrence<br>
+&nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;event&nbsp;occurrence.&nbsp;Filter&nbsp;attribute.<br>
 type&nbsp;:&nbsp;enum.<a href="#EventType">EventType</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;Type&nbsp;of&nbsp;the&nbsp;event.<br>&nbsp;</tt></td></tr>
+&nbsp;&nbsp;&nbsp;&nbsp;Type&nbsp;of&nbsp;the&nbsp;event.&nbsp;Filter&nbsp;attribute.<br>
+&nbsp;<br>
+<a href="#Filter">Filter</a>-Only&nbsp;Attributes<br>
+-----------------------<br>
+These&nbsp;attributes&nbsp;can&nbsp;only&nbsp;be&nbsp;used&nbsp;at&nbsp;endpoints&nbsp;which&nbsp;return&nbsp;instances<br>
+of&nbsp;this&nbsp;class&nbsp;and&nbsp;takes&nbsp;filter&nbsp;arguments.&nbsp;They&nbsp;are&nbsp;not&nbsp;attached&nbsp;to&nbsp;the<br>
+object&nbsp;itself&nbsp;and&nbsp;trying&nbsp;to&nbsp;access&nbsp;them&nbsp;will&nbsp;cause&nbsp;an&nbsp;AttributeError<br>
+&nbsp;<br>
+latest&nbsp;:&nbsp;bool<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;only&nbsp;the&nbsp;latest&nbsp;unique&nbsp;events,&nbsp;which&nbsp;is&nbsp;useful&nbsp;for&nbsp;checking&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;the&nbsp;primary&nbsp;modfile&nbsp;has&nbsp;changed.<br>
+subscribed&nbsp;:&nbsp;bool<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;only&nbsp;events&nbsp;connected&nbsp;to&nbsp;mods&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;is&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;subscribed&nbsp;to,&nbsp;which&nbsp;is&nbsp;useful&nbsp;for&nbsp;keeping&nbsp;the&nbsp;users&nbsp;mods&nbsp;up-to-date.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">
 </td></tr></table> <p>
@@ -176,7 +202,10 @@ various&nbsp;methods.&nbsp;For&nbsp;advanced&nbsp;users&nbsp;it&nbsp;is&nbsp;als
 arguments&nbsp;directly&nbsp;to&nbsp;the&nbsp;class&nbsp;given&nbsp;that&nbsp;they&nbsp;are&nbsp;already&nbsp;in&nbsp;modio&nbsp;format.<br>
 If&nbsp;you&nbsp;don't&nbsp;know&nbsp;the&nbsp;modio&nbsp;format&nbsp;simply&nbsp;use&nbsp;the&nbsp;methods,&nbsp;all&nbsp;method&nbsp;return<br>
 self&nbsp;for&nbsp;fluid&nbsp;chaining.&nbsp;This&nbsp;is&nbsp;also&nbsp;used&nbsp;for&nbsp;sorting&nbsp;and&nbsp;pagination.&nbsp;These<br>
-instances&nbsp;can&nbsp;be&nbsp;save&nbsp;and&nbsp;reused&nbsp;at&nbsp;will.<br>
+instances&nbsp;can&nbsp;be&nbsp;save&nbsp;and&nbsp;reused&nbsp;at&nbsp;will.&nbsp;Attributes&nbsp;which&nbsp;can&nbsp;be&nbsp;used&nbsp;as&nbsp;filters<br>
+will&nbsp;be&nbsp;marked&nbsp;as&nbsp;"<a href="#Filter">Filter</a>&nbsp;attributes"&nbsp;in&nbsp;the&nbsp;docs&nbsp;for&nbsp;the&nbsp;class&nbsp;the&nbsp;endpoint&nbsp;<br>
+returns.&nbsp;E.g.&nbsp;ID&nbsp;is&nbsp;marked&nbsp;as&nbsp;a&nbsp;filter&nbsp;argument&nbsp;in&nbsp;the&nbsp;class&nbsp;Game&nbsp;and&nbsp;therefore<br>
+in&nbsp;get_games()&nbsp;it&nbsp;can&nbsp;be&nbsp;used&nbsp;as&nbsp;filter.<br>
 &nbsp;<br>
 Parameters<br>
 ----------<br>
@@ -319,6 +348,19 @@ message&nbsp;:&nbsp;str<br>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="MetaData">class <strong>MetaData</strong></a>(builtins.object)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>mod.io&nbsp;<a href="#MetaData">MetaData</a>&nbsp;objects&nbsp;are&nbsp;represented&nbsp;as&nbsp;dictionnaries&nbsp;and&nbsp;are&nbsp;returned<br>
+as&nbsp;such&nbsp;by&nbsp;the&nbsp;function&nbsp;of&nbsp;this&nbsp;library,&nbsp;each&nbsp;entry&nbsp;in&nbsp;the&nbsp;dictionnary<br>
+is&nbsp;composed&nbsp;of&nbsp;the&nbsp;metakey&nbsp;as&nbsp;the&nbsp;key&nbsp;and&nbsp;the&nbsp;metavalue&nbsp;as&nbsp;the&nbsp;value.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">
+</td></tr></table>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="ModFile">class <strong>ModFile</strong></a>(builtins.object)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
@@ -330,15 +372,15 @@ then&nbsp;<a href="#ModFile-edit">edit</a>()&nbsp;and&nbsp;<a href="#ModFile-del
 Attributes<br>
 -----------<br>
 id&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;modfile<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;modfile.&nbsp;Filter&nbsp;attribute.<br>
 mod&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;mod&nbsp;it&nbsp;was&nbsp;added&nbsp;for<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;mod&nbsp;it&nbsp;was&nbsp;added&nbsp;for.&nbsp;Filter&nbsp;attribute.<br>
 date&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;modfile&nbsp;was&nbsp;submitted<br>
+&nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;modfile&nbsp;was&nbsp;submitted.&nbsp;Filter&nbsp;attribute.<br>
 scanned&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;file&nbsp;was&nbsp;virus&nbsp;scanned<br>
-status&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Current&nbsp;status&nbsp;of&nbsp;the&nbsp;virus&nbsp;scan&nbsp;for&nbsp;the&nbsp;file.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;file&nbsp;was&nbsp;virus&nbsp;scanned.&nbsp;Filter&nbsp;attribute.<br>
+virus_status&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Current&nbsp;status&nbsp;of&nbsp;the&nbsp;virus&nbsp;scan&nbsp;for&nbsp;the&nbsp;file.&nbsp;Filter&nbsp;attribute.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;:&nbsp;Not&nbsp;scanned<br>
 &nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;:&nbsp;Scan&nbsp;complete<br>
 &nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;:&nbsp;In&nbsp;progress<br>
@@ -346,21 +388,21 @@ status&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;4&nbsp;:&nbsp;File&nbsp;not&nbsp;found<br>
 &nbsp;&nbsp;&nbsp;&nbsp;5&nbsp;:&nbsp;Error&nbsp;Scanning<br>
 virus&nbsp;:&nbsp;bool<br>
-&nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;if&nbsp;a&nbsp;virus&nbsp;was&nbsp;detected,&nbsp;False&nbsp;if&nbsp;it&nbsp;wasn't.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;if&nbsp;a&nbsp;virus&nbsp;was&nbsp;detected,&nbsp;False&nbsp;if&nbsp;it&nbsp;wasn't.&nbsp;Filter&nbsp;attribute.<br>
 virus_hash&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;VirusTotal&nbsp;proprietary&nbsp;hash&nbsp;to&nbsp;view&nbsp;the&nbsp;scan&nbsp;results.<br>
 size&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Size&nbsp;of&nbsp;the&nbsp;file&nbsp;in&nbsp;bytes<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Size&nbsp;of&nbsp;the&nbsp;file&nbsp;in&nbsp;bytes.&nbsp;Filter&nbsp;attribute.<br>
 hash&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;MD5&nbsp;hash&nbsp;of&nbsp;the&nbsp;file.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;MD5&nbsp;hash&nbsp;of&nbsp;the&nbsp;file.&nbsp;Filter&nbsp;attribute.<br>
 name&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;of&nbsp;the&nbsp;file<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;of&nbsp;the&nbsp;file.&nbsp;Filter&nbsp;attribute.&nbsp;(Filtering&nbsp;conflict)<br>
 version&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Version&nbsp;of&nbsp;the&nbsp;file<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Version&nbsp;of&nbsp;the&nbsp;file.&nbsp;Filter&nbsp;attribute.<br>
 changelog&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Changelog&nbsp;for&nbsp;the&nbsp;file<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Changelog&nbsp;for&nbsp;the&nbsp;file.&nbsp;Filter&nbsp;attribute.<br>
 metadata&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Metadata&nbsp;stored&nbsp;by&nbsp;the&nbsp;game&nbsp;developer&nbsp;for&nbsp;this&nbsp;file.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Metadata&nbsp;stored&nbsp;by&nbsp;the&nbsp;game&nbsp;developer&nbsp;for&nbsp;this&nbsp;file.&nbsp;Filter&nbsp;attribute.<br>
 download&nbsp;:&nbsp;dict<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Contains&nbsp;download&nbsp;data<br>
 &nbsp;&nbsp;&nbsp;&nbsp;'binary_url'&nbsp;:&nbsp;url&nbsp;to&nbsp;download&nbsp;file<br>
@@ -575,21 +617,21 @@ Represents&nbsp;a&nbsp;summary&nbsp;of&nbsp;stats&nbsp;for&nbsp;a&nbsp;mod<br>
 Attributes<br>
 -----------<br>
 id&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Mod&nbsp;ID&nbsp;of&nbsp;the&nbsp;stats<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Mod&nbsp;ID&nbsp;of&nbsp;the&nbsp;stats.&nbsp;Filter&nbsp;attribute.<br>
 rank&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Current&nbsp;rank&nbsp;of&nbsp;the&nbsp;mod<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Current&nbsp;rank&nbsp;of&nbsp;the&nbsp;mod.&nbsp;Filter&nbsp;attribute.<br>
 rank_total&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;ranking&nbsp;spots&nbsp;the&nbsp;current&nbsp;rank&nbsp;is&nbsp;measured&nbsp;against<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;ranking&nbsp;spots&nbsp;the&nbsp;current&nbsp;rank&nbsp;is&nbsp;measured&nbsp;against.&nbsp;Filter&nbsp;attribute<br>
 downloads&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Amount&nbsp;of&nbsp;times&nbsp;the&nbsp;mod&nbsp;was&nbsp;downloaded<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Amount&nbsp;of&nbsp;times&nbsp;the&nbsp;mod&nbsp;was&nbsp;downloaded.&nbsp;Filter&nbsp;attribute<br>
 subscribers&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Amount&nbsp;of&nbsp;subscribers<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Amount&nbsp;of&nbsp;subscribers.&nbsp;Filter&nbsp;attribute<br>
 total&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;times&nbsp;this&nbsp;item&nbsp;has&nbsp;been&nbsp;rated<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;times&nbsp;this&nbsp;item&nbsp;has&nbsp;been&nbsp;rated.&nbsp;<br>
 positive&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;positive&nbsp;ratings<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;positive&nbsp;ratings.&nbsp;Filter&nbsp;attribute<br>
 negative&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;negative&nbsp;ratings<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;negative&nbsp;ratings.&nbsp;Filter&nbsp;attribute<br>
 percentage&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Percentage&nbsp;of&nbsp;positive&nbsp;rating&nbsp;(positive/total)<br>
 weighted&nbsp;:&nbsp;int<br>
@@ -613,6 +655,30 @@ bool<br>
 &nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;if&nbsp;stats&nbsp;are&nbsp;expired,&nbsp;False&nbsp;else.</tt></dd></dl>
 
 </td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Tag">class <strong>Tag</strong></a>(builtins.object)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>mod.io&nbsp;<a href="#Tag">Tag</a>&nbsp;objects&nbsp;are&nbsp;represented&nbsp;as&nbsp;dictionnaries&nbsp;and&nbsp;are&nbsp;returned<br>
+as&nbsp;such&nbsp;by&nbsp;the&nbsp;function&nbsp;of&nbsp;this&nbsp;library,&nbsp;each&nbsp;entry&nbsp;of&nbsp;in&nbsp;the&nbsp;dictionnary<br>
+is&nbsp;composed&nbsp;of&nbsp;the&nbsp;tag&nbsp;name&nbsp;as&nbsp;the&nbsp;key&nbsp;and&nbsp;the&nbsp;date_added&nbsp;as&nbsp;the&nbsp;value.&nbsp;Use<br>
+dict.keys()&nbsp;to&nbsp;access&nbsp;tags&nbsp;as&nbsp;a&nbsp;list.<br>
+&nbsp;<br>
+<a href="#Filter">Filter</a>-Only&nbsp;Attributes<br>
+-----------------------<br>
+These&nbsp;attributes&nbsp;can&nbsp;only&nbsp;be&nbsp;used&nbsp;at&nbsp;endpoints&nbsp;which&nbsp;return&nbsp;instances<br>
+of&nbsp;this&nbsp;class&nbsp;and&nbsp;takes&nbsp;filter&nbsp;arguments.&nbsp;They&nbsp;are&nbsp;not&nbsp;attached&nbsp;to&nbsp;the<br>
+object&nbsp;itself&nbsp;and&nbsp;trying&nbsp;to&nbsp;access&nbsp;them&nbsp;will&nbsp;cause&nbsp;an&nbsp;AttributeError<br>
+&nbsp;<br>
+date&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Unix&nbsp;timestamp&nbsp;of&nbsp;date&nbsp;tag&nbsp;was&nbsp;added.<br>
+tag&nbsp;:&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;String&nbsp;representation&nbsp;of&nbsp;the&nbsp;tag.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">
+</td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -654,16 +720,27 @@ Attributes<br>
 -----------<br>
 member_id&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;id&nbsp;of&nbsp;the&nbsp;user&nbsp;in&nbsp;the&nbsp;context&nbsp;of&nbsp;their&nbsp;team,&nbsp;not&nbsp;the&nbsp;same&nbsp;as<br>
-&nbsp;&nbsp;&nbsp;&nbsp;user&nbsp;id<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user&nbsp;id.&nbsp;Filter&nbsp;attribute.<br>
 level&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Level&nbsp;of&nbsp;permissions&nbsp;the&nbsp;user&nbsp;has<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Level&nbsp;of&nbsp;permissions&nbsp;the&nbsp;user&nbsp;has.&nbsp;Filter&nbsp;attribute.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;:&nbsp;Moderator<br>
 &nbsp;&nbsp;&nbsp;&nbsp;4&nbsp;:&nbsp;Creator<br>
 &nbsp;&nbsp;&nbsp;&nbsp;8&nbsp;:&nbsp;Administrator<br>
 date&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Unix&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;user&nbsp;was&nbsp;added&nbsp;to&nbsp;the&nbsp;team.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Unix&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;user&nbsp;was&nbsp;added&nbsp;to&nbsp;the&nbsp;team.&nbsp;Filter&nbsp;attribute.<br>
 position&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Custom&nbsp;title&nbsp;given&nbsp;to&nbsp;the&nbsp;user&nbsp;in&nbsp;this&nbsp;team.<br>&nbsp;</tt></td></tr>
+&nbsp;&nbsp;&nbsp;&nbsp;Custom&nbsp;title&nbsp;given&nbsp;to&nbsp;the&nbsp;user&nbsp;in&nbsp;this&nbsp;team.&nbsp;Filter&nbsp;attribute.<br>
+&nbsp;<br>
+<a href="#Filter">Filter</a>-Only&nbsp;Attributes<br>
+-----------------------<br>
+These&nbsp;attributes&nbsp;can&nbsp;only&nbsp;be&nbsp;used&nbsp;at&nbsp;endpoints&nbsp;which&nbsp;return&nbsp;instances<br>
+of&nbsp;this&nbsp;class&nbsp;and&nbsp;takes&nbsp;filter&nbsp;arguments.&nbsp;They&nbsp;are&nbsp;not&nbsp;attached&nbsp;to&nbsp;the<br>
+<a href="builtins.html#object">object</a>&nbsp;itself&nbsp;and&nbsp;trying&nbsp;to&nbsp;access&nbsp;them&nbsp;will&nbsp;cause&nbsp;an&nbsp;AttributeError<br>
+&nbsp;<br>
+user_id&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Unique&nbsp;id&nbsp;of&nbsp;the&nbsp;user.&nbsp;&nbsp;<br>
+username&nbsp;:&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Username&nbsp;of&nbsp;the&nbsp;user.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
 
@@ -695,20 +772,20 @@ Represents&nbsp;a&nbsp;modio&nbsp;user.<br>
 Attributes<br>
 ----------<br>
 id&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;of&nbsp;the&nbsp;user.&nbsp;Filter&nbsp;attribute.<br>
 name_id&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Subdomain&nbsp;name&nbsp;of&nbsp;the&nbsp;user.&nbsp;For&nbsp;example:&nbsp;https://mod.io/members/username-id-here<br>
-name&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Subdomain&nbsp;name&nbsp;of&nbsp;the&nbsp;user.&nbsp;For&nbsp;example:&nbsp;https://mod.io/members/username-id-here.&nbsp;Filter&nbsp;attribute.<br>
+username&nbsp;:&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;of&nbsp;the&nbsp;user.&nbsp;Filter&nbsp;attribute.<br>
 last_online&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Unix&nbsp;timestamp&nbsp;of&nbsp;date&nbsp;the&nbsp;user&nbsp;was&nbsp;last&nbsp;online.<br>
 avatar&nbsp;:&nbsp;modio.<a href="#Image">Image</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;Contains&nbsp;avatar&nbsp;data<br>
 tz&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Timezone&nbsp;of&nbsp;the&nbsp;user,&nbsp;format&nbsp;is&nbsp;country/city.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Timezone&nbsp;of&nbsp;the&nbsp;user,&nbsp;format&nbsp;is&nbsp;country/city.&nbsp;Filter&nbsp;attribute.<br>
 lang&nbsp;:&nbsp;str<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Users&nbsp;language&nbsp;preference.&nbsp;See&nbsp;localization&nbsp;for&nbsp;the&nbsp;supported&nbsp;languages.<br>
-url&nbsp;:&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Users&nbsp;language&nbsp;preference.&nbsp;See&nbsp;localization&nbsp;for&nbsp;the&nbsp;supported&nbsp;languages.&nbsp;Filter&nbsp;attribute.<br>
+profile&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;URL&nbsp;to&nbsp;the&nbsp;user's&nbsp;mod.io&nbsp;profile.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"></td></tr></table></td></tr></table>
