@@ -53,6 +53,7 @@ class Image:
         self.large = list(attrs.values())[4] if len(attrs) > 4 else None    
 
 class EventType(enum.Enum):
+    """An enum to render all event types easy to compare."""
     file_changed  = 0
     available     = 1
     unavailable   = 2
@@ -153,10 +154,10 @@ class Comment:
         self.client = attrs.pop("client")
         self.mod = attrs.pop("mod")
 
-        def delete(self):
-            """Remove a comment"""
-            r = self.client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}')
-            return r
+    def delete(self):
+        """Remove the comment"""
+        r = self.client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}')
+        return r
 
 class ModFile:
     """A object to represents modfiles. If the modfile has been returned for the me/modfile endpoint

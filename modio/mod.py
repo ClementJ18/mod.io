@@ -85,7 +85,7 @@ class Mod:
         self.summary = attrs.pop("summary")
         self.description = attrs.pop("description")
         self.metadata = attrs.pop("metadata_blob")
-        self.kvp = {data["metakey"] : data["metavalue"] for data in attrs.pop("metadata_kvp")}
+        self._kvp_raw = attrs.pop("metadata_kvp")
         self.profile = attrs.pop("profile_url")
         self._file = attrs.pop("modfile", None)
         self.media = ModMedia(**attrs.pop("media"))
@@ -98,6 +98,17 @@ class Mod:
     @property
     def file(self):
         return ModFile(**self._file, game_id=self.game, client=client) if self._file else None 
+
+    @property
+    def kvp(self):
+        meta = {}
+        for item in self._kvp_raw:
+            if item["metakey"] not in meta:
+                meta[item["metakey"]] = []
+            
+            meta[item["metakey"]].append(item["metavalue"])
+
+        return meta   
 
     def get_file(self, id : int):
         """Get the Mod File with the following ID
@@ -181,11 +192,11 @@ class Mod:
 
         Returns
         --------
-        dict{metakey : metavalue}
+        dict{metakey : [metavalue]}
             dict of metadata
         """
         meta_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/metadatakvp")
-        new_meta = {meta["key"] : meta["value"] for meta in meta_json["data"]}
+        new_meta = {meta["metakey"] : meta["metavalue"] for meta in meta_json["data"]}
         self.kvp = new_meta
         return new_meta
 
@@ -584,7 +595,7 @@ class Mod:
         Parameters
         ----------
         dependencies : list[int]
-            List fo dependencies to submit.
+            List of mod ids to submit as dependencies.
 
         """
         while len(depedencies) > 0:

@@ -9,7 +9,8 @@ from .errors import *
 from .objects import *
 
 class Client:
-    """Represents the base-level client to make requests to the mod.io API with.
+    """Represents the base-level client to make requests to the mod.io API with. Upon
+    initializiation the Client will confirm the api key and O Auth 2 token.
 
     Parameters
     -----------
@@ -51,9 +52,7 @@ class Client:
         self.rate_limit = None
         self.rate_remain = None
         self.rate_retry = None
-
-        test = fields.pop("test", False)
-        self.BASE_PATH = "https://api.test.mod.io/v1" if test else "https://api.mod.io/v1"
+        self.BASE_PATH = "https://api.test.mod.io/v1" if fields.pop("test", False) else "https://api.mod.io/v1"
 
         #check o auth 2 token
         if self.access_token:

@@ -6,20 +6,11 @@
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
 <tr bgcolor="#7799ee">
 <td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="modio.html"><font color="#ffffff">modio</font></a>.game</strong></big></big></font></td
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="index.html"><font color="#ffffff">modio</font></a>.game</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cclement%5Cdesktop%5Cmod.io%5Cmodio%5Cgame.py">c:\users\clement\desktop\mod.io\modio\game.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br></font></td></tr></table>
     <p></p>
 <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#aa55cc">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
-    
-<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="enum.html">enum</a><br>
-</td><td width="25%" valign=top><a href="hashlib.html">hashlib</a><br>
-</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -27,7 +18,7 @@
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+<dt><font face="helvetica, arial">Table of Contents
 </font></dt><dd>
 <dl>
 <dt><font face="helvetica, arial"><a href="modio.game.html#Game">Game</a>
@@ -38,10 +29,12 @@
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="Game">class <strong>Game</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="Game">class <strong>Game</strong></a>(builtins.object)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Represents&nbsp;an&nbsp;instance&nbsp;of&nbsp;a&nbsp;modio.<a href="#Game">Game</a>.&nbsp;Do&nbsp;not&nbsp;create&nbsp;manually.<br>
+<td colspan=2><tt><a href="#Game">Game</a>(client,&nbsp;**attrs)<br>
+&nbsp;<br>
+Represents&nbsp;an&nbsp;instance&nbsp;of&nbsp;a&nbsp;modio.<a href="#Game">Game</a>.&nbsp;Do&nbsp;not&nbsp;create&nbsp;manually.<br>
 &nbsp;<br>
 Attributes<br>
 -----------<br>
@@ -52,7 +45,7 @@ status&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;:&nbsp;Accepted&nbsp;(default)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;:&nbsp;Archived&nbsp;(default)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;3&nbsp;:&nbsp;Deleted<br>
-submitter&nbsp;:&nbsp;modio.User<br>
+submitter&nbsp;:&nbsp;<a href="modio.objects.html#User">modio.User</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;Instance&nbsp;of&nbsp;the&nbsp;modio&nbsp;user&nbsp;having&nbsp;submitted&nbsp;the&nbsp;game<br>
 date&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;the&nbsp;date&nbsp;the&nbsp;game&nbsp;was&nbsp;registered<br>
@@ -100,11 +93,11 @@ maturity_options&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;containing&nbsp;mature&nbsp;content<br>
 ugc&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Word&nbsp;used&nbsp;to&nbsp;describe&nbsp;user-generated&nbsp;content&nbsp;(mods,&nbsp;items,&nbsp;addons&nbsp;etc).<br>
-icon&nbsp;:&nbsp;modio.Image<br>
+icon&nbsp;:&nbsp;<a href="modio.objects.html#Image">modio.Image</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;game&nbsp;icon<br>
-logo&nbsp;:&nbsp;modio.Image<br>
+logo&nbsp;:&nbsp;<a href="modio.objects.html#Image">modio.Image</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;game&nbsp;logo<br>
-header&nbsp;:&nbsp;modio.Image<br>
+header&nbsp;:&nbsp;<a href="modio.objects.html#Image">modio.Image</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;game&nbsp;header<br>
 name&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;of&nbsp;the&nbsp;game<br>
@@ -120,15 +113,11 @@ instructions_url&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;make&nbsp;and&nbsp;submit&nbsp;mods&nbsp;to&nbsp;your&nbsp;games&nbsp;profile.<br>
 profile&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;URL&nbsp;to&nbsp;the&nbsp;game's&nbsp;mod.io&nbsp;page.<br>
-tag_options&nbsp;:&nbsp;list[modio.TagOption]<br>
+tag_options&nbsp;:&nbsp;list[<a href="modio.objects.html#TagOption">modio.TagOption</a>]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;List&nbsp;of&nbsp;tags&nbsp;from&nbsp;which&nbsp;mods&nbsp;can&nbsp;pick<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="Game-__init__"><strong>__init__</strong></a>(self, client, **attrs)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
-
-<dl><dt><a name="Game-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>Return&nbsp;repr(self).</tt></dd></dl>
-
-<dl><dt><a name="Game-add_media"><strong>add_media</strong></a>(self, **fields)</dt><dd><tt>Upload&nbsp;new&nbsp;media&nbsp;to&nbsp;to&nbsp;the&nbsp;game.&nbsp;This&nbsp;function&nbsp;can&nbsp;take&nbsp;between&nbsp;1&nbsp;to&nbsp;3&nbsp;arguments<br>
+<dl><dt><a name="Game-add_media"><strong>add_media</strong></a>(self, **media)</dt><dd><tt>Upload&nbsp;new&nbsp;media&nbsp;to&nbsp;to&nbsp;the&nbsp;game.&nbsp;This&nbsp;function&nbsp;can&nbsp;take&nbsp;between&nbsp;1&nbsp;to&nbsp;3&nbsp;arguments<br>
 depending&nbsp;on&nbsp;what&nbsp;media&nbsp;you&nbsp;desire&nbsp;to&nbsp;upload/update<br>
 &nbsp;<br>
 Parameters<br>
@@ -157,22 +146,22 @@ Message<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
-mod&nbsp;:&nbsp;modio.NewMod<br>
+mod&nbsp;:&nbsp;<a href="modio.objects.html#NewMod">modio.NewMod</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;mod&nbsp;to&nbsp;be&nbsp;submitted<br>
 &nbsp;<br>
 Raises<br>
 -------<br>
 modioException<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;instance&nbsp;of&nbsp;modio.NewMod&nbsp;or&nbsp;submissions&nbsp;from&nbsp;3rd&nbsp;party&nbsp;disabled<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;instance&nbsp;of&nbsp;<a href="modio.objects.html#NewMod">modio.NewMod</a>&nbsp;or&nbsp;submissions&nbsp;from&nbsp;3rd&nbsp;party&nbsp;disabled<br>
 ValueError<br>
 &nbsp;&nbsp;&nbsp;&nbsp;One&nbsp;of&nbsp;the&nbsp;requirements&nbsp;for&nbsp;a&nbsp;parameter&nbsp;has&nbsp;not&nbsp;been&nbsp;met.<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
-modio.Mod<br>
+<a href="modio.mod.html#Mod">modio.Mod</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;newly&nbsp;created&nbsp;mod</tt></dd></dl>
 
-<dl><dt><a name="Game-add_tags"><strong>add_tags</strong></a>(self, **fields)</dt><dd><tt>Add&nbsp;tags&nbsp;which&nbsp;mods&nbsp;can&nbsp;apply&nbsp;to&nbsp;their&nbsp;profiles.&nbsp;If&nbsp;the&nbsp;tag&nbsp;name&nbsp;already&nbsp;exists&nbsp;it&nbsp;will<br>
+<dl><dt><a name="Game-add_tags"><strong>add_tags</strong></a>(self, **tags)</dt><dd><tt>Add&nbsp;tags&nbsp;which&nbsp;mods&nbsp;can&nbsp;apply&nbsp;to&nbsp;their&nbsp;profiles.&nbsp;If&nbsp;the&nbsp;tag&nbsp;name&nbsp;already&nbsp;exists&nbsp;it&nbsp;will<br>
 overwrite&nbsp;it.<br>
 &nbsp;<br>
 Parameters<br>
@@ -187,7 +176,7 @@ hidden&nbsp;:&nbsp;bool<br>
 tags&nbsp;:&nbsp;list[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Array&nbsp;of&nbsp;tags&nbsp;that&nbsp;mod&nbsp;creators&nbsp;can&nbsp;apply&nbsp;to&nbsp;their&nbsp;mod</tt></dd></dl>
 
-<dl><dt><a name="Game-delete_tags"><strong>delete_tags</strong></a>(self, **fields)</dt><dd><tt>Delete&nbsp;one&nbsp;or&nbsp;more&nbsp;tags&nbsp;from&nbsp;a&nbsp;tag&nbsp;option<br>
+<dl><dt><a name="Game-delete_tags"><strong>delete_tags</strong></a>(self, **tags)</dt><dd><tt>Delete&nbsp;one&nbsp;or&nbsp;more&nbsp;tags&nbsp;from&nbsp;a&nbsp;tag&nbsp;option<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -257,7 +246,7 @@ maturity&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;containing&nbsp;mature&nbsp;content</tt></dd></dl>
 
 <dl><dt><a name="Game-get_mod"><strong>get_mod</strong></a>(self, id:int)</dt><dd><tt>Queries&nbsp;the&nbsp;mod.io&nbsp;API&nbsp;for&nbsp;the&nbsp;given&nbsp;mod&nbsp;ID&nbsp;and&nbsp;if&nbsp;found&nbsp;returns&nbsp;it&nbsp;as&nbsp;a&nbsp;<br>
-modio.Mod&nbsp;instance.&nbsp;If&nbsp;not&nbsp;found&nbsp;raises&nbsp;NotFound<br>
+<a href="modio.mod.html#Mod">modio.Mod</a>&nbsp;instance.&nbsp;If&nbsp;not&nbsp;found&nbsp;raises&nbsp;NotFound<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -279,8 +268,8 @@ filtering&nbsp;arguments.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
-filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;<a href="modio.objects.html#Filter">modio.Filter</a>&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Returns<br>
@@ -292,27 +281,34 @@ list<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
-filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;<a href="modio.objects.html#Filter">modio.Filter</a>&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
 list<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.Mod&nbsp;instances</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;<a href="modio.mod.html#Mod">modio.Mod</a>&nbsp;instances</tt></dd></dl>
+
+<dl><dt><a name="Game-get_owner"><strong>get_owner</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;original&nbsp;submitter&nbsp;of&nbsp;the&nbsp;resource<br>
+&nbsp;<br>
+Returns<br>
+--------<br>
+User<br>
+&nbsp;&nbsp;&nbsp;&nbsp;User&nbsp;that&nbsp;submitted&nbsp;the&nbsp;resource</tt></dd></dl>
 
 <dl><dt><a name="Game-get_stats"><strong>get_stats</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;the&nbsp;stat&nbsp;objects&nbsp;for&nbsp;all&nbsp;the&nbsp;mods&nbsp;of&nbsp;this&nbsp;game.&nbsp;Takes&nbsp;<br>
 filtering&nbsp;arguments<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
-filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;<a href="modio.objects.html#Filter">modio.Filter</a>&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
-list[modio.Stats]<br>
+list[<a href="modio.objects.html#Stats">modio.Stats</a>]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;List&nbsp;of&nbsp;all&nbsp;the&nbsp;mod&nbsp;stats</tt></dd></dl>
 
 <dl><dt><a name="Game-get_tags"><strong>get_tags</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;game&nbsp;tags&nbsp;available&nbsp;for&nbsp;this&nbsp;game.&nbsp;Takes&nbsp;filtering<br>
@@ -320,22 +316,14 @@ arguments.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
-filter&nbsp;:&nbsp;Optional[modio.Filter]<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;<a href="modio.objects.html#Filter">modio.Filter</a>&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;results<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
 list<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.TagOption&nbsp;instances</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;<a href="modio.objects.html#TagOption">modio.TagOption</a>&nbsp;instances</tt></dd></dl>
 
-<hr>
-Data descriptors defined here:<br>
-<dl><dt><strong>__dict__</strong></dt>
-<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
-<dl><dt><strong>__weakref__</strong></dt>
-<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
 </td></tr></table></td></tr></table>
 </body></html>
