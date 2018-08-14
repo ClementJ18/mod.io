@@ -111,7 +111,7 @@ class Mod:
         self.media = ModMedia(**attrs.pop("media"))
         self.maturity = attrs.pop("maturity_option")
 
-        self.rating = Stats(**attrs.pop("rating"))
+        self.rating = Stats(**attrs.pop("stats"))
         self.client = client
         self.tags = {tag["name"] : tag["date_added"] for tag in attrs.pop("tags", [])}
 
@@ -128,7 +128,10 @@ class Mod:
             
             meta[item["metakey"]].append(item["metavalue"])
 
-        return meta   
+        return meta
+
+    def __repr__(self):
+        return f"<modio.Mod id={self.id} name={self.name} game={self.game}>"   
 
     def get_file(self, id : int):
         """Get the Mod File with the following ID
@@ -293,7 +296,7 @@ class Mod:
         User
             User that submitted the resource
         """
-        user_json = self.client._get_request(f"/general/ownership", data={"resource_type" : "mods", "resource_id" : self.id})
+        user_json = self.client._get_request(f"/general/ownership", params={"resource_type" : "mods", "resource_id" : self.id})
         return User(**user_json)
 
     def edit(self, **fields):

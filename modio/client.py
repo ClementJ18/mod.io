@@ -51,7 +51,7 @@ class Client:
         self.lang = fields.pop("lang", "en")
         self.rate_limit = None
         self.rate_remain = None
-        self.rate_retry = None
+        self.rate_retry = 0
         self.BASE_PATH = "https://api.test.mod.io/v1" if fields.pop("test", False) else "https://api.mod.io/v1"
 
         #check o auth 2 token
@@ -66,13 +66,15 @@ class Client:
                 self.get_games()
             except Forbidden:
                 raise Forbidden("API key invalid")
-    
 
+    def __repr__(self):
+        return f"<modio.Client rate_limit={self.rate_limit} rate_retry={self.rate_retry} rate_remain={self.rate_remain}>"
+    
     def _error_check(self, r):
         """Updates the rate-limit attributes and check validity of the request."""
         self.rate_limit = r.headers.get("X-RateLimit-Limit", self.rate_limit)
         self.rate_remain = r.headers.get("X-RateLimit-Remaining", self.rate_remain)
-        self.rate_retry = r.headers.get("X-Ratelimit-RetryAfter", None)
+        self.rate_retry = r.headers.get("X-Ratelimit-RetryAfter", 0)
 
         try:
             request_json = r.json()
@@ -105,14 +107,17 @@ class Client:
             elif code == 429:
                 time.sleep(self.rate_retry) #feeble attempt at handling rate limits
                 raise TooManyRequests(msg, self.rate_retry)
-                self.rate_retry = None
+                self.rate_retry = 0
             else:
                 raise modioException(msg)
         else:
             return request_json
 
     def _get_request(self, url, **fields):
-        extra = fields.pop("filter", Filter()).__dict__.copy()
+        extra = fields.pop("filter", None)
+        if not extra:
+            extra = Filter()    
+        extra = extra.__dict__.copy()
 
         if not self.access_token:
             headers = {
@@ -382,7 +387,7 @@ class Client:
             A list of modio.ModFile instances representing all modfiles the user added.
         """
         files_json = self._get_request("/me/files", filter=filter)
-        return [ModFile(**file) for file in files_json]
+        return [ModFile(**file) for file in files_json["data"]]
         
     def email_request(self, email : str):
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address
@@ -490,7 +495,7 @@ class Client:
         if fields["resource"] not in ["games", "mods", "users"]:
             raise modioException("You cannot report this type of resources")
 
-        msg = self._post_request('/report', h_type = 0, data = fields)
+        msg = self._post_request('/report', data = fields)
 
-        return Message(msg)
+        return Message(**msg)
         

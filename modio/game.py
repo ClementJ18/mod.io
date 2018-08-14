@@ -125,7 +125,7 @@ class Game:
         self.client = client
 
     def __repr__(self):
-        return f'<{self.__class__.__name__} id={self.id} name={self.name}>'
+        return f'<modio.Game id={self.id} name={self.name}>'
 
     def _all_tags(self):
         tag_list = []
@@ -248,7 +248,7 @@ class Game:
         User
             User that submitted the resource
         """
-        user_json = self.client._get_request(f"/general/ownership", data={"resource_type" : "games", "resource_id" : self.id})
+        user_json = self.client._get_request(f"/general/ownership", params={"resource_type" : "games", "resource_id" : self.id})
         return User(**user_json)
 
     def edit(self, **fields):

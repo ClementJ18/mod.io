@@ -50,7 +50,10 @@ class Image:
 
         self.small = list(attrs.values())[2] if len(attrs) > 2 else None
         self.medium = list(attrs.values())[3] if len(attrs) > 3 else None
-        self.large = list(attrs.values())[4] if len(attrs) > 4 else None    
+        self.large = list(attrs.values())[4] if len(attrs) > 4 else None
+
+    def __repr__(self):
+        return f"<modio.Image filename={self.filename} original={self.original}>"    
 
 class EventType(enum.Enum):
     """An enum to render all event types easy to compare."""
@@ -106,24 +109,12 @@ class Event:
     @property
     def type(self):
         if self._raw_type.startswith("MOD"):
-            return EventType[self._raw_type.replace("MOD", "").replace("_", "").lower()]
+            return EventType[self._raw_type.replace("MOD", "").replace("MOD_", "").lower()]
         else:
             return EventType[self._raw_type.replace("USER_", "").lower()]
 
-        # if self._raw_type == "MODFILE_CHANGED":
-        #     return EventType.file_changed
-        # elif self._raw_type == "MOD_AVAILABLE":
-        #     return EventType.available
-        # elif self._raw_type == "MOD_UNAVAILABLE":
-        #     return EventType.unavailable
-        # elif self._raw_type == "MOD_EDITED":
-        #     return EventType.edited
-        # elif self._raw_type == "MOD_DELETED":
-        #     return EventType.deleted
-        # elif self._raw_type == "MOD_TEAM_CHANGED":
-        #     return EventType.team_changed
-        # else:
-        #     return EventType.other
+    def __repr__(self):
+        return f"<modio.Event id={self.id} type={self.type.name} mod={self.mod}>"
 
 class Comment:
     """Represents a comment on a mod page.
@@ -165,11 +156,14 @@ class Comment:
         self.karma_guest = attrs.pop("karma_guest")
         self.content = attrs.pop("content")
         self.client = attrs.pop("client")
-        self.mod = attrs.pop("mod")
+        self._mod = attrs.pop("mod")
+
+    def __repr__(self):
+        return f"<modio.Comment id={self.id} mod={self.mod}>"
 
     def delete(self):
         """Remove the comment"""
-        r = self.client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}')
+        r = self.client._delete_request(f'/games/{self._mod.game}/mods/{self._mod.id}/comments/{self.id}')
         return r
 
 class ModFile:
@@ -236,6 +230,9 @@ class ModFile:
         self.game = attrs.pop("game_id", None)
         self.client = attrs.pop("client", None)
 
+    def __repr__(self):
+        return f"<modio.ModFile name={self.filename} version={self.version} mod={self.mod}>"
+
     def get_owner(self):
         """Returns the original submitter of the resource
 
@@ -244,7 +241,7 @@ class ModFile:
         User
             User that submitted the resource
         """
-        user_json = self.client._get_request(f"/general/ownership", data={"resource_type" : "files", "resource_id" : self.id})
+        user_json = self.client._get_request(f"/general/ownership", params={"resource_type" : "files", "resource_id" : self.id})
         return User(**user_json)
 
     def edit(self, **fields):
@@ -337,7 +334,7 @@ class TagOption:
         self.tags = attrs.pop("tags", [])
 
     def __repr__(self):
-        return self.name
+        return f"<modio.TagOption name={self.name} hidden={self.hidden}>"
 
 class RatingType(enum.Enum):
     good = 1
@@ -379,18 +376,21 @@ class Stats:
         should be polled again when this expires.
     """
     def __init__(self, **attrs):
-        self.id = kwargs.pop("mod_id")
-        self.rank = kwargs.pop("popularity_rank_position")
-        self.rank_total = kwargs.pop("popularity_rank_total_mods")
-        self.downloads = kwargs.pop("downloads_total")
-        self.subscribers = kwargs.pop("subscribers_total")
-        self.expires = kwargs.pop("date_expires")
+        self.id = attrs.pop("mod_id")
+        self.rank = attrs.pop("popularity_rank_position")
+        self.rank_total = attrs.pop("popularity_rank_total_mods")
+        self.downloads = attrs.pop("downloads_total")
+        self.subscribers = attrs.pop("subscribers_total")
+        self.expires = attrs.pop("date_expires")
         self.total = attrs.pop("ratings_total")
         self.positive = attrs.pop("ratings_positive")
         self.negative = attrs.pop("ratings_negative")
         self.percentage = attrs.pop("ratings_percentage_positive")
         self.weighted = attrs.pop("ratings_weighted_aggregate")
         self.text = attrs.pop("ratings_display_text")
+
+    def __repr__(self):
+        return f"<modio.Stats id={self.id} expired={self.is_stale}>"
 
     def is_stale(self):
         """Returns a bool depending on whether or not the stats are considered stale.
@@ -477,12 +477,15 @@ class User:
         self.lang = attrs.pop("language")
         self.profile = attrs.pop("profile_url")
 
+    def __repr__(self):
+        return f"<modio.User id={self.id} username={self.username}>"
+
 class TeamMember(User):
     """Inherits from modio.User. Represents a user as part of a team.
     
     Attributes
     -----------
-    member_id : int
+    team_id : int
         The id of the user in the context of their team, not the same as
         user id. Filter attribute.
     level : int
@@ -516,6 +519,9 @@ class TeamMember(User):
         self.client = attrs.pop("client")
         self.mod = attrs.pop("mod")
 
+    def __repr__(self):
+        return f"<modio.TeamMember team_id={self.team_id} id={self.id} level={self.level}>"
+
     def edit(self, *, level=None, position=None):
         """Edit a team member's details.
 
@@ -547,7 +553,7 @@ class NewMod:
     Parameters
     -----------
     name : str
-        Name of the mod
+        Name of the mod.
     name_id : str
         Subdomain name for the mod. Optional, if not specified the name will be use. Cannot
         exceed 80 characters
@@ -558,12 +564,10 @@ class NewMod:
     homepage : str
         Official homepage for your mod. Must be a valid URL. Optional
     stock : int
-        Maximium number of subscribers for this mod. A value of 0 disables this limit.
+        Maximium number of subscribers for this mod. Optional, if not included disables
     metadata : str
         Metadata stored by developers which may include properties on how information 
         required. Optional.
-    stock : int
-        Maximum number of subscribers for this mod. Optional, if not included disables it
     maturity : int
         Choose if the mod contains mature content. 
         0 : None
