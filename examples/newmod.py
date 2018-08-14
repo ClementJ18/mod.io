@@ -3,7 +3,7 @@ import modio
 client = modio.Client(auth="oauth2 token goes here")
 newmod = modio.NewMod(
         name="A LOTR Toilet Mod",
-        name_id = "lotr-toilets"
+        name_id = "lotr-toilets",
         summary="Embark on a fascinating journey through Middle Earth's most beautiful toilets.",
         description = "<h1>It's a very good mod</h1><br><h2>You should play it</h2>",
         homepage = "https://me.toilets.lotr",

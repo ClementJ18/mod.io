@@ -203,7 +203,7 @@ class Client:
         
         """
         game_json = self._get_request(f'/games/{id}')
-        return Game(self, **game_json)
+        return Game(client=self, **game_json)
 
     def get_games(self, *, filter=None):
         """Gets all the games available on mod.io. Takes filtering arguments.
@@ -300,7 +300,7 @@ class Client:
             A list of modio.Mod instances representing all mods the user is subscribed to
         """
         mod_json = self._get_request("/me/subscribed", filter=filter)
-        return [Mod(self, **mod) for mod in mod_json["data"]]
+        return [Mod(client=self, **mod) for mod in mod_json["data"]]
 
     def get_my_events(self, *, filter=None):
         """Get events that have been fired specifically for the authenticated user. Takes
@@ -364,7 +364,7 @@ class Client:
             A list of modio.Mod instances representing all mods the user is added or is team member of
         """
         mod_json = self._get_request("/me/mods", filter=filter)
-        return [Mod(self, **mod) for mod in mod_json["data"]]
+        return [Mod(client=self, **mod) for mod in mod_json["data"]]
 
     def get_my_modfiles(self, *, filter=None):
         """Get all the mods the authenticated user uploaded. The returned modfile objects cannot be

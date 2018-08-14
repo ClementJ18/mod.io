@@ -89,7 +89,7 @@ class Mod:
         subscribers 
 
     """
-    def __init__(self, client, **attrs):
+    def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.status = attrs.pop("status")
         self.visible = attrs.pop("visible")
@@ -105,15 +105,14 @@ class Mod:
         self.summary = attrs.pop("summary")
         self.description = attrs.pop("description")
         self.metadata = attrs.pop("metadata_blob")
-        self._kvp_raw = attrs.pop("metadata_kvp")
         self.profile = attrs.pop("profile_url")
-        self._file = attrs.pop("modfile", None)
         self.media = ModMedia(**attrs.pop("media"))
         self.maturity = attrs.pop("maturity_option")
-
         self.rating = Stats(**attrs.pop("stats"))
-        self.client = client
         self.tags = {tag["name"] : tag["date_added"] for tag in attrs.pop("tags", [])}
+        self._client = attrs.pop("client")
+        self._file = attrs.pop("modfile", None)
+        self._kvp_raw = attrs.pop("metadata_kvp")
 
     @property
     def file(self):
@@ -151,8 +150,8 @@ class Mod:
         ModFile
             The found modfile
         """
-        file_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/files/{id}")
-        return ModFile(**file_json, game_id=self.game, client=self.client)
+        file_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/files/{id}")
+        return ModFile(**file_json, game_id=self.game, client=self._client)
 
     def get_files(self, *, filter=None):
         """Get all mod files for this mod. Takes filtering arguments
@@ -168,8 +167,8 @@ class Mod:
         list[ModFile]
             List of all modfiles for this mod
         """
-        files_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/files", filter=filter)
-        return [ModFile(**file, game_id=self.game, client=self.client) for file in files_json["data"]]
+        files_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/files", filter=filter)
+        return [ModFile(**file, game_id=self.game, client=self._client) for file in files_json["data"]]
 
     def get_events(self, *, filter=None):
         """Get all events for that mod sorted by latest. Takes filtering arguments.
@@ -186,7 +185,7 @@ class Mod:
             List of all the events for this mod
 
         """
-        event_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/events", filter=filter)
+        event_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/events", filter=filter)
         return [Event(**event) for event in event_json["data"]]
 
     def get_tags(self, *, filter=None): 
@@ -205,7 +204,7 @@ class Mod:
             dict of tags with the names as keys and date_added as values
 
         """
-        tag_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/tags", filter=filter)
+        tag_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/tags", filter=filter)
         new_tags = {tag["name"] : tag["date_added"] for tag in tag_json["data"]}
         self.tags = new_tags
         return new_tags
@@ -218,7 +217,7 @@ class Mod:
         dict{metakey : [metavalue]}
             dict of metadata
         """
-        meta_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/metadatakvp")
+        meta_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/metadatakvp")
         new_meta = {meta["metakey"] : meta["metavalue"] for meta in meta_json["data"]}
         self.kvp = new_meta
         return new_meta
@@ -238,7 +237,7 @@ class Mod:
             dict of dependencies
 
         """
-        depen_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/dependencies", filter=filter)
+        depen_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/dependencies", filter=filter)
         return {dependecy["mod_id"] : dependecy["date_added"] for dependecy in depen_json["data"]}
 
     def get_team(self, *, filter=filter):
@@ -257,8 +256,8 @@ class Mod:
             List of team members
 
         """
-        team_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/team", filter=filter)
-        return [TeamMember(**member, client=self.client, mod=self) for member in team_json["data"]]
+        team_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/team", filter=filter)
+        return [TeamMember(**member, client=self._client, mod=self) for member in team_json["data"]]
 
     def get_comments(self, *, filter=None):
         """Returns a list of all the comments for this mod. Takes filtering arguments
@@ -274,8 +273,8 @@ class Mod:
         list[Comment]
             List of comments.
         """
-        comment_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/comments", filter=filter)
-        return [Comment(**comment, client=self.client, mod=self) for comment in comment_json["data"]]
+        comment_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/comments", filter=filter)
+        return [Comment(**comment, client=self._client, mod=self) for comment in comment_json["data"]]
 
     def get_stats(self):
         """Returns a Stats object, representing a series of stats for the mod
@@ -285,7 +284,7 @@ class Mod:
         Stats
             The stats summary object for the mod.
         """
-        stats_json = self.client._get_request(f"/games/{self.game}/mods/{self.id}/stats")
+        stats_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/stats")
         return Stats(**stats_json)
 
     def get_owner(self):
@@ -296,7 +295,7 @@ class Mod:
         User
             User that submitted the resource
         """
-        user_json = self.client._get_request(f"/general/ownership", params={"resource_type" : "mods", "resource_id" : self.id})
+        user_json = self._client._get_request(f"/general/ownership", params={"resource_type" : "mods", "resource_id" : self.id})
         return User(**user_json)
 
     def edit(self, **fields):
@@ -339,12 +338,12 @@ class Mod:
                 Metadata stored by the mod developer which may include properties as to how 
                 the item works, or other information you need to display.
         """
-        mod_json = self.client._put_request(f'/games/{self.game}/mods/{self.id}', data = fields)
-        return self.__init__(self.client, **mod_json)
+        mod_json = self._client._put_request(f'/games/{self.game}/mods/{self.id}', data = fields)
+        return self.__init__(self._client, **mod_json)
 
     def delete(self):
         """Delete a mod and set its status to deleted."""
-        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}')
+        r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}')
         self.status = 3
         return r
 
@@ -374,11 +373,11 @@ class Mod:
         file_d = file.__dict__
         files = {"filedata" : file_d.pop("file")}
         try:
-            file_json = self.client._post_request(f'/games/{self.game}/mods/{self.id}/files', h_type = 1, data = file_d, files=files)
+            file_json = self._client._post_request(f'/games/{self.game}/mods/{self.id}/files', h_type = 1, data = file_d, files=files)
         finally:
             file.file.close()
 
-        return ModFile(**file_json)
+        return ModFile(**file_json, game_id=self.game)
 
     def add_media(self, **media):
         """Upload new media to the mod.
@@ -425,7 +424,7 @@ class Mod:
         media = {**media, **yt, **sketch, **images}
 
         try:
-            media_json = self.client._post_request(f'/games/{self.game}/mods/{self.id}/media', h_type = 1, files = media)
+            media_json = self._client._post_request(f'/games/{self.game}/mods/{self.id}/media', h_type = 1, files = media)
         finally:
             media["logo"].close()
             for image in images.values():
@@ -455,7 +454,7 @@ class Mod:
         sketch = media.pop("sketchfab", [])
         sketch = {f"sketchfab[{sketch.index(link)}]" : link for link in sketch}
 
-        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/media')
+        r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/media')
         return r
 
     def subscribe(self):
@@ -467,8 +466,8 @@ class Mod:
             The mod that was just subscribed to, if the user was already subscribed it will return None
         """
         try:
-            mod_json = self.client._post_request(f'/games/{self.game}/mods/{self.id}/subscribe')
-            return Mod(self.client, **mod_json)
+            mod_json = self._client._post_request(f'/games/{self.game}/mods/{self.id}/subscribe')
+            return Mod(self._client, **mod_json)
         except BadRequest:
             pass
 
@@ -476,7 +475,7 @@ class Mod:
         """Unsubscribe from a mod. Returns None if the user is not subscribed."""
 
         try:
-            r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/subscribe')
+            r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/subscribe')
             return r
         except BadRequest:
             pass
@@ -495,7 +494,7 @@ class Mod:
         tags = set([tag.lower() for tag in tags if tag.lower() not in self.tags.keys()])
         fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
 
-        message = self.client._post_request(f'/games/{self.game}/mods/{self.id}/tags', data = fields)
+        message = self._client._post_request(f'/games/{self.game}/mods/{self.id}/tags', data = fields)
         
         for tag in tags:
             self.tags[tag] = time.time()
@@ -520,7 +519,7 @@ class Mod:
 
         fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
 
-        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/tags', data = fields)
+        r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/tags', data = fields)
 
         for tag in tags:
             del self.tags[tag]
@@ -556,7 +555,7 @@ class Mod:
             raise modioException("rating is an argument that can only be RatingType.good or RatingType.bad")
 
         try:
-            checked = self.client._post_request(f'/games/{self.game}/mods/{self.id}/rating', data={"rating":rating})
+            checked = self._client._post_request(f'/games/{self.game}/mods/{self.id}/rating', data={"rating":rating})
         except BadRequest:
             return
 
@@ -590,7 +589,7 @@ class Mod:
             metadata[f"metadata[{index}]"] = f"{data}:{':'.join(metadata[data])}"
             index += 1
 
-        checked = self.client._post_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata)
+        checked = self._client._post_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata)
             
         return Message(**checked)
 
@@ -606,7 +605,7 @@ class Mod:
             metadata[f"metadata[{index}]"] = f"{data}{':' if len(metadata[data]) > 0 else ''}{':'.join(metadata[data])}"
             index += 1
 
-        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata)
+        r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata)
         return r
 
     def add_dependencies(self, dependencies : list):
@@ -625,7 +624,7 @@ class Mod:
             dependecy = {f"dependencies[{dependencies.index(data)}]" : data for data in dependencies[:5]}
             dependencies = dependencies[5:]
 
-            r = self.client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependecy)
+            r = self._client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependecy)
 
         return r
 
@@ -638,7 +637,7 @@ class Mod:
             List of dependencies to remove
         """
         dependecy = {f"dependencies[{dependencies.index(data)}]" : data for data in dependencies}
-        r = self.client._delete_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependecy)
+        r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependecy)
         return r
 
     def add_team_member(self, *, email, level, position=None):
@@ -658,6 +657,6 @@ class Mod:
 
         """
         data = {"email" : email, "level" : level, "position" : position}
-        msg = self.client._post_request(f'/games/{self.game}/mods/{self.id}/team', data=data)
+        msg = self._client._post_request(f'/games/{self.game}/mods/{self.id}/team', data=data)
         return Message(**msg)
 

@@ -155,7 +155,7 @@ class Comment:
         self.karma = attrs.pop("karma")
         self.karma_guest = attrs.pop("karma_guest")
         self.content = attrs.pop("content")
-        self.client = attrs.pop("client")
+        self._client = attrs.pop("client")
         self._mod = attrs.pop("mod")
 
     def __repr__(self):
@@ -163,12 +163,12 @@ class Comment:
 
     def delete(self):
         """Remove the comment"""
-        r = self.client._delete_request(f'/games/{self._mod.game}/mods/{self._mod.id}/comments/{self.id}')
+        r = self._client._delete_request(f'/games/{self._mod.game}/mods/{self._mod.id}/comments/{self.id}')
         return r
 
 class ModFile:
     """A object to represents modfiles. If the modfile has been returned for the me/modfile endpoint
-    then edit() and delete() cannot be called as a game_id is lacking.
+    then edit() and delete() cannot be called as a game is lacking.
 
     Attributes
     -----------
@@ -227,8 +227,8 @@ class ModFile:
         self.changelog = attrs.pop("changelog")
         self.metadata = attrs.pop("metadata_blob")
         self.download = attrs.pop("download")
-        self.game = attrs.pop("game_id", None)
-        self.client = attrs.pop("client", None)
+        self._game_id = attrs.pop("game_id", None)
+        self._client = attrs.pop("client", None)
 
     def __repr__(self):
         return f"<modio.ModFile name={self.filename} version={self.version} mod={self.mod}>"
@@ -241,7 +241,7 @@ class ModFile:
         User
             User that submitted the resource
         """
-        user_json = self.client._get_request(f"/general/ownership", params={"resource_type" : "files", "resource_id" : self.id})
+        user_json = self._client._get_request(f"/general/ownership", params={"resource_type" : "files", "resource_id" : self.id})
         return User(**user_json)
 
     def edit(self, **fields):
@@ -259,11 +259,11 @@ class ModFile:
             Metadata stored by the game developer which may include 
             properties such as what version of the game this file is compatible with.
         """
-        if not self.game:
+        if not self._game_id:
             raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
 
-        file_json = self.client._put_request(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}', data = fields)
-        self.__init__(client=self.client, game_id=self.game, **file_json)
+        file_json = self._client._put_request(f'/games/{self._game_id}/mods/{self.mod_id}/files/{self.id}', data = fields)
+        self.__init__(client=self._client, game_id=self._game_id, **file_json)
 
     def delete(self):
         """Deletes the modfile, this will raise an error if the
@@ -274,10 +274,10 @@ class ModFile:
         Forbidden
             You cannot delete the active release of a mod
         """
-        if not self.game:
+        if not self._game_id:
             raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
             
-        r = requests.delete(f'/games/{self.game_id}/mods/{self.mod_id}/files/{self.id}')
+        r = requests.delete(f'/games/{self._game_id}/mods/{self.mod_id}/files/{self.id}')
         return r
 
     def url_expired(self):
@@ -516,8 +516,8 @@ class TeamMember(User):
         self.level = attrs.pop("level")
         self.date = attrs.pop("date_added")
         self.position = attrs.pop("position")
-        self.client = attrs.pop("client")
-        self.mod = attrs.pop("mod")
+        self._client = attrs.pop("client")
+        self._mod = attrs.pop("mod")
 
     def __repr__(self):
         return f"<modio.TeamMember team_id={self.team_id} id={self.id} level={self.level}>"
@@ -537,12 +537,12 @@ class TeamMember(User):
 
         """
         data = {"level" : level, "position" : position}
-        msg = self.client._put_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}', data=data)
+        msg = self._client._put_request(f'/games/{self._mod.game}/mods/{self._mod.id}/team/{self.team_id}', data=data)
         return Message(**msg)
 
     def delete(self):
         """Remove the user from the team. Fires a MOD_TEAM_CHANGED event"""
-        r = self.client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}')
+        r = self._client._delete_request(f'/games/{self._mod.game}/mods/{self._mod.id}/team/{self.team_id}')
         return r
     
 

@@ -9,14 +9,13 @@ client.email_request("necro@mordor.com")
 #check your email for the security code
 code = input("Code: ")
 
-oauth2 = client.email_exchange(code)["access_token"]
+oauth2 = client.email_exchange(code)
 
 #your oauth2 token is now stored in the variable
 
 #to save simply
-file = open("oauth2.txt", "w")
-file.write(oauth2)
-file.close()
+with open("oauth2.txt", "w") as f:
+    f.write(oauth2)
 
 #and now the token is stored in oauth2.txt
 

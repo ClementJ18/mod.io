@@ -96,7 +96,7 @@ class Game:
         List of tags from which mods can pick
 
     """
-    def __init__(self, client, **attrs):
+    def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.status = attrs.pop("status")
         self.submitter = User(**attrs.pop("submitted_by"))
@@ -122,7 +122,7 @@ class Game:
         self.profile = attrs.pop("profile_url")
         self.tag_options = [TagOption(**tag) for tag in attrs.pop("tag_options", [])]
         self.maturity_options = attrs.pop("maturity_options")
-        self.client = client
+        self._client = attrs.pop("client")
 
     def __repr__(self):
         return f'<modio.Game id={self.id} name={self.name}>'
@@ -155,9 +155,9 @@ class Game:
             The mod with the given ID
         
         """
-        mod_json = self.client._get_request(f"/games/{self.id}/mods/{id}")
+        mod_json = self._client._get_request(f"/games/{self.id}/mods/{id}")
 
-        return Mod(self.client, **mod_json)
+        return Mod(client=self._client, **mod_json)
 
     def get_mods(self, filter=None):
         """Gets all the mods available for the game. Takes filtering arguments.
@@ -174,11 +174,11 @@ class Game:
             A list of modio.Mod instances
                
         """
-        mod_json = self.client._get_request(f"/games/{self.id}/mods", filter=filter)
+        mod_json = self._client._get_request(f"/games/{self.id}/mods", filter=filter)
 
         mod_list = list()
         for mod in mod_json["data"]:
-            mod_list.append(Mod(self.client, **mod))
+            mod_list.append(Mod(client=self._client, **mod))
 
         return mod_list
 
@@ -198,7 +198,7 @@ class Game:
             A list of modio.Event instances
                
         """
-        event_json = self.client._get_request(f"/games/{self.id}/mods/events", filter=filter)
+        event_json = self._client._get_request(f"/games/{self.id}/mods/events", filter=filter)
 
         return [Event(**event) for event in event_json["data"]]
 
@@ -218,7 +218,7 @@ class Game:
             A list of modio.TagOption instances
                
         """
-        tag_json = self.client._get_request(f"/games/{self.id}/tags", filter=filter)
+        tag_json = self._client._get_request(f"/games/{self.id}/tags", filter=filter)
 
         return [TagOption(**tag_option) for tag_option in tag_json["data"]]
 
@@ -237,7 +237,7 @@ class Game:
         list[modio.Stats]
             List of all the mod stats
         """
-        stats_json = self.client._get_request(f"/games/{self.id}/mods/stats", filter=filter)
+        stats_json = self._client._get_request(f"/games/{self.id}/mods/stats", filter=filter)
         return [Stats(**stats) for stats in stats_json["data"]]
 
     def get_owner(self):
@@ -248,7 +248,7 @@ class Game:
         User
             User that submitted the resource
         """
-        user_json = self.client._get_request(f"/general/ownership", params={"resource_type" : "games", "resource_id" : self.id})
+        user_json = self._client._get_request(f"/general/ownership", params={"resource_type" : "games", "resource_id" : self.id})
         return User(**user_json)
 
     def edit(self, **fields):
@@ -311,8 +311,8 @@ class Game:
             1 : Allow mod developpers to decide whether or not to flag their mod as 
             containing mature content"""
 
-        game_json = self.client._put_request(f'/games/{self.id}', data = fields)
-        self.__init__(self.client, **game_json)
+        game_json = self._client._put_request(f'/games/{self.id}', data = fields)
+        self.__init__(self._client, **game_json)
 
     def add_mod(self, mod):
         """Add a mod to this game.
@@ -347,11 +347,11 @@ class Game:
             mod_d[f"tags[{tags.index(tag)}]"] = tag
 
         try:
-            mod_json = self.client._post_request(f'/games/{self.id}/mods', h_type = 1, data = mod_d, files=files)
+            mod_json = self._client._post_request(f'/games/{self.id}/mods', h_type = 1, data = mod_d, files=files)
         finally:
             mod.logo.close()
 
-        return Mod(self.client, **mod_json)
+        return Mod(client=self._client, **mod_json)
 
     def add_media(self, **media):
         """Upload new media to to the game. This function can take between 1 to 3 arguments
@@ -383,7 +383,7 @@ class Game:
             media[image] = open(media[image])
 
         try:
-            message = self.client._post_request(f'/games/{self.id}/media', h_type = 1, files = fields)
+            message = self._client._post_request(f'/games/{self.id}/media', h_type = 1, files = fields)
         finally:
             for image in media.values():
                 image.close()
@@ -409,7 +409,7 @@ class Game:
         """
         tags = tags.pop("tags", [])
         tags = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
-        message = self.client._post_request(f'/games/{self.id}/tags', data = {"input_json" : tags})
+        message = self._client._post_request(f'/games/{self.id}/tags', data = {"input_json" : tags})
 
         self.tag_options.append(TagOption(**tags))
         return Message(**message)
@@ -427,7 +427,7 @@ class Game:
         """
         tags = tags.pop("tags", [])
         tags = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
-        r = self.client._delete_request(f'/games/{self.id}/tags', data = tags)
+        r = self._client._delete_request(f'/games/{self.id}/tags', data = tags)
         if len(tags) > 0:
             for tag in tags:
                 if tag in self.tags[tags["name"]]:
