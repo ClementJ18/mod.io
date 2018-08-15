@@ -248,7 +248,7 @@ class Game:
         User
             User that submitted the resource
         """
-        user_json = self._client._get_request(f"/general/ownership", params={"resource_type" : "games", "resource_id" : self.id})
+        user_json = self._client._post_request(f"/general/ownership", data={"resource_type" : "games", "resource_id" : self.id})
         return User(**user_json)
 
     def edit(self, **fields):

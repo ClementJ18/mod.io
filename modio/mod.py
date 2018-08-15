@@ -116,7 +116,7 @@ class Mod:
 
     @property
     def file(self):
-        return ModFile(**self._file, game_id=self.game, client=client) if self._file else None 
+        return ModFile(**self._file, game_id=self.game, client=self._client) if self._file else None 
 
     @property
     def kvp(self):
@@ -295,7 +295,7 @@ class Mod:
         User
             User that submitted the resource
         """
-        user_json = self._client._get_request(f"/general/ownership", params={"resource_type" : "mods", "resource_id" : self.id})
+        user_json = self._client._post_request(f"/general/ownership", data={"resource_type" : "mods", "resource_id" : self.id})
         return User(**user_json)
 
     def edit(self, **fields):

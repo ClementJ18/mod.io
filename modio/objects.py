@@ -228,7 +228,7 @@ class ModFile:
         self.metadata = attrs.pop("metadata_blob")
         self.download = attrs.pop("download")
         self._game_id = attrs.pop("game_id", None)
-        self._client = attrs.pop("client", None)
+        self._client = attrs.pop("client")
 
     def __repr__(self):
         return f"<modio.ModFile name={self.filename} version={self.version} mod={self.mod}>"
@@ -241,7 +241,7 @@ class ModFile:
         User
             User that submitted the resource
         """
-        user_json = self._client._get_request(f"/general/ownership", params={"resource_type" : "files", "resource_id" : self.id})
+        user_json = self._client._post_request(f"/general/ownership", data={"resource_type" : "files", "resource_id" : self.id})
         return User(**user_json)
 
     def edit(self, **fields):
@@ -277,7 +277,7 @@ class ModFile:
         if not self._game_id:
             raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
             
-        r = requests.delete(f'/games/{self._game_id}/mods/{self.mod_id}/files/{self.id}')
+        r = self.client._delete_request(f'/games/{self._game_id}/mods/{self.mod_id}/files/{self.id}')
         return r
 
     def url_expired(self):

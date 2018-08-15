@@ -114,10 +114,8 @@ class Client:
             return request_json
 
     def _get_request(self, url, **fields):
-        extra = fields.pop("filter", None)
-        if not extra:
-            extra = Filter()    
-        extra = extra.__dict__.copy()
+        filter = (fields.pop("filter") if fields.get("filter") else Filter()).__dict__.copy()
+        extra = {**filter, **fields}
 
         if not self.access_token:
             headers = {
@@ -154,29 +152,39 @@ class Client:
               'Accept': 'application/json',
               'Accept-Language': self.lang
             }
-        else:
+        elif h_type == 2:
             headers = {
-              'Authorization': 'Bearer ' + self.access_token,
               'Accept': 'application/json',
-              'Content-Type': 'multipart/form-data',
               'Accept-Language': self.lang
             }
 
         return headers
 
     def _post_request(self, url, *, h_type=0, **fields):
+        if not self.access_token:
+            fields["api_key"] = self.api_key
+            h_type = 2
+
         r = requests.post(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
         r = self._error_check(r)
 
         return r
 
     def _put_request(self, url, *, h_type=0, **fields):
+        if not self.access_token:
+            fields["api_key"] = self.api_key
+            h_type = 2
+
         r = requests.put(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
         r = self._error_check(r)
 
         return r
 
     def _delete_request(self, url, *, h_type=0, **fields):
+        if not self.access_token:
+            fields["api_key"] = self.api_key
+            h_type = 2
+
         r = requests.delete(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
         r = self._error_check(r)
 
@@ -221,7 +229,7 @@ class Client:
                
         """
         game_json = self._get_request('/games', filter=filter)
-        return [Game(self, **game) for game in game_json["data"]]
+        return [Game(client=self, **game) for game in game_json["data"]]
 
     def get_user(self, id : int):
         """Gets a user with the specified ID.
@@ -341,7 +349,7 @@ class Client:
             A list of modio.Game instances representing all games the user is added or is team member of
         """
         game_json = self._get_request("/me/games", filter=filter)
-        return [Game(self, **game) for game in game_json["data"]]
+        return [Game(client=self, **game) for game in game_json["data"]]
 
     def get_my_mods(self, *, filter=None):
         """Get all the mods the authenticated user added or is a team member of. Takes
@@ -387,7 +395,7 @@ class Client:
             A list of modio.ModFile instances representing all modfiles the user added.
         """
         files_json = self._get_request("/me/files", filter=filter)
-        return [ModFile(**file) for file in files_json["data"]]
+        return [ModFile(**file, client=self) for file in files_json["data"]]
         
     def email_request(self, email : str):
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address
