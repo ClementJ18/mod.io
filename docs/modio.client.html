@@ -36,7 +36,7 @@
 Represents&nbsp;the&nbsp;base-level&nbsp;client&nbsp;to&nbsp;make&nbsp;requests&nbsp;to&nbsp;the&nbsp;mod.io&nbsp;API&nbsp;with.&nbsp;Upon<br>
 initializiation&nbsp;the&nbsp;<a href="#Client">Client</a>&nbsp;will&nbsp;confirm&nbsp;the&nbsp;api&nbsp;key&nbsp;and&nbsp;O&nbsp;Auth&nbsp;2&nbsp;token.<br>
 &nbsp;<br>
-Parameters<br>
+    Parameters<br>
 -----------<br>
 api_key&nbsp;:&nbsp;Optional[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;api&nbsp;key&nbsp;that&nbsp;will&nbsp;be&nbsp;used&nbsp;to&nbsp;authenticate&nbsp;the&nbsp;bot&nbsp;while&nbsp;it&nbsp;makes&nbsp;most&nbsp;of&nbsp;<br>
@@ -54,19 +54,21 @@ lang&nbsp;:&nbsp;Optional[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;user&nbsp;will&nbsp;be&nbsp;used,&nbsp;default&nbsp;is&nbsp;US&nbsp;English.<br>
 test&nbsp;:&nbsp;Optional[bool]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Whether&nbsp;or&nbsp;not&nbsp;to&nbsp;use&nbsp;the&nbsp;mod.io&nbsp;test&nbsp;environment.&nbsp;If&nbsp;not&nbsp;included&nbsp;will&nbsp;default&nbsp;to&nbsp;False.<br>
+version&nbsp;:&nbsp;Optional[str]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;An&nbsp;optional&nbsp;keyword&nbsp;argument&nbsp;to&nbsp;allow&nbsp;you&nbsp;to&nbsp;pick&nbsp;a&nbsp;specific&nbsp;version&nbsp;of&nbsp;the&nbsp;API&nbsp;to&nbsp;query,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;usually&nbsp;you&nbsp;shouldn't&nbsp;need&nbsp;to&nbsp;change&nbsp;this.&nbsp;This&nbsp;cannot&nbsp;be&nbsp;changed&nbsp;once&nbsp;set&nbsp;apart&nbsp;by&nbsp;forcibly<br>
+&nbsp;&nbsp;&nbsp;&nbsp;overwriting&nbsp;BASE_PATH<br>
 &nbsp;<br>
 Attributes<br>
 -----------<br>
 rate_limit&nbsp;:&nbsp;int<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;requests&nbsp;that&nbsp;can&nbsp;be&nbsp;made&nbsp;using&nbsp;the&nbsp;supplied&nbsp;API&nbsp;Key/access&nbsp;token.&nbsp;Is<br>
-&nbsp;&nbsp;&nbsp;&nbsp;None&nbsp;until&nbsp;first&nbsp;request&nbsp;is&nbsp;made.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;requests&nbsp;that&nbsp;can&nbsp;be&nbsp;made&nbsp;using&nbsp;the&nbsp;supplied&nbsp;API&nbsp;Key/access&nbsp;token.<br>
 rate_remain&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;requests&nbsp;remaining.&nbsp;Once&nbsp;this&nbsp;number&nbsp;hits&nbsp;0&nbsp;the&nbsp;requests&nbsp;will&nbsp;become&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rejected&nbsp;and&nbsp;the&nbsp;library&nbsp;will&nbsp;sleep&nbsp;until&nbsp;the&nbsp;limit&nbsp;resets&nbsp;then&nbsp;raise&nbsp;429&nbsp;TooManyRequests.&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Is&nbsp;None&nbsp;until&nbsp;first&nbsp;request&nbsp;is&nbsp;made<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rejected&nbsp;and&nbsp;the&nbsp;library&nbsp;will&nbsp;sleep&nbsp;until&nbsp;the&nbsp;limit&nbsp;resets&nbsp;then&nbsp;raise&nbsp;429&nbsp;TooManyRequests.<br>
 rate_retry&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;seconds&nbsp;until&nbsp;the&nbsp;rate&nbsp;limits&nbsp;are&nbsp;reset&nbsp;for&nbsp;this&nbsp;API&nbsp;Key/access&nbsp;token.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Is&nbsp;None&nbsp;until&nbsp;the&nbsp;rate_remain&nbsp;is&nbsp;0&nbsp;and&nbsp;become&nbsp;None&nbsp;again&nbsp;once&nbsp;the&nbsp;rate&nbsp;limit&nbsp;is&nbsp;reset.<br>&nbsp;</tt></td></tr>
+&nbsp;&nbsp;&nbsp;&nbsp;Is&nbsp;0&nbsp;until&nbsp;the&nbsp;rate_remain&nbsp;is&nbsp;0&nbsp;and&nbsp;becomes&nbsp;0&nbsp;again&nbsp;once&nbsp;the&nbsp;rate&nbsp;limit&nbsp;is&nbsp;reset.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="Client-email_exchange"><strong>email_exchange</strong></a>(self, code:int)</dt><dd><tt>Exchanges&nbsp;the&nbsp;given&nbsp;5-digit&nbsp;code&nbsp;for&nbsp;an&nbsp;OAuth2&nbsp;token.<br>

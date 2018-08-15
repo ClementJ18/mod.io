@@ -231,7 +231,7 @@ class ModFile:
         self._client = attrs.pop("client")
 
     def __repr__(self):
-        return f"<modio.ModFile name={self.filename} version={self.version} mod={self.mod}>"
+        return f"<modio.ModFile id={self.id} name={self.filename} version={self.version}>"
 
     def get_owner(self):
         """Returns the original submitter of the resource

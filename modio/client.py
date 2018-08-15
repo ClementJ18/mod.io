@@ -30,29 +30,32 @@ class Client:
         user will be used, default is US English.
     test : Optional[bool]
         Whether or not to use the mod.io test environment. If not included will default to False.
+    version : Optional[str]
+        An optional keyword argument to allow you to pick a specific version of the API to query,
+        usually you shouldn't need to change this. This cannot be changed once set apart by forcibly
+        overwriting BASE_PATH
 
     Attributes
     -----------
     rate_limit : int
-        Number of requests that can be made using the supplied API Key/access token. Is
-        None until first request is made.
+        Number of requests that can be made using the supplied API Key/access token.
     rate_remain : int
         Number of requests remaining. Once this number hits 0 the requests will become 
-        rejected and the library will sleep until the limit resets then raise 429 TooManyRequests. 
-        Is None until first request is made
+        rejected and the library will sleep until the limit resets then raise 429 TooManyRequests.
     rate_retry : int
         Number of seconds until the rate limits are reset for this API Key/access token.
-        Is None until the rate_remain is 0 and become None again once the rate limit is reset. 
+        Is 0 until the rate_remain is 0 and becomes 0 again once the rate limit is reset. 
     """
 
     def __init__(self, **fields):
         self.api_key = fields.pop("api_key", None)
         self.access_token = fields.pop("auth", None)
         self.lang = fields.pop("lang", "en")
+        self.version = fields.pop("version", "v1")
         self.rate_limit = None
         self.rate_remain = None
         self.rate_retry = 0
-        self.BASE_PATH = "https://api.test.mod.io/v1" if fields.pop("test", False) else "https://api.mod.io/v1"
+        self.BASE_PATH = f"https://api.test.mod.io/{self.version}" if fields.pop("test", False) else f"https://api.mod.io/{self.version}"
 
         #check o auth 2 token
         if self.access_token:
