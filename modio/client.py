@@ -79,11 +79,10 @@ class Client:
         self.rate_remain = r.headers.get("X-RateLimit-Remaining", self.rate_remain)
         self.rate_retry = r.headers.get("X-Ratelimit-RetryAfter", 0)
 
-        try:
-            request_json = r.json()
-        except json.JSONDecoderError:
+        if r.status_code == 204:
             return r
 
+        request_json = r.json()
         if "error" in request_json:
             code = request_json["error"]["code"]
             msg = request_json["error"]["message"]
@@ -116,33 +115,9 @@ class Client:
         else:
             return request_json
 
-    def _get_request(self, url, **fields):
-        filter = (fields.pop("filter") if fields.get("filter") else Filter()).__dict__.copy()
-        extra = {**filter, **fields}
-
-        if not self.access_token:
-            headers = {
-              'Accept': 'application/json',
-              'Accept-Language': self.lang
-            }
-
-            r = requests.get(self.BASE_PATH + url, params={
-              'api_key': self.api_key,
-              **extra
-            }, headers = headers)
-        else:
-            headers = {
-              'Accept': 'application/json',
-              'Authorization': "Bearer " + self.access_token,
-              'Accept-Language': self.lang
-            }
-
-            r = requests.get(self.BASE_PATH + url, headers = headers, params=extra)
-
-        return self._error_check(r)
-
     def _define_headers(self, h_type):
         if h_type == 0:
+            #regular O auth 2 header when submitting data
             headers = {
               'Authorization': 'Bearer ' + self.access_token,
               'Content-Type': 'application/x-www-form-urlencoded',
@@ -150,12 +125,16 @@ class Client:
               'Accept-Language': self.lang
             }
         elif h_type == 1:
+            #o auth 2 header for submitting multipart/data, had to remove Content-Type
+            #because it is already added by the requests lib when defining a files parameter
             headers = {
               'Authorization': 'Bearer ' + self.access_token,
               'Accept': 'application/json',
               'Accept-Language': self.lang
             }
         elif h_type == 2:
+            #header to use when making calls using the api key, the key itself is added in
+            #the parameters in the methods below
             headers = {
               'Accept': 'application/json',
               'Accept-Language': self.lang
@@ -163,15 +142,26 @@ class Client:
 
         return headers
 
+    def _get_request(self, url, **fields):
+        filter = (fields.pop("filter") if fields.get("filter") else Filter()).__dict__.copy()
+        extra = {**filter, **fields}
+
+        if not self.access_token:
+            extra["api_key"] = self.api_key
+            h_type = 2
+        else:
+            h_type = 0
+
+        r  = requests.get(self.BASE_PATH + url, headers=self._define_headers(h_type), params=extra)
+        return self._error_check(r)
+
     def _post_request(self, url, *, h_type=0, **fields):
         if not self.access_token:
             fields["api_key"] = self.api_key
             h_type = 2
 
         r = requests.post(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
-        r = self._error_check(r)
-
-        return r
+        return self._error_check(r)
 
     def _put_request(self, url, *, h_type=0, **fields):
         if not self.access_token:
@@ -179,9 +169,7 @@ class Client:
             h_type = 2
 
         r = requests.put(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
-        r = self._error_check(r)
-
-        return r
+        return self._error_check(r)
 
     def _delete_request(self, url, *, h_type=0, **fields):
         if not self.access_token:
@@ -189,9 +177,7 @@ class Client:
             h_type = 2
 
         r = requests.delete(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
-        r = self._error_check(r)
-
-        return r
+        return self._error_check(r)
 
     def get_game(self, id : int):
         """Queries the mod.io API for the given game ID and if found returns it as a 

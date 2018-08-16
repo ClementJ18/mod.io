@@ -680,7 +680,7 @@ class Filter:
         for key, value in filters.items():
             self._set(key, value)
 
-    def _set(self, key, value):
+    def _set(self, key, value, text="{}"):
         _lib_to_api = {
             "date" : "date_added",
             "metadata" : "metadata_blob",
@@ -737,7 +737,7 @@ class Filter:
             else:
                 value = f"USER_{value.name.upper()}"
 
-        self.__setattr__(key, value)
+        self.__setattr__(text.format(key), value)
 
     def text(self, query):
         """Full-text search is a lenient search filter that is only available if
@@ -770,7 +770,7 @@ class Filter:
         the request. E.g. 'id=10' or 'name="Best Mod"'
         """
         for key, value in kwargs.items():
-            self._set(f"{key}-not", value)
+            self._set(key, value, "{}-not")
         return self
 
     def like(self, **kwargs):
@@ -780,7 +780,7 @@ class Filter:
         the request. E.g. 'id=10' or 'name="Best Mod"'
         """
         for key, value in kwargs.items():
-            self._set(f"{key}-lk", value)
+            self._set(key, value, "{}-lk")
         return self
 
     def not_like(self, **kwargs):
@@ -790,25 +790,26 @@ class Filter:
         them into arguments that will be passed to the request. E.g. 'id=10' or 'name="Best Mod"'
         """
         for key, value in kwargs.items():
-            self._set(f"{key}-not-lk", value)
+            self._set(key, value, "{}-not-lk")
         return self
 
-    def in_text(self, **kwargs):
+    def values_in(self, **kwargs):
         """Where the supplied list of values appears in the preceding column value. This is equivalent 
-        to SQL's IN. There are not set parameters, this methods takes any named keywords and transforms 
-        them into arguments that will be passed to the request. E.g. 'id=10' or 'name="Best Mod"
+        to SQL's IN. There are not set parameters, this methods takes any named keywords and values as lists
+         and transforms them into arguments that will be passed to the request. 
+         E.g. 'id=[10, 3, 4]' or 'name=["Best","Mod"]'
         """
         for key, value in kwargs.items():
-            self._set(f"{key}-in", value)
+            self._set(key, ",".join(value), "{}-in")
         return self
 
-    def not_in_text(self, **kwargs):
+    def values_not_in(self, **kwargs):
         """Where the supplied list of values does not equal the preceding column value. This is equivalent 
         to SQL's NOT IN. There are not set parameters, this methods takes any named keywords and transforms 
         them into arguments that will be passed to the request. E.g. 'id=10' or 'name="Best Mod"
         """
         for key, value in kwargs.items():
-            self._set(f"{key}-not-in", value)
+            self._set(key, ",".join(value), "{}-not-in")
         return self
 
     def max(self, **kwargs):
@@ -817,7 +818,7 @@ class Filter:
         to the request. E.g. 'game=40'
         """
         for key, value in kwargs.items():
-            self._set(f"{key}-max", value)
+            self._set(key, value, "{}-max")
         return self
 
     def min(self, **kwargs):
@@ -826,7 +827,7 @@ class Filter:
         to the request. E.g. 'game=40'
         """
         for key, value in kwargs.items():
-            self._set(f"{key}-min", value)
+            self._set(key, value, "{}-min")
         return self
 
     def smaller_than(self, **kwargs):
@@ -835,7 +836,7 @@ class Filter:
         to the request. E.g. 'game=40'
         """
         for key, value in kwargs.items():
-            self._set(f"{key}-st", value)
+            self._set(key, value, "{}-st")
         return self
 
     def greater_than(self, **kwargs):
@@ -844,7 +845,7 @@ class Filter:
         to the request. E.g. 'game=40'
         """
         for key, value in kwargs.items():
-            self._set(f"{key}-gt", value)
+            self._set(key, value, "{}-gt")
         return self
 
     def bitwise(self, **kwargs):
@@ -854,17 +855,17 @@ class Filter:
         that have both option A and B enabled.
         """
         for key, value in kwargs.items():
-            self._set(f"{key}-bitwise-and", value)
+            self._set(key, value, "{}-bitwise-and")
         return self
 
-    def sort(self, key, reverse=False):
+    def sort(self, key, *, reverse=False):
         """Allows you to sort the results by the value of a top level column with a single value.
 
         Paramters
         ----------
         key : str
             The column by which to sort the results
-        reverse : bool
+        reverse : Optional[bool]
             Optional, defaults to False. Whether to sort by ascending (False) or descending (True)
             order.
 

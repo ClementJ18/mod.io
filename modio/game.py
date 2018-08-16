@@ -204,7 +204,7 @@ class Game:
 
     def get_tags(self, *, filter=None):
         """Gets all the game tags available for this game. Takes filtering
-        arguments.
+        arguments. Updates the tag_option attribute
 
         Parameters
         -----------
@@ -219,8 +219,8 @@ class Game:
                
         """
         tag_json = self._client._get_request(f"/games/{self.id}/tags", filter=filter)
-
-        return [TagOption(**tag_option) for tag_option in tag_json["data"]]
+        self.tag_options = tags = [TagOption(**tag_option) for tag_option in tag_json["data"]]
+        return tags
 
     def get_stats(self, *, filter=None):
         """Gets the stat objects for all the mods of this game. Takes 
@@ -334,9 +334,6 @@ class Game:
         modio.Mod
             The newly created mod
         """
-        if self.submission == 0:
-            raise modioException("Cannot submit new mods through non-official sources (game wise)")
-
         if not isinstance(mod, NewMod):
             raise modioException("mod argument must be type modio.NewMod")
 
@@ -359,17 +356,17 @@ class Game:
         
         Parameters
         -----------
-        logo : str
+        logo : Optional[str]
             Path to the file that you desire to be the game's logo. Dimensions must be at least 
             640x360 and we recommended you supply a high resolution image with a 16 / 9 ratio. mod.io 
             will use this logo to create three thumbnails with the dimensions of 320x180, 640x360 and 
             1280x720.
-        icon : str
+        icon : Optional[str]
             Path to the file that you desire to be the game's icon. Must be gif, jpg or png format 
             and cannot exceed 1MB in filesize. Dimensions must be at least 64x64 and a transparent 
             png that works on a colorful background is recommended. mod.io will use this icon to 
             create three thumbnails with the dimensions of 64x64, 128x128 and 256x256.
-        header : str
+        header : Optional[str]
             Path to the file that you desire to be the game's header. Must be gif, jpg or png format 
             and cannot exceed 256KB in filesize. Dimensions of 400x100 and a light transparent png that 
             works on a dark background is recommended.
@@ -390,7 +387,7 @@ class Game:
         
         return Message(**message)
 
-    def add_tags(self, **tags):
+    def add_tags(self, **tag_option):
         """Add tags which mods can apply to their profiles. If the tag name already exists it will
         overwrite it.
 
@@ -407,11 +404,12 @@ class Game:
             Array of tags that mod creators can apply to their mod
 
         """
-        tags = tags.pop("tags", [])
+        tags = tag_option.pop("tags", [])
         tags = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
-        message = self._client._post_request(f'/games/{self.id}/tags', data = {"input_json" : tags})
+        input_json = {**tag_option, **tags}
+        message = self._client._post_request(f'/games/{self.id}/tags', data = {"input_json" : input_json})
 
-        self.tag_options.append(TagOption(**tags))
+        self.tag_options.append(TagOption(**input_json))
         return Message(**message)
 
     def delete_tags(self, **tags):
@@ -421,13 +419,14 @@ class Game:
         -----------
         name : str
             Name of the group from which you wish to delete from
-        tags : list[str]
+        tags : Optional[list[str]]
             Optional. Tags to delete from group. If left blank the entire group will be
             deleted
         """
         tags = tags.pop("tags", [])
         tags = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
         r = self._client._delete_request(f'/games/{self.id}/tags', data = tags)
+        
         if len(tags) > 0:
             for tag in tags:
                 if tag in self.tags[tags["name"]]:
