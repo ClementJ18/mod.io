@@ -158,38 +158,14 @@ class Client:
         return self._error_check(r)
 
     def _post_request(self, url, *, h_type=0, **fields):
-        if not self.access_token:
-            if "params" in fields:
-                fields["params"]["api_key"] = self.api_key
-            else:
-                fields["params"] = {"api_key" : self.api_key}
-            
-            h_type = 2
-
         r = requests.post(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
         return self._error_check(r)
 
     def _put_request(self, url, *, h_type=0, **fields):
-        if not self.access_token:
-            if "params" in fields:
-                fields["params"]["api_key"] = self.api_key
-            else:
-                fields["params"] = {"api_key" : self.api_key}
-            
-            h_type = 2
-
         r = requests.put(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
         return self._error_check(r)
 
     def _delete_request(self, url, *, h_type=0, **fields):
-        if not self.access_token:
-            if "params" in fields:
-                fields["params"]["api_key"] = self.api_key
-            else:
-                fields["params"] = {"api_key" : self.api_key}
-            
-            h_type = 2
-
         r = requests.delete(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
         return self._error_check(r)
 
@@ -424,7 +400,7 @@ class Client:
 
         """
 
-        r = self._post_request("/oauth/emailrequest", params={'email' : email})
+        r = self._post_request("/oauth/emailrequest", params={'email' : email, 'api_key': self.api_key}, h_type = 2)
         return Message(**r)
 
     def email_exchange(self, code : int):
@@ -452,7 +428,7 @@ class Client:
         if len(code) != 5:
             raise ValueError("Security code must be 5 digits")
 
-        r = self._post_request("/oauth/emailexchange", params={'security_code' : code})
+        r = self._post_request("/oauth/emailexchange", params={'security_code' : code, "api_key":self.api_key}, h_type=2)
         self.access_token = r["access_token"]
 
         return r["access_token"]
