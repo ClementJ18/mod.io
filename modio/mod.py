@@ -113,10 +113,7 @@ class Mod:
         self._client = attrs.pop("client")
         self._file = attrs.pop("modfile", None)
         self._kvp_raw = attrs.pop("metadata_kvp")
-
-    @property
-    def file(self):
-        return ModFile(**self._file, game_id=self.game, client=self._client) if self._file else None 
+        self.file =  ModFile(**self._file, game_id=self.game, client=self._client) if self._file else None 
 
     @property
     def kvp(self):
@@ -214,8 +211,8 @@ class Mod:
         self.tags = new_tags = {tag["name"] : tag["date_added"] for tag in tag_json["data"]}
         return new_tags, Pagination(**tag_json)
 
-    def get_meta(self):
-        """Returns a dict of metakey-metavalue pairs. This will also updated the mod's kvp attribute.
+    def get_metadata(self):
+        """Returns a dict of metakey-metavalue pairs. This will also update the mod's kvp attribute.
 
         Returns
         --------
@@ -225,7 +222,7 @@ class Mod:
             Pagination data
         """
         meta_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/metadatakvp")
-        self.kvp = new_meta = {meta["metakey"] : meta["metavalue"] for meta in meta_json["data"]}
+        self._kvp_raw = new_meta = {meta["metakey"] : meta["metavalue"] for meta in meta_json["data"]}
         return new_meta, Pagination(**meta_json)
 
     def get_dependencies(self, *, filter=None):
@@ -450,11 +447,11 @@ class Mod:
 
         Parameters
         -----------
-        images : list[str]
+        images : Optional[list[str]]
             Optional. List of image filenames that you want to delete
-        youtube : list[str]
+        youtube : Optional[list[str]]
             Optional. List of youtube links that you want to delete
-        sketchfab : list[str]
+        sketchfab : Optional[list[str]]
             Optional. List sketchfab links that you want to delete
         """
         images = media.pop("images", [])
@@ -595,14 +592,18 @@ class Mod:
             message on the status of the successful added meta data
 
         """
-        metadata = {}
+        metadata_d = {}
         index = 0
         for data in metadata:
-            metadata[f"metadata[{index}]"] = f"{data}:{':'.join(metadata[data])}"
+            metadata_d[f"metadata[{index}]"] = f"{data}:{':'.join(metadata[data])}"
             index += 1
 
-        checked = self._client._post_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata)
-            
+        checked = self._client._post_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata_d)
+        
+        for key, value in metadata.items():
+            for item in value:
+                self._kvp_raw.append({"metakey" : key, "metavalue" : item})
+
         return Message(**checked)
 
     def delete_metadata(self, **metadata):
@@ -611,13 +612,20 @@ class Mod:
         meta-values for the meta-key will be deleted.
 
         """
-        metadata = {}
+        metadata_d = {}
         index = 0
         for data in metadata:
-            metadata[f"metadata[{index}]"] = f"{data}{':' if len(metadata[data]) > 0 else ''}{':'.join(metadata[data])}"
+            metadata_d[f"metadata[{index}]"] = f"{data}{':' if len(metadata[data]) > 0 else ''}{':'.join(metadata[data])}"
             index += 1
 
-        r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata)
+        r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata_d)
+
+        for key, value in metadata.items():
+            if len(value) == 0:
+                self._kvp_raw = [x for x in self._kvp_raw if x["metakey"] != key]
+            else:
+                self._kvp_raw = [x for x in self._kvp_raw if x["metakey"] != key and x["metavalue"] not in values]
+
         return r
 
     def add_dependencies(self, dependencies : list):
@@ -633,7 +641,7 @@ class Mod:
 
         """
         while len(depedencies) > 0:
-            dependecy = {f"dependencies[{dependencies.index(data)}]" : data for data in dependencies[:5]}
+            dependecy = {f"dependencies[{dependencies.index(data)}]" : data for data in dependencies[5:]}
             dependencies = dependencies[5:]
 
             r = self._client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependecy)

@@ -406,12 +406,12 @@ class Game:
             Array of tags that mod creators can apply to their mod
 
         """
-        tags = tag_option.pop("tags", [])
+        tags = tag_option.get("tags", [])
         tags = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
         input_json = {**tag_option, **tags}
         message = self._client._post_request(f'/games/{self.id}/tags', data = {"input_json" : input_json})
 
-        self.tag_options.append(TagOption(**input_json))
+        self.tag_options.append(TagOption(**tag_option))
         return Message(**message)
 
     def delete_tags(self, **tags):

@@ -19,8 +19,11 @@ class Message:
         self.code = attrs.pop("code")
         self.message = attrs.pop("message")
 
-    def __repr__(self):
+    def __str__(self):
         return f"{self.code} : {self.message}"
+
+    def __repr__(self):
+        return f"<modio.Message code={self.code}>"
 
 class Image:
     """A representation of a modio image, which stand for the Logo, Icon
@@ -554,18 +557,18 @@ class NewMod:
     -----------
     name : str
         Name of the mod.
-    name_id : str
+    name_id : Optional[str]
         Subdomain name for the mod. Optional, if not specified the name will be use. Cannot
         exceed 80 characters
     summary : str
         Brief overview of the mod, cannot exceed 250 characters.
     description :str
         Detailed description of the mod, supports HTML.
-    homepage : str
+    homepage : Optional[str]
         Official homepage for your mod. Must be a valid URL. Optional
     stock : int
         Maximium number of subscribers for this mod. Optional, if not included disables
-    metadata : str
+    metadata : Optional[str]
         Metadata stored by developers which may include properties on how information 
         required. Optional.
     maturity : int
@@ -623,8 +626,8 @@ class NewModFile:
         Version of the mod that this file represents
     changelog : str
         Changelog for the release
-    active : bool
-        Label this upload as the current release. Optional, if not included defaults to true.
+    active : Optional[bool]
+        Label this upload as the current release. Optional, if not included defaults to True.
     metadata : str
         Metadata stored by the game developer which may include properties such as what version 
         of the game this file is compatible with.
