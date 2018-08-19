@@ -7,6 +7,7 @@ from .game import Game
 from .mod import Mod
 from .errors import *
 from .objects import *
+from .utils import auth
 
 class Client:
     """Represents the base-level client to make requests to the mod.io API with. Upon
@@ -137,7 +138,8 @@ class Client:
             #the parameters in the methods below
             headers = {
               'Accept': 'application/json',
-              'Accept-Language': self.lang
+              'Accept-Language': self.lang,
+              'Content-Type': "application/x-www-form-urlencoded"
             }
 
         return headers
@@ -157,7 +159,11 @@ class Client:
 
     def _post_request(self, url, *, h_type=0, **fields):
         if not self.access_token:
-            fields["api_key"] = self.api_key
+            if "params" in fields:
+                fields["params"]["api_key"] = self.api_key
+            else:
+                fields["params"] = {"api_key" : self.api_key}
+            
             h_type = 2
 
         r = requests.post(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
@@ -165,7 +171,11 @@ class Client:
 
     def _put_request(self, url, *, h_type=0, **fields):
         if not self.access_token:
-            fields["api_key"] = self.api_key
+            if "params" in fields:
+                fields["params"]["api_key"] = self.api_key
+            else:
+                fields["params"] = {"api_key" : self.api_key}
+            
             h_type = 2
 
         r = requests.put(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
@@ -173,7 +183,11 @@ class Client:
 
     def _delete_request(self, url, *, h_type=0, **fields):
         if not self.access_token:
-            fields["api_key"] = self.api_key
+            if "params" in fields:
+                fields["params"]["api_key"] = self.api_key
+            else:
+                fields["params"] = {"api_key" : self.api_key}
+            
             h_type = 2
 
         r = requests.delete(self.BASE_PATH + url, headers=self._define_headers(h_type), **fields)
@@ -195,7 +209,7 @@ class Client:
 
         Returns
         --------
-        :class: `Game`
+        Game
             The game with the given ID
         
         """
@@ -213,12 +227,13 @@ class Client:
 
         Returns
         --------
-        list
+        list[modio.Game]
             A list of modio.Game instances
-               
+        modio.Pagination
+            Pagination data       
         """
         game_json = self._get_request('/games', filter=filter)
-        return [Game(client=self, **game) for game in game_json["data"]]
+        return [Game(client=self, **game) for game in game_json["data"]], Pagination(**game_json)
 
     def get_user(self, id : int):
         """Gets a user with the specified ID.
@@ -235,7 +250,7 @@ class Client:
 
         Returns
         --------
-        :class: `User`
+        User
             The user with the given ID
 
         """
@@ -253,13 +268,15 @@ class Client:
 
         Returns
         --------
-        list
+        list[modio.User]
             A list of modio.User instances
+        modio.Pagination
+            Pagination data
                
         """
         user_json = self._get_request("/users", filter=filter)
-        return [User(**user) for user in user_json["data"]]
-
+        return [User(**user) for user in user_json["data"]], Pagination(**user_json)
+    
     def get_my_user(self):
         """Gets the authenticated user's details (aka the user who created the API key/access token)
         Raises
@@ -293,11 +310,13 @@ class Client:
 
         Returns
         -------
-        list
+        list[modio.Mod]
             A list of modio.Mod instances representing all mods the user is subscribed to
+        modio.Pagination
+            Pagination data
         """
         mod_json = self._get_request("/me/subscribed", filter=filter)
-        return [Mod(client=self, **mod) for mod in mod_json["data"]]
+        return [Mod(client=self, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
 
     def get_my_events(self, *, filter=None):
         """Get events that have been fired specifically for the authenticated user. Takes
@@ -311,8 +330,10 @@ class Client:
 
         Returns
         --------
-        list : Events
+        list[modio.Events]
             list of events related to the user
+        modio.Pagination
+            Pagination data
         """
         events_json = self._get_request("/me/events", filter=filter)
         return [Event(**event) for event in events_json["data"]]
@@ -334,11 +355,13 @@ class Client:
 
         Returns
         -------
-        list
+        list[modio.Game]
             A list of modio.Game instances representing all games the user is added or is team member of
+        modio.Pagination
+            Pagination data
         """
         game_json = self._get_request("/me/games", filter=filter)
-        return [Game(client=self, **game) for game in game_json["data"]]
+        return [Game(client=self, **game) for game in game_json["data"]], Pagination(**game_json)
 
     def get_my_mods(self, *, filter=None):
         """Get all the mods the authenticated user added or is a team member of. Takes
@@ -357,11 +380,13 @@ class Client:
 
         Returns
         -------
-        list
+        list[modio.Mod]
             A list of modio.Mod instances representing all mods the user is added or is team member of
+        modio.Pagination
+            Pagination data
         """
         mod_json = self._get_request("/me/mods", filter=filter)
-        return [Mod(client=self, **mod) for mod in mod_json["data"]]
+        return [Mod(client=self, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
 
     def get_my_modfiles(self, *, filter=None):
         """Get all the mods the authenticated user uploaded. The returned modfile objects cannot be
@@ -380,11 +405,13 @@ class Client:
 
         Returns
         -------
-        list
+        list[modio.ModFile]
             A list of modio.ModFile instances representing all modfiles the user added.
+        modio.Pagination
+            Pagination data
         """
         files_json = self._get_request("/me/files", filter=filter)
-        return [ModFile(**file, client=self) for file in files_json["data"]]
+        return [ModFile(**file, client=self) for file in files_json["data"]], Pagination(**files_json)
         
     def email_request(self, email : str):
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address
@@ -397,17 +424,8 @@ class Client:
 
         """
 
-        headers = {
-          'Accept': 'application/json',
-          'Content-Type': "application/x-www-form-urlencoded"
-        }
-
-        r = requests.post(self.BASE_PATH + "/oauth/emailrequest", params={
-          'api_key': self.api_key,
-          'email' : email
-        }, headers = headers)
-
-        return Message(**self._error_check(r))
+        r = self._post_request("/oauth/emailrequest", params={'email' : email})
+        return Message(**r)
 
     def email_exchange(self, code : int):
         """Exchanges the given 5-digit code for an OAuth2 token.
@@ -430,20 +448,11 @@ class Client:
             The access code. The access code will also be added directly to the Client's `access_token` 
             attribute.
         """
-        headers = {
-          'Accept': 'application/json',
-          'Content-Type': "application/x-www-form-urlencoded"
-        }
 
         if len(code) != 5:
             raise ValueError("Security code must be 5 digits")
 
-        r = requests.post(self.BASE_PATH + "/oauth/emailexchange", params={
-          'api_key': self.api_key,
-          'security_code' : code
-        }, headers = headers)
-
-        r = self._error_check(r)
+        r = self._post_request("/oauth/emailexchange", params={'security_code' : code})
         self.access_token = r["access_token"]
 
         return r["access_token"]
@@ -475,7 +484,7 @@ class Client:
         Returns
         -------
         Message
-            :class: `Message` 
+            Report status message sent back by mod.io 
 
 
         """

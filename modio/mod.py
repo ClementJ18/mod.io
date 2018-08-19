@@ -164,11 +164,13 @@ class Mod:
         
         Returns
         --------
-        list[ModFile]
+        list[modio.ModFile]
             List of all modfiles for this mod
+        modio.Pagination
+            Pagination data
         """
         files_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/files", filter=filter)
-        return [ModFile(**file, game_id=self.game, client=self._client) for file in files_json["data"]]
+        return [ModFile(**file, game_id=self.game, client=self._client) for file in files_json["data"]], Pagination(**files_json)
 
     def get_events(self, *, filter=None):
         """Get all events for that mod sorted by latest. Takes filtering arguments.
@@ -181,12 +183,14 @@ class Mod:
 
         Returns
         --------
-        list[Events]
+        list[modio.Events]
             List of all the events for this mod
+        modio.Pagination
+            Pagination data
 
         """
         event_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/events", filter=filter)
-        return [Event(**event) for event in event_json["data"]]
+        return [Event(**event) for event in event_json["data"]], Pagination(**event_json)
 
     def get_tags(self, *, filter=None): 
         """Gets all the tags for this mod. Takes filtering arguments. Updates the instance's
@@ -202,25 +206,27 @@ class Mod:
         --------
         dict{name : date_added}
             dict of tags with the names as keys and date_added as values
+        modio.Pagination
+            Pagination data
 
         """
         tag_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/tags", filter=filter)
-        new_tags = {tag["name"] : tag["date_added"] for tag in tag_json["data"]}
-        self.tags = new_tags
-        return new_tags
+        self.tags = new_tags = {tag["name"] : tag["date_added"] for tag in tag_json["data"]}
+        return new_tags, Pagination(**tag_json)
 
     def get_meta(self):
         """Returns a dict of metakey-metavalue pairs. This will also updated the mod's kvp attribute.
 
         Returns
         --------
-        dict{metakey : [metavalue]}
+        dict{metakey : list[metavalue]}
             dict of metadata
+        modio.Pagination
+            Pagination data
         """
         meta_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/metadatakvp")
-        new_meta = {meta["metakey"] : meta["metavalue"] for meta in meta_json["data"]}
-        self.kvp = new_meta
-        return new_meta
+        self.kvp = new_meta = {meta["metakey"] : meta["metavalue"] for meta in meta_json["data"]}
+        return new_meta, Pagination(**meta_json)
 
     def get_dependencies(self, *, filter=None):
         """Returns a dict of dependency_id-date_added pairs. Takes filtering arguments.
@@ -235,10 +241,12 @@ class Mod:
         --------
         dict{id : date}
             dict of dependencies
+        modio.Pagination
+            Pagination data
 
         """
         depen_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/dependencies", filter=filter)
-        return {dependecy["mod_id"] : dependecy["date_added"] for dependecy in depen_json["data"]}
+        return {dependecy["mod_id"] : dependecy["date_added"] for dependecy in depen_json["data"]}, Pagination(**depen_json)
 
     def get_team(self, *, filter=filter):
         """Returns a list of TeamMember object representing the Team in charge of the mod. Takes
@@ -252,12 +260,14 @@ class Mod:
 
         Returns
         --------
-        list[TeamMember]
+        list[modio.TeamMember]
             List of team members
+        modio.Pagination
+            Pagination data
 
         """
         team_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/team", filter=filter)
-        return [TeamMember(**member, client=self._client, mod=self) for member in team_json["data"]]
+        return [TeamMember(**member, client=self._client, mod=self) for member in team_json["data"]], Pagination(**team_json)
 
     def get_comments(self, *, filter=None):
         """Returns a list of all the comments for this mod. Takes filtering arguments
@@ -270,11 +280,13 @@ class Mod:
 
         Returns
         --------
-        list[Comment]
+        list[modio.Comment]
             List of comments.
+        modio.Pagination
+            Pagination data
         """
         comment_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/comments", filter=filter)
-        return [Comment(**comment, client=self._client, mod=self) for comment in comment_json["data"]]
+        return [Comment(**comment, client=self._client, mod=self) for comment in comment_json["data"]], Pagination(**comment_json)
 
     def get_stats(self):
         """Returns a Stats object, representing a series of stats for the mod

@@ -156,7 +156,6 @@ class Game:
         
         """
         mod_json = self._client._get_request(f"/games/{self.id}/mods/{id}")
-
         return Mod(client=self._client, **mod_json)
 
     def get_mods(self, filter=None):
@@ -170,17 +169,14 @@ class Game:
 
         Returns
         --------
-        list
+        list[modio.Mod]
             A list of modio.Mod instances
+        modio.Pagination
+            Pagination data
                
         """
         mod_json = self._client._get_request(f"/games/{self.id}/mods", filter=filter)
-
-        mod_list = list()
-        for mod in mod_json["data"]:
-            mod_list.append(Mod(client=self._client, **mod))
-
-        return mod_list
+        return [Mod(client=self._client, **mod) for mod in mod_json["dat"]], Pagination(**mod_json)
 
     def get_mod_events(self, *, filter=None):
         """Gets all the mod events available for this game sorted by latest event first. Takes 
@@ -194,13 +190,15 @@ class Game:
 
         Returns
         --------
-        list
+        list[modio.Event]
             A list of modio.Event instances
+        modio.Pagination
+            Pagination data
                
         """
         event_json = self._client._get_request(f"/games/{self.id}/mods/events", filter=filter)
 
-        return [Event(**event) for event in event_json["data"]]
+        return [Event(**event) for event in event_json["data"]], Pagination(**event_json)
 
     def get_tags(self, *, filter=None):
         """Gets all the game tags available for this game. Takes filtering
@@ -214,13 +212,15 @@ class Game:
 
         Returns
         --------
-        list
+        list[modio.TagOption]
             A list of modio.TagOption instances
+        modio.Pagination
+            Pagination data
                
         """
         tag_json = self._client._get_request(f"/games/{self.id}/tags", filter=filter)
         self.tag_options = tags = [TagOption(**tag_option) for tag_option in tag_json["data"]]
-        return tags
+        return tags, Pagination(**tag_json)
 
     def get_stats(self, *, filter=None):
         """Gets the stat objects for all the mods of this game. Takes 
@@ -236,9 +236,11 @@ class Game:
         --------
         list[modio.Stats]
             List of all the mod stats
+        modio.Pagination
+            Pagination data
         """
         stats_json = self._client._get_request(f"/games/{self.id}/mods/stats", filter=filter)
-        return [Stats(**stats) for stats in stats_json["data"]]
+        return [Stats(**stats) for stats in stats_json["data"]], Pagination(**stats_json)
 
     def get_owner(self):
         """Returns the original submitter of the resource

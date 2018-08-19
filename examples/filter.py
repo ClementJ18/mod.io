@@ -31,5 +31,5 @@ filters.limit(20)
 filters.offset(5)
 #skip the first five results
 
-games = client.get_games(filter=filters)
+games, pagination_metadata = client.get_games(filter=filters)
 #returns all the result that meet the above criteria

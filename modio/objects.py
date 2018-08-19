@@ -431,7 +431,7 @@ class MetaData:
 class Dependencies:
     """mod.io Depedencies objects are represented as dictionnaries and are returned
     as such by the function of this library, each entry of in the dictionnary
-    is composed of the dependency (mod) id as the key and the date_added as the value. User
+    is composed of the dependency (mod) id as the key and the date_added as the value. Use
     dict.keys() to access dependencies as a list.
 
     """
@@ -667,8 +667,8 @@ class Filter:
     self for fluid chaining. This is also used for sorting and pagination. These
     instances can be save and reused at will. Attributes which can be used as filters
     will be marked as "Filter attributes" in the docs for the class the endpoint 
-    returns. E.g. ID is marked as a filter argument for in the class Game and therefore
-    in get_games() it can be used a filter.
+    returns an array of. E.g. ID is marked as a filter argument for in the class Game 
+    and therefore in get_games() it can be used a filter.
 
     Parameters
     ----------
@@ -887,13 +887,57 @@ class Filter:
     def offset(self, offset):
         """Allows to offset the first result by a certain amount.
 
-        Paramters
+        Parameters
         ----------
         offset : int
             The number of results to skip.
         """
         self._offset = offset
         return self
+
+class Pagination:
+    """This class is unique to the library and represents the pagination
+    data that some of the endpoints return.
+
+    Attributes
+    -----------
+    count : int
+        Number of results returned by the request.
+    limit : int
+        Maximum number of results returned.
+    offsent : int
+        Number of results skipped over
+    """
+
+    def __init__(self, **attrs):
+        self.count = attrs.pop("result_count")
+        self.limit = attrs.pop("result_limit")
+        self.offset = attrs.pop("result_offset")
+
+    def __repr__(self):
+        return f"<modio.Pagination count={self.count} limit={self.limit} offset={self.offset}>"
+
+    def max(self):
+        """Returns True if there are no additional results after this set. Can fail if the returned count is coincidentally
+        exactly the same as the limit."""
+        return self.count == self.limit
+
+    def min(self):
+        """Returns True if there are no additional results before this set."""
+        return self.offset == 0
+
+    def next(self):
+        """Returns the offset required for the next set of results"""
+        return self.offset + self.limit
+
+    def previous(self):
+        """Returns the offset required for the previous set of results"""
+        return self.offset - self.limit
+
+    def page(self):
+        """Returns the current page number. Page numbers start at 0"""
+        return self.offset // self.limit
+
 
 
 class Object:
