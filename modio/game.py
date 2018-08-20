@@ -162,7 +162,8 @@ class Game:
         return Mod(client=self._client, **mod_json)
 
     def get_mods(self, filter=None):
-        """Gets all the mods available for the game. Takes filtering arguments.
+        """Gets all the mods available for the game. Takes filtering arguments. Returns a 
+        named tuple with parameters results and pagination.
 
         Parameters
         -----------
@@ -179,7 +180,7 @@ class Game:
                
         """
         mod_json = self._client._get_request(f"/games/{self.id}/mods", filter=filter)
-        return Returned([Mod(client=self._client, **mod) for mod in mod_json["dat"]], Pagination(**mod_json))
+        return Returned([Mod(client=self._client, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
 
     def get_mod_events(self, *, filter=None):
         """Gets all the mod events available for this game sorted by latest event first. Takes 
@@ -351,7 +352,7 @@ class Game:
         try:
             mod_json = self._client._post_request(f'/games/{self.id}/mods', h_type = 1, data = mod_d, files=files)
         finally:
-            mod.logo.close()
+            files["logo"].close()
 
         return Mod(client=self._client, **mod_json)
 
@@ -382,10 +383,10 @@ class Game:
             A message containing the result of the query if successful.
         """
         for image in media:
-            media[image] = open(media[image])
+            media[image] = open(media[image], "rb")
 
         try:
-            message = self._client._post_request(f'/games/{self.id}/media', h_type = 1, files = fields)
+            message = self._client._post_request(f'/games/{self.id}/media', h_type = 1, files = media)
         finally:
             for image in media.values():
                 image.close()

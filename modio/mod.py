@@ -2,7 +2,7 @@ from math import sqrt
 import time
 
 from .objects import *
-from .errors import modioException
+from .errors import modioException, BadRequest
 
 class Mod:
     """Represent a modio mod object.
@@ -108,7 +108,7 @@ class Mod:
         self.profile = attrs.pop("profile_url")
         self.media = ModMedia(**attrs.pop("media"))
         self.maturity = attrs.pop("maturity_option")
-        self.rating = Stats(**attrs.pop("stats"))
+        self.stats = Stats(**attrs.pop("stats"))
         self.tags = {tag["name"] : tag["date_added"] for tag in attrs.pop("tags", [])}
         self._client = attrs.pop("client")
         self._file = attrs.pop("modfile", None)
@@ -151,7 +151,8 @@ class Mod:
         return ModFile(**file_json, game_id=self.game, client=self._client)
 
     def get_files(self, *, filter=None):
-        """Get all mod files for this mod. Takes filtering arguments
+        """Get all mod files for this mod. Takes filtering arguments. Returns a named tuple
+        with parameters results and pagination.
 
         Parameters
         -----------
@@ -170,7 +171,8 @@ class Mod:
         return Returned([ModFile(**file, game_id=self.game, client=self._client) for file in files_json["data"]], Pagination(**files_json))
 
     def get_events(self, *, filter=None):
-        """Get all events for that mod sorted by latest. Takes filtering arguments.
+        """Get all events for that mod sorted by latest. Takes filtering arguments. Returns ,
+        a named tuple with parameters results and pagination.
 
         Parameters
         -----------
@@ -191,7 +193,7 @@ class Mod:
 
     def get_tags(self, *, filter=None): 
         """Gets all the tags for this mod. Takes filtering arguments. Updates the instance's
-        tag attribute.
+        tag attribute. Returns a named tuple with parameters results and pagination.
 
         Parameters
         -----------
@@ -222,11 +224,12 @@ class Mod:
             Pagination data
         """
         meta_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/metadatakvp")
-        self._kvp_raw = new_meta = {meta["metakey"] : meta["metavalue"] for meta in meta_json["data"]}
-        return Returned(new_meta, Pagination(**meta_json))
+        self._kvp_raw = meta_json["data"]
+        return Returned(self.kvp, Pagination(**meta_json))
 
     def get_dependencies(self, *, filter=None):
-        """Returns a dict of dependency_id-date_added pairs. Takes filtering arguments.
+        """Returns a dict of dependency_id-date_added pairs. Takes filtering arguments. Returns 
+        a named tuple with parameters results and pagination.
 
         Parameters
         -----------
@@ -294,7 +297,8 @@ class Mod:
             The stats summary object for the mod.
         """
         stats_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/stats")
-        return Stats(**stats_json)
+        self.stats = stats = Stats(**stats_json)
+        return stats
 
     def get_owner(self):
         """Returns the original submitter of the resource
@@ -384,9 +388,9 @@ class Mod:
         try:
             file_json = self._client._post_request(f'/games/{self.game}/mods/{self.id}/files', h_type = 1, data = file_d, files=files)
         finally:
-            file.file.close()
+            files["filedata"].close()
 
-        return ModFile(**file_json, game_id=self.game)
+        return ModFile(**file_json, game_id=self.game, client=self._client)
 
     def add_media(self, **media):
         """Upload new media to the mod.
@@ -416,7 +420,7 @@ class Mod:
         """
         logo = media.pop("logo", None)
         if logo:
-            media["logo"] = open(logo)
+            media["logo"] = open(logo, "rb")
 
         images = media.pop("images", None)
         if isinstance(images, str):
@@ -500,13 +504,17 @@ class Mod:
 
         """
         self.get_tags()
-        tags = set([tag.lower() for tag in tags if tag.lower() not in self.tags.keys()])
+        tags = list(set([tag.lower() for tag in tags if tag.lower() not in self.tags.keys()]))
+        
+        if len(tags) < 1:
+            raise modioException("No unique tags were submitted")
+
         fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
 
         message = self._client._post_request(f'/games/{self.game}/mods/{self.id}/tags', data = fields)
         
         for tag in tags:
-            self.tags[tag] = time.time()
+            self.tags[tag] = int(time.time())
 
         return Message(**message)
 
@@ -520,13 +528,15 @@ class Mod:
 
         """
         self.get_tags()
-
         if tags:
-            tags = set([tag.lower() for tag in tags if tag.lower() in self.tags.keys()])
+            tags = list(set([tag.lower() for tag in tags if tag.lower() in self.tags.keys()]))
         else:
-            tags = self.tags.keys()
+            tags = list(self.tags.keys())
 
-        fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
+        if len(tags) < 1:
+            raise modioException("No unique tags were submitted")
+
+        fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags} if len(tags) > 0 else {"tags[]":""}
 
         r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/tags', data = fields)
 
@@ -535,56 +545,38 @@ class Mod:
             
         return r
 
-    def add_rating(self, rating : RatingType):
-        """Adds a good or bad rating to the mod, the author of the rating will be the authenticated user.
-        If the mod has already been rated by the user it will return None.
-
-        Parameters
-        -----------
-        rating : modio.RatingType
-            The rating that will be assigned to the mod.
-
-        Raises
-        -------
-        modioException
-            rating argument must be RatingType
-
-        """
-        def confidence(ups, downs):
-            n = ups + downs
-
-            if n == 0:
-                return 0
-
-            z = 1.96 #1.44 = 85%, 1.96 = 95%
-            phat = float(ups) / n
-            return ((phat + z*z/(2*n) - z * sqrt((phat*(1-phat)+z*z/(4*n))/n))/(1+z*z/n))
-
-        if not isinstance(rating, RatingType):
-            raise modioException("rating is an argument that can only be RatingType.good or RatingType.bad")
-
+    def _add_rating(self, rating : RatingType):
         try:
-            checked = self._client._post_request(f'/games/{self.game}/mods/{self.id}/rating', data={"rating":rating})
+            checked = self._client._post_request(f'/games/{self.game}/mods/{self.id}/ratings', data={"rating":rating.value})
         except BadRequest:
             return
 
-        self.rating.total += 1
-        if rating == 1:
-            self.rating.positive += 1
-        else:
-            self.rating.negative += 1
-
-        self.rating.percentage = int((self.rating.positive / self.rating.total)*100)
-        self.rating.weighted = confidence(self.rating.positive, self.rating.negative)
-        #need to recalculate mod message
-
+        self.get_stats()
         return Message(**checked)
 
+    def add_positive_rating(self):
+        """Adds a good rating to the mod, the author of the rating will be the authenticated user.
+        If the mod has already been rated by the user it will return None."""
+        return self._add_rating(RatingType.good)
+
+    def add_negative_rating(self):
+        """Adds a bad rating to the mod, the author of the rating will be the authenticated user.
+        If the mod has already been rated by the user it will return None."""
+        return self._add_rating(RatingType.bad)
+
     def add_metadata(self, **metadata):
-        """Add metadate key-value pairs to the mod. To submit new meta data, mass meta data keys
+        """Add metadate key-value pairs to the mod. To submit new meta data, pass meta data keys
         as keyword arguments and meta data value as a list of values. E.g pistol_dmg = [800, 400].
         Keys support alphanumeric, '-' and '_'. Total lengh of key and values cannot exceed 255
-        characters.
+        characters. To add meta-keys which contain a dash in their name they must be passed as an
+        upacked dictionnary.
+
+        Example
+        --------
+        mod.add_metadata(difficulty=["hard", "medium", "easy"])
+            This will add the values "hard", "medium" and "easy" to the meta key "difficulty"
+        mod.add_metadata(**{"test-var": ["test1", "test2", "test3"]})
+            This will add the values "test1", "test2" and "test3" to meta key "test-var"
 
         Returns
         --------
@@ -609,7 +601,19 @@ class Mod:
     def delete_metadata(self, **metadata):
         """Deletes metadata from a mod. To do so pass the meta-key as a keyword argument and the
         meta-values you wish to delete as a list. You can pass an empty list in which case all
-        meta-values for the meta-key will be deleted.
+        meta-values for the meta-key will be deleted. To delete meta-keys which contain a dash in their 
+        name they must be passed as an upacked dictionnary.
+
+        Example
+        --------
+        mod.delete_metadata(difficulty=["easy"])
+            This will remove the value "easy" from the meta key "difficulty"
+        mod.delete_metadata(difficulty=[])
+            This will remove the meta key "difficulty"
+        mod.delete_metadata(**{"test-var": ["test1"]})
+            This will remove the value "test1" from the meta key "test-var"
+        mod.delete_metadata(**{"test-var":[]})
+            This will remove the meta key "test-var"
 
         """
         metadata_d = {}
@@ -620,8 +624,8 @@ class Mod:
 
         r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata_d)
 
-        for key, value in metadata.items():
-            if len(value) == 0:
+        for key, values in metadata.items():
+            if len(values) == 0:
                 self._kvp_raw = [x for x in self._kvp_raw if x["metakey"] != key]
             else:
                 self._kvp_raw = [x for x in self._kvp_raw if x["metakey"] != key and x["metavalue"] not in values]
@@ -640,13 +644,13 @@ class Mod:
             List of mod ids to submit as dependencies.
 
         """
-        while len(depedencies) > 0:
-            dependecy = {f"dependencies[{dependencies.index(data)}]" : data for data in dependencies[5:]}
+        while len(dependencies) > 0:
+            dependency = {f"dependencies[{dependencies.index(data)}]" : data for data in dependencies[:5]}
             dependencies = dependencies[5:]
 
-            r = self._client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependecy)
+            r = self._client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependency)
 
-        return r
+        return Message(**r)
 
     def delete_dependencies(self, dependencies : list):
         """Delete mod dependecies required by this mod.

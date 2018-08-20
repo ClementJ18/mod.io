@@ -189,7 +189,8 @@ class Client:
         return Game(client=self, **game_json)
 
     def get_games(self, *, filter=None):
-        """Gets all the games available on mod.io. Takes filtering arguments.
+        """Gets all the games available on mod.io. Takes filtering arguments. Returns a 
+        named tuple with parameters results and pagination.
 
         Parameters
         -----------
@@ -230,7 +231,8 @@ class Client:
         return User(**user_json)
 
     def get_users(self, *, filter=None):
-        """Gets all the users availaible on mod.io. Takes filtering arguments.
+        """Gets all the users availaible on mod.io. Takes filtering arguments. Returns 
+        a named tuple with parameters results and pagination.
 
         Parameters
         -----------
@@ -362,7 +364,8 @@ class Client:
 
     def get_my_modfiles(self, *, filter=None):
         """Get all the mods the authenticated user uploaded. The returned modfile objects cannot be
-        edited or deleted and do not have a `game_id` attribute. Takes filtering arguments.
+        edited or deleted and do not have a `game_id` attribute. Takes filtering arguments. Returns 
+        a named tuple with parameters results and pagination.
 
         Parameters
         -----------
