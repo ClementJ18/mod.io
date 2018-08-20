@@ -1,6 +1,9 @@
 from .mod import Mod
 from .objects import *
 from .errors import modioException
+from .utils import *
+
+import json
 
 class Game:
     """Represents an instance of a modio.Game. Do not create manually.
@@ -176,7 +179,7 @@ class Game:
                
         """
         mod_json = self._client._get_request(f"/games/{self.id}/mods", filter=filter)
-        return [Mod(client=self._client, **mod) for mod in mod_json["dat"]], Pagination(**mod_json)
+        return Returned([Mod(client=self._client, **mod) for mod in mod_json["dat"]], Pagination(**mod_json))
 
     def get_mod_events(self, *, filter=None):
         """Gets all the mod events available for this game sorted by latest event first. Takes 
@@ -198,7 +201,7 @@ class Game:
         """
         event_json = self._client._get_request(f"/games/{self.id}/mods/events", filter=filter)
 
-        return [Event(**event) for event in event_json["data"]], Pagination(**event_json)
+        return Returned([Event(**event) for event in event_json["data"]], Pagination(**event_json))
 
     def get_tags(self, *, filter=None):
         """Gets all the game tags available for this game. Takes filtering
@@ -220,7 +223,7 @@ class Game:
         """
         tag_json = self._client._get_request(f"/games/{self.id}/tags", filter=filter)
         self.tag_options = tags = [TagOption(**tag_option) for tag_option in tag_json["data"]]
-        return tags, Pagination(**tag_json)
+        return Returned(tags, Pagination(**tag_json))
 
     def get_stats(self, *, filter=None):
         """Gets the stat objects for all the mods of this game. Takes 
@@ -240,7 +243,7 @@ class Game:
             Pagination data
         """
         stats_json = self._client._get_request(f"/games/{self.id}/mods/stats", filter=filter)
-        return [Stats(**stats) for stats in stats_json["data"]], Pagination(**stats_json)
+        return Returned([Stats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
 
     def get_owner(self):
         """Returns the original submitter of the resource
@@ -397,19 +400,24 @@ class Game:
         -----------
         name : str
             Name of the tag group
-        type : str
+        type : Optional[str]
+            Defaults to dropdown
             dropdown : Mods can select only one tag from this group, dropdown menu shown on site profile.
             checkboxes : Mods can select multiple tags from this group, checkboxes shown on site profile.
-        hidden : bool
-            Whether or not this group of tags should be hidden from users and mod devs.
+        hidden : Optional[bool]
+            Whether or not this group of tags should be hidden from users and mod devs. Defaults to False
         tags : list[str]
             Array of tags that mod creators can apply to their mod
 
         """
-        tags = tag_option.get("tags", [])
-        tags = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
-        input_json = {**tag_option, **tags}
-        message = self._client._post_request(f'/games/{self.id}/tags', data = {"input_json" : input_json})
+        raw_tags = tag_option.get("tags", [])
+        tags = {f"tags[{raw_tags.index(tag)}]" : tag for tag in raw_tags}
+        tags["name"] = tag_option.get("name")
+        tags["type"] = tag_option.get("type", "dropdown")
+        tags["hidden"] = json.dumps(tag_option.get("hidden", False))
+        print(tags)
+
+        message = self._client._post_request(f'/games/{self.id}/tags', data=tags)
 
         self.tag_options.append(TagOption(**tag_option))
         return Message(**message)
@@ -424,17 +432,24 @@ class Game:
         tags : Optional[list[str]]
             Optional. Tags to delete from group. If left blank the entire group will be
             deleted
-        """
-        tags = tags.pop("tags", [])
-        tags = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
-        r = self._client._delete_request(f'/games/{self.id}/tags', data = tags)
-        
-        if len(tags) > 0:
-            for tag in tags:
-                if tag in self.tags[tags["name"]]:
-                    self.tags[tags["name"]].remove(tag)
-        else:
-            del self.tags[tags["name"]]
 
-        return r
+        Returns
+        --------
+        bool
+            Returns True if the tags were sucessfully removed, False if the requests was
+            sucessful but the tags was not removed (if the tag wasn't part of the option.)
+        """
+        raw_tags = tags.get("tags", [])
+        data = {f"tags[{raw_tags.index(tag)}]" : tag for tag in raw_tags} if len(raw_tags) > 0 else {"tags[]":""}
+        data["name"] = tags.get("name")
+
+        r = self._client._delete_request(f'/games/{self.id}/tags', data = data)
+
+        option = find(self.tag_options, name=data["name"])
+        if len(raw_tags) > 0:
+            option.tags = [tag for tag in option.tags if tag not in raw_tags]
+        else:
+            self.tag_options.remove(option)
+
+        return not isinstance(r, dict)
 

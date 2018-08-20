@@ -7,7 +7,6 @@ from .game import Game
 from .mod import Mod
 from .errors import *
 from .objects import *
-from .utils import auth
 
 class Client:
     """Represents the base-level client to make requests to the mod.io API with. Upon
@@ -27,14 +26,12 @@ class Client:
     lang : Optional[str]
         The mod.io API provides localization for a collection of languages. To specify 
         responses from the API to be in a particular language, simply provide the lang 
-        parameter with an ISO 639 compliant language code. Else the language of the authenticated
-        user will be used, default is US English.
+        parameter with an ISO 639 compliant language code. Default is US English.
     test : Optional[bool]
         Whether or not to use the mod.io test environment. If not included will default to False.
     version : Optional[str]
         An optional keyword argument to allow you to pick a specific version of the API to query,
-        usually you shouldn't need to change this. This cannot be changed once set apart by forcibly
-        overwriting BASE_PATH
+        usually you shouldn't need to change this. Default is the latest supported version.
 
     Attributes
     -----------
@@ -56,20 +53,21 @@ class Client:
         self.rate_limit = None
         self.rate_remain = None
         self.rate_retry = 0
-        self.BASE_PATH = f"https://api.test.mod.io/{self.version}" if fields.pop("test", False) else f"https://api.mod.io/{self.version}"
-
+        self._test = fields.pop("test", False)
+        
         #check o auth 2 token
         if self.access_token:
-            try:
-                self.get_my_user()
-            except Forbidden:
-                raise Forbidden("O Auth 2 token invalid")
+            self.get_my_user()
         else:
             #check api key if no o auth 2
-            try:
-                self.get_games()
-            except Forbidden:
-                raise Forbidden("API key invalid")
+            self.get_games()
+
+    @property
+    def BASE_PATH(self):
+        if self._test:
+            return f"https://api.test.mod.io/{self.version}"
+        else:
+            f"https://api.mod.io/{self.version}"
 
     def __repr__(self):
         return f"<modio.Client rate_limit={self.rate_limit} rate_retry={self.rate_retry} rate_remain={self.rate_remain}>"
@@ -139,20 +137,18 @@ class Client:
             headers = {
               'Accept': 'application/json',
               'Accept-Language': self.lang,
-              'Content-Type': "application/x-www-form-urlencoded"
+              'Content-Type': 'application/x-www-form-urlencoded'
             }
 
         return headers
 
-    def _get_request(self, url, **fields):
+    def _get_request(self, url, *, h_type=0, **fields):
         filter = (fields.pop("filter") if fields.get("filter") else Filter()).__dict__.copy()
         extra = {**filter, **fields}
 
         if not self.access_token:
             extra["api_key"] = self.api_key
             h_type = 2
-        else:
-            h_type = 0
 
         r  = requests.get(self.BASE_PATH + url, headers=self._define_headers(h_type), params=extra)
         return self._error_check(r)
@@ -209,7 +205,7 @@ class Client:
             Pagination data       
         """
         game_json = self._get_request('/games', filter=filter)
-        return [Game(client=self, **game) for game in game_json["data"]], Pagination(**game_json)
+        return Returned([Game(client=self, **game) for game in game_json["data"]], Pagination(**game_json))
 
     def get_user(self, id : int):
         """Gets a user with the specified ID.
@@ -251,7 +247,7 @@ class Client:
                
         """
         user_json = self._get_request("/users", filter=filter)
-        return [User(**user) for user in user_json["data"]], Pagination(**user_json)
+        return Returned([User(**user) for user in user_json["data"]], Pagination(**user_json))
     
     def get_my_user(self):
         """Gets the authenticated user's details (aka the user who created the API key/access token)
@@ -292,7 +288,7 @@ class Client:
             Pagination data
         """
         mod_json = self._get_request("/me/subscribed", filter=filter)
-        return [Mod(client=self, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
+        return Returned([Mod(client=self, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
 
     def get_my_events(self, *, filter=None):
         """Get events that have been fired specifically for the authenticated user. Takes
@@ -312,7 +308,7 @@ class Client:
             Pagination data
         """
         events_json = self._get_request("/me/events", filter=filter)
-        return [Event(**event) for event in events_json["data"]]
+        return Returned([Event(**event) for event in events_json["data"]], Pagination(**events_json))
 
     def get_my_games(self, filter=None):
         """Get all the games the authenticated user added or is a team member of. Takes
@@ -337,7 +333,7 @@ class Client:
             Pagination data
         """
         game_json = self._get_request("/me/games", filter=filter)
-        return [Game(client=self, **game) for game in game_json["data"]], Pagination(**game_json)
+        return Returned([Game(client=self, **game) for game in game_json["data"]], Pagination(**game_json))
 
     def get_my_mods(self, *, filter=None):
         """Get all the mods the authenticated user added or is a team member of. Takes
@@ -362,7 +358,7 @@ class Client:
             Pagination data
         """
         mod_json = self._get_request("/me/mods", filter=filter)
-        return [Mod(client=self, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
+        return Returned([Mod(client=self, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
 
     def get_my_modfiles(self, *, filter=None):
         """Get all the mods the authenticated user uploaded. The returned modfile objects cannot be
@@ -387,7 +383,7 @@ class Client:
             Pagination data
         """
         files_json = self._get_request("/me/files", filter=filter)
-        return [ModFile(**file, client=self) for file in files_json["data"]], Pagination(**files_json)
+        return Returned([ModFile(**file, client=self) for file in files_json["data"]], Pagination(**files_json))
         
     def email_request(self, email : str):
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address

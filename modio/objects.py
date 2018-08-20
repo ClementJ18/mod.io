@@ -2,6 +2,11 @@ from .errors import modioException
 
 import hashlib
 import enum
+from collections import namedtuple
+import time
+
+
+Returned = namedtuple("Returned", "results pagination")
 
 class Message:
     """A simple representation of a modio Message, used when modio returns
@@ -112,7 +117,7 @@ class Event:
     @property
     def type(self):
         if self._raw_type.startswith("MOD"):
-            return EventType[self._raw_type.replace("MOD", "").replace("MOD_", "").lower()]
+            return EventType[self._raw_type.replace("MOD_", "").replace("MOD", "").lower()]
         else:
             return EventType[self._raw_type.replace("USER_", "").lower()]
 
@@ -332,8 +337,8 @@ class TagOption:
     """
     def __init__(self, **attrs):
         self.name = attrs.pop("name")
-        self.type = attrs.pop("type")
-        self.hidden = attrs.pop("hidden")
+        self.type = attrs.pop("type", "dropdown")
+        self.hidden = attrs.pop("hidden", False)
         self.tags = attrs.pop("tags", [])
 
     def __repr__(self):
@@ -393,7 +398,7 @@ class Stats:
         self.text = attrs.pop("ratings_display_text")
 
     def __repr__(self):
-        return f"<modio.Stats id={self.id} expired={self.is_stale}>"
+        return f"<modio.Stats id={self.id} expired={self.is_stale()}>"
 
     def is_stale(self):
         """Returns a bool depending on whether or not the stats are considered stale.

@@ -167,7 +167,7 @@ class Mod:
             Pagination data
         """
         files_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/files", filter=filter)
-        return [ModFile(**file, game_id=self.game, client=self._client) for file in files_json["data"]], Pagination(**files_json)
+        return Returned([ModFile(**file, game_id=self.game, client=self._client) for file in files_json["data"]], Pagination(**files_json))
 
     def get_events(self, *, filter=None):
         """Get all events for that mod sorted by latest. Takes filtering arguments.
@@ -187,7 +187,7 @@ class Mod:
 
         """
         event_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/events", filter=filter)
-        return [Event(**event) for event in event_json["data"]], Pagination(**event_json)
+        return Returned([Event(**event) for event in event_json["data"]], Pagination(**event_json))
 
     def get_tags(self, *, filter=None): 
         """Gets all the tags for this mod. Takes filtering arguments. Updates the instance's
@@ -209,7 +209,7 @@ class Mod:
         """
         tag_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/tags", filter=filter)
         self.tags = new_tags = {tag["name"] : tag["date_added"] for tag in tag_json["data"]}
-        return new_tags, Pagination(**tag_json)
+        return Returned(new_tags, Pagination(**tag_json))
 
     def get_metadata(self):
         """Returns a dict of metakey-metavalue pairs. This will also update the mod's kvp attribute.
@@ -223,7 +223,7 @@ class Mod:
         """
         meta_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/metadatakvp")
         self._kvp_raw = new_meta = {meta["metakey"] : meta["metavalue"] for meta in meta_json["data"]}
-        return new_meta, Pagination(**meta_json)
+        return Returned(new_meta, Pagination(**meta_json))
 
     def get_dependencies(self, *, filter=None):
         """Returns a dict of dependency_id-date_added pairs. Takes filtering arguments.
@@ -243,7 +243,7 @@ class Mod:
 
         """
         depen_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/dependencies", filter=filter)
-        return {dependecy["mod_id"] : dependecy["date_added"] for dependecy in depen_json["data"]}, Pagination(**depen_json)
+        return Returned({dependecy["mod_id"] : dependecy["date_added"] for dependecy in depen_json["data"]}, Pagination(**depen_json))
 
     def get_team(self, *, filter=filter):
         """Returns a list of TeamMember object representing the Team in charge of the mod. Takes
@@ -264,7 +264,7 @@ class Mod:
 
         """
         team_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/team", filter=filter)
-        return [TeamMember(**member, client=self._client, mod=self) for member in team_json["data"]], Pagination(**team_json)
+        return Returned([TeamMember(**member, client=self._client, mod=self) for member in team_json["data"]], Pagination(**team_json))
 
     def get_comments(self, *, filter=None):
         """Returns a list of all the comments for this mod. Takes filtering arguments
@@ -283,7 +283,7 @@ class Mod:
             Pagination data
         """
         comment_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/comments", filter=filter)
-        return [Comment(**comment, client=self._client, mod=self) for comment in comment_json["data"]], Pagination(**comment_json)
+        return Returned([Comment(**comment, client=self._client, mod=self) for comment in comment_json["data"]], Pagination(**comment_json))
 
     def get_stats(self):
         """Returns a Stats object, representing a series of stats for the mod
