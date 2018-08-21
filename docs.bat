@@ -11,3 +11,5 @@ python -m pydoc -w modio.objects
 move modio.objects.html raw_docs\modio.objects.html
 python -m pydoc -w modio.errors
 move modio.errors.html raw_docs\modio.errors.html
+python -m pydoc -w modio.utils
+move modio.utils.html raw_docs\modio.utils.html

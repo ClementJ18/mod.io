@@ -281,11 +281,12 @@ NotFound<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
-:class:&nbsp;`Mod`<br>
+<a href="modio.mod.html#Mod">modio.Mod</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;mod&nbsp;with&nbsp;the&nbsp;given&nbsp;ID</tt></dd></dl>
 
 <dl><dt><a name="Game-get_mod_events"><strong>get_mod_events</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;mod&nbsp;events&nbsp;available&nbsp;for&nbsp;this&nbsp;game&nbsp;sorted&nbsp;by&nbsp;latest&nbsp;event&nbsp;first.&nbsp;Takes&nbsp;<br>
-filtering&nbsp;arguments.<br>
+filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;
+named&nbsp;tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -295,10 +296,13 @@ filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>
 &nbsp;<br>
 Returns<br>
 --------<br>
-list<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.Event&nbsp;instances</tt></dd></dl>
+list[<a href="modio.object.html#Event">modio.Event</a>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.Event&nbsp;instances<br>
+<a href="modio.objects.html#Pagination">modio.Pagination</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;Pagination&nbsp;data</tt></dd></dl>
 
-<dl><dt><a name="Game-get_mods"><strong>get_mods</strong></a>(self, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;mods&nbsp;available&nbsp;for&nbsp;the&nbsp;game.&nbsp;Takes&nbsp;filtering&nbsp;arguments.<br>
+<dl><dt><a name="Game-get_mods"><strong>get_mods</strong></a>(self, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;mods&nbsp;available&nbsp;for&nbsp;the&nbsp;game.&nbsp;Takes&nbsp;filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;<br>
+named&nbsp;tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -308,18 +312,20 @@ filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>
 &nbsp;<br>
 Returns<br>
 --------<br>
-list<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;<a href="modio.mod.html#Mod">modio.Mod</a>&nbsp;instances</tt></dd></dl>
+list[<a href="modio.mod.html#Mod">modio.Mod</a>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.Mod&nbsp;instances<br>
+<a href="modio.objects.html#Pagination">modio.Pagination</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;Pagination&nbsp;data</tt></dd></dl>
 
 <dl><dt><a name="Game-get_owner"><strong>get_owner</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;original&nbsp;submitter&nbsp;of&nbsp;the&nbsp;resource<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
-User<br>
+<a href="modio.objects.html#User">modio.User</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;User&nbsp;that&nbsp;submitted&nbsp;the&nbsp;resource</tt></dd></dl>
 
 <dl><dt><a name="Game-get_stats"><strong>get_stats</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;the&nbsp;stat&nbsp;objects&nbsp;for&nbsp;all&nbsp;the&nbsp;mods&nbsp;of&nbsp;this&nbsp;game.&nbsp;Takes&nbsp;<br>
-filtering&nbsp;arguments<br>
+filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named&nbsp;tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -330,10 +336,12 @@ filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>
 Returns<br>
 --------<br>
 list[<a href="modio.objects.html#Stats">modio.Stats</a>]<br>
-&nbsp;&nbsp;&nbsp;&nbsp;List&nbsp;of&nbsp;all&nbsp;the&nbsp;mod&nbsp;stats</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;List&nbsp;of&nbsp;all&nbsp;the&nbsp;mod&nbsp;stats<br>
+<a href="modio.objects.html#Pagination">modio.Pagination</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;Pagination&nbsp;data</tt></dd></dl>
 
 <dl><dt><a name="Game-get_tags"><strong>get_tags</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;game&nbsp;tags&nbsp;available&nbsp;for&nbsp;this&nbsp;game.&nbsp;Takes&nbsp;filtering<br>
-arguments.<br>
+arguments.&nbsp;Returns&nbsp;a&nbsp;named&nbsp;tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -343,8 +351,10 @@ filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>
 &nbsp;<br>
 Returns<br>
 --------<br>
-list<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;<a href="modio.objects.html#TagOption"><a href="modio.objects.html#TagOption">modio.TagOption</a></a>&nbsp;instances</tt></dd></dl>
+list[<a href="modio.objects.html#TagOption">modio.Pagination</a>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.TagOption&nbsp;instances<br>
+<a href="modio.objects.html#Pagination">modio.Pagination</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;Pagination&nbsp;data</tt></dd></dl>
 
 </td></tr></table></td></tr></table>
 </body></html>
