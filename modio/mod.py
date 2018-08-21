@@ -549,19 +549,21 @@ class Mod:
         try:
             checked = self._client._post_request(f'/games/{self.game}/mods/{self.id}/ratings', data={"rating":rating.value})
         except BadRequest:
-            return
+            return False
 
         self.get_stats()
-        return Message(**checked)
+        return True
 
     def add_positive_rating(self):
         """Adds a good rating to the mod, the author of the rating will be the authenticated user.
-        If the mod has already been rated by the user it will return None."""
+        If the mod has already been rated by the user it will return False. If the positive rating
+        is successful it will return True"""
         return self._add_rating(RatingType.good)
 
     def add_negative_rating(self):
         """Adds a bad rating to the mod, the author of the rating will be the authenticated user.
-        If the mod has already been rated by the user it will return None."""
+        If the mod has already been rated by the user it will return False. If the negative rating
+        is successful it will return True."""
         return self._add_rating(RatingType.bad)
 
     def add_metadata(self, **metadata):

@@ -84,7 +84,10 @@ karma_guest&nbsp;:&nbsp;int<br>
 content&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Content&nbsp;of&nbsp;the&nbsp;comment.&nbsp;Filter&nbsp;attribute.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
-<td width="100%">
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Comment-delete"><strong>delete</strong></a>(self)</dt><dd><tt>Remove&nbsp;the&nbsp;comment&nbsp;permanently</tt></dd></dl>
+
+</dl>
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
@@ -178,14 +181,6 @@ Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
 <dl><dt><strong>value</strong></dt>
 <dd><tt>The&nbsp;value&nbsp;of&nbsp;the&nbsp;Enum&nbsp;member.</tt></dd>
 </dl>
-<hr>
-Data descriptors inherited from <a href="enum.html#EnumMeta">enum.EnumMeta</a>:<br>
-<dl><dt><strong>__members__</strong></dt>
-<dd><tt>Returns&nbsp;a&nbsp;mapping&nbsp;of&nbsp;member&nbsp;name-&gt;value.<br>
-&nbsp;<br>
-This&nbsp;mapping&nbsp;lists&nbsp;all&nbsp;enum&nbsp;members,&nbsp;including&nbsp;aliases.&nbsp;Note&nbsp;that&nbsp;this<br>
-is&nbsp;a&nbsp;read-only&nbsp;view&nbsp;of&nbsp;the&nbsp;internal&nbsp;mapping.</tt></dd>
-</dl>
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
@@ -203,9 +198,9 @@ arguments&nbsp;directly&nbsp;to&nbsp;the&nbsp;class&nbsp;given&nbsp;that&nbsp;th
 If&nbsp;you&nbsp;don't&nbsp;know&nbsp;the&nbsp;modio&nbsp;format&nbsp;simply&nbsp;use&nbsp;the&nbsp;methods,&nbsp;all&nbsp;method&nbsp;return<br>
 self&nbsp;for&nbsp;fluid&nbsp;chaining.&nbsp;This&nbsp;is&nbsp;also&nbsp;used&nbsp;for&nbsp;sorting&nbsp;and&nbsp;pagination.&nbsp;These<br>
 instances&nbsp;can&nbsp;be&nbsp;save&nbsp;and&nbsp;reused&nbsp;at&nbsp;will.&nbsp;Attributes&nbsp;which&nbsp;can&nbsp;be&nbsp;used&nbsp;as&nbsp;filters<br>
-will&nbsp;be&nbsp;marked&nbsp;as&nbsp;"<a href="#Filter">Filter</a>&nbsp;attributes"&nbsp;in&nbsp;the&nbsp;docs&nbsp;for&nbsp;the&nbsp;class&nbsp;the&nbsp;endpoint&nbsp;<br>
-returns.&nbsp;E.g.&nbsp;ID&nbsp;is&nbsp;marked&nbsp;as&nbsp;a&nbsp;filter&nbsp;argument&nbsp;in&nbsp;the&nbsp;class&nbsp;Game&nbsp;and&nbsp;therefore<br>
-in&nbsp;get_games()&nbsp;it&nbsp;can&nbsp;be&nbsp;used&nbsp;as&nbsp;filter.<br>
+will&nbsp;be&nbsp;marked&nbsp;as&nbsp;"Filter/Filtering&nbsp;attributes"&nbsp;in&nbsp;the&nbsp;docs&nbsp;for&nbsp;the&nbsp;class&nbsp;the&nbsp;endpoint&nbsp;<br>
+returns&nbsp;an&nbsp;array&nbsp;of.&nbsp;E.g.&nbsp;ID&nbsp;is&nbsp;marked&nbsp;as&nbsp;a&nbsp;filter&nbsp;argument&nbsp;for&nbsp;in&nbsp;the&nbsp;class&nbsp;Game&nbsp;<br>
+and&nbsp;therefore&nbsp;in&nbsp;get_games()&nbsp;it&nbsp;can&nbsp;be&nbsp;used&nbsp;a&nbsp;filter.<br>
 &nbsp;<br>
 Parameters<br>
 ----------<br>
@@ -226,10 +221,6 @@ any&nbsp;named&nbsp;keywords&nbsp;and&nbsp;transforms&nbsp;them&nbsp;into&nbsp;a
 <dl><dt><a name="Filter-greater_than"><strong>greater_than</strong></a>(self, **kwargs)</dt><dd><tt>Where&nbsp;the&nbsp;preceding&nbsp;column&nbsp;value&nbsp;is&nbsp;greater&nbsp;than&nbsp;the&nbsp;value&nbsp;specified.&nbsp;There&nbsp;are&nbsp;not&nbsp;set&nbsp;<br>
 parameters,&nbsp;this&nbsp;methods&nbsp;takes&nbsp;any&nbsp;named&nbsp;keywords&nbsp;and&nbsp;transforms&nbsp;them&nbsp;into&nbsp;arguments&nbsp;that&nbsp;will&nbsp;be&nbsp;passed&nbsp;<br>
 to&nbsp;the&nbsp;request.&nbsp;E.g.&nbsp;'game=40'</tt></dd></dl>
-
-<dl><dt><a name="Filter-in_text"><strong>in_text</strong></a>(self, **kwargs)</dt><dd><tt>Where&nbsp;the&nbsp;supplied&nbsp;list&nbsp;of&nbsp;values&nbsp;appears&nbsp;in&nbsp;the&nbsp;preceding&nbsp;column&nbsp;value.&nbsp;This&nbsp;is&nbsp;equivalent&nbsp;<br>
-to&nbsp;SQL's&nbsp;IN.&nbsp;There&nbsp;are&nbsp;not&nbsp;set&nbsp;parameters,&nbsp;this&nbsp;methods&nbsp;takes&nbsp;any&nbsp;named&nbsp;keywords&nbsp;and&nbsp;transforms&nbsp;<br>
-them&nbsp;into&nbsp;arguments&nbsp;that&nbsp;will&nbsp;be&nbsp;passed&nbsp;to&nbsp;the&nbsp;request.&nbsp;E.g.&nbsp;'id=10'&nbsp;or&nbsp;'name="Best&nbsp;Mod"</tt></dd></dl>
 
 <dl><dt><a name="Filter-like"><strong>like</strong></a>(self, **kwargs)</dt><dd><tt>Where&nbsp;the&nbsp;string&nbsp;supplied&nbsp;matches&nbsp;the&nbsp;preceding&nbsp;column&nbsp;value.&nbsp;This&nbsp;is&nbsp;equivalent&nbsp;to&nbsp;SQL's&nbsp;LIKE.&nbsp;<br>
 Consider&nbsp;using&nbsp;wildcard's&nbsp;*&nbsp;for&nbsp;the&nbsp;best&nbsp;chance&nbsp;of&nbsp;results&nbsp;as&nbsp;described&nbsp;below.&nbsp;There&nbsp;are&nbsp;not&nbsp;set&nbsp;parameters,&nbsp;<br>
@@ -254,10 +245,6 @@ to&nbsp;the&nbsp;request.&nbsp;E.g.&nbsp;'game=40'</tt></dd></dl>
 <dl><dt><a name="Filter-not_equals"><strong>not_equals</strong></a>(self, **kwargs)</dt><dd><tt>Where&nbsp;the&nbsp;preceding&nbsp;column&nbsp;value&nbsp;does&nbsp;not&nbsp;equal&nbsp;the&nbsp;value&nbsp;specified.&nbsp;There&nbsp;are&nbsp;not&nbsp;set&nbsp;parameters,&nbsp;<br>
 this&nbsp;methods&nbsp;takes&nbsp;any&nbsp;named&nbsp;keywords&nbsp;and&nbsp;transforms&nbsp;them&nbsp;into&nbsp;arguments&nbsp;that&nbsp;will&nbsp;be&nbsp;passed&nbsp;to&nbsp;<br>
 the&nbsp;request.&nbsp;E.g.&nbsp;'id=10'&nbsp;or&nbsp;'name="Best&nbsp;Mod"'</tt></dd></dl>
-
-<dl><dt><a name="Filter-not_in_text"><strong>not_in_text</strong></a>(self, **kwargs)</dt><dd><tt>Where&nbsp;the&nbsp;supplied&nbsp;list&nbsp;of&nbsp;values&nbsp;does&nbsp;not&nbsp;equal&nbsp;the&nbsp;preceding&nbsp;column&nbsp;value.&nbsp;This&nbsp;is&nbsp;equivalent&nbsp;<br>
-to&nbsp;SQL's&nbsp;NOT&nbsp;IN.&nbsp;There&nbsp;are&nbsp;not&nbsp;set&nbsp;parameters,&nbsp;this&nbsp;methods&nbsp;takes&nbsp;any&nbsp;named&nbsp;keywords&nbsp;and&nbsp;transforms&nbsp;<br>
-them&nbsp;into&nbsp;arguments&nbsp;that&nbsp;will&nbsp;be&nbsp;passed&nbsp;to&nbsp;the&nbsp;request.&nbsp;E.g.&nbsp;'id=10'&nbsp;or&nbsp;'name="Best&nbsp;Mod"</tt></dd></dl>
 
 <dl><dt><a name="Filter-not_like"><strong>not_like</strong></a>(self, **kwargs)</dt><dd><tt>Where&nbsp;the&nbsp;string&nbsp;supplied&nbsp;does&nbsp;not&nbsp;match&nbsp;the&nbsp;preceding&nbsp;column&nbsp;value.&nbsp;This&nbsp;is&nbsp;equivalent&nbsp;to&nbsp;SQL's&nbsp;<br>
 NOT&nbsp;LIKE.&nbsp;This&nbsp;is&nbsp;equivalent&nbsp;to&nbsp;SQL's&nbsp;LIKE.&nbsp;Consider&nbsp;using&nbsp;wildcard's&nbsp;*&nbsp;for&nbsp;the&nbsp;best&nbsp;chance&nbsp;of&nbsp;results&nbsp;<br>
@@ -294,6 +281,16 @@ query&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;words&nbsp;to&nbsp;identify.&nbsp;filter.<a href="#Filter-text">text</a>("The&nbsp;Lord&nbsp;of&nbsp;the&nbsp;Rings")&nbsp;-&nbsp;This&nbsp;will&nbsp;return&nbsp;every&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;where&nbsp;the&nbsp;name&nbsp;column&nbsp;contains&nbsp;any&nbsp;of&nbsp;the&nbsp;following&nbsp;words:&nbsp;'The',&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;'Lord',&nbsp;'of',&nbsp;'the',&nbsp;'Rings'.</tt></dd></dl>
+
+<dl><dt><a name="Filter-values_in"><strong>values_in</strong></a>(self, **kwargs)</dt><dd><tt>Where&nbsp;the&nbsp;supplied&nbsp;list&nbsp;of&nbsp;values&nbsp;appears&nbsp;in&nbsp;the&nbsp;preceding&nbsp;column&nbsp;value.&nbsp;This&nbsp;is&nbsp;equivalent&nbsp;<br>
+to&nbsp;SQL's&nbsp;IN.&nbsp;There&nbsp;are&nbsp;not&nbsp;set&nbsp;parameters,&nbsp;this&nbsp;methods&nbsp;takes&nbsp;any&nbsp;named&nbsp;keywords&nbsp;and&nbsp;values&nbsp;as&nbsp;lists<br>
+&nbsp;and&nbsp;transforms&nbsp;them&nbsp;into&nbsp;arguments&nbsp;that&nbsp;will&nbsp;be&nbsp;passed&nbsp;to&nbsp;the&nbsp;request.&nbsp;<br>
+&nbsp;E.g.&nbsp;'id=[10,&nbsp;3,&nbsp;4]'&nbsp;or&nbsp;'name=["Best","Mod"]'</tt></dd></dl>
+
+<dl><dt><a name="Filter-values_not_in"><strong>values_not_in</strong></a>(self, **kwargs)</dt><dd><tt>Where&nbsp;the&nbsp;supplied&nbsp;list&nbsp;of&nbsp;values&nbsp;does&nbsp;NOT&nbsp;appears&nbsp;in&nbsp;the&nbsp;preceding&nbsp;column&nbsp;value.&nbsp;This&nbsp;is&nbsp;equivalent&nbsp;<br>
+to&nbsp;SQL's&nbsp;NOT&nbsp;IN.&nbsp;There&nbsp;are&nbsp;not&nbsp;set&nbsp;parameters,&nbsp;this&nbsp;methods&nbsp;takes&nbsp;any&nbsp;named&nbsp;keywords&nbsp;and&nbsp;values&nbsp;as&nbsp;lists<br>
+&nbsp;and&nbsp;transforms&nbsp;them&nbsp;into&nbsp;arguments&nbsp;that&nbsp;will&nbsp;be&nbsp;passed&nbsp;to&nbsp;the&nbsp;request.&nbsp;<br>
+&nbsp;E.g.&nbsp;'id=[10,&nbsp;3,&nbsp;4]'&nbsp;or&nbsp;'name=["Best","Mod"]'</tt></dd></dl>
 <br>
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -597,12 +594,6 @@ Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
 </dl>
 <hr>
 Data descriptors inherited from <a href="enum.html#EnumMeta">enum.EnumMeta</a>:<br>
-<dl><dt><strong>__members__</strong></dt>
-<dd><tt>Returns&nbsp;a&nbsp;mapping&nbsp;of&nbsp;member&nbsp;name-&gt;value.<br>
-&nbsp;<br>
-This&nbsp;mapping&nbsp;lists&nbsp;all&nbsp;enum&nbsp;members,&nbsp;including&nbsp;aliases.&nbsp;Note&nbsp;that&nbsp;this<br>
-is&nbsp;a&nbsp;read-only&nbsp;view&nbsp;of&nbsp;the&nbsp;internal&nbsp;mapping.</tt></dd>
-</dl>
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">

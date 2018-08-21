@@ -812,9 +812,10 @@ class Filter:
         return self
 
     def values_not_in(self, **kwargs):
-        """Where the supplied list of values does not equal the preceding column value. This is equivalent 
-        to SQL's NOT IN. There are not set parameters, this methods takes any named keywords and transforms 
-        them into arguments that will be passed to the request. E.g. 'id=10' or 'name="Best Mod"
+        """Where the supplied list of values does NOT appears in the preceding column value. This is equivalent 
+        to SQL's NOT IN. There are not set parameters, this methods takes any named keywords and values as lists
+         and transforms them into arguments that will be passed to the request. 
+         E.g. 'id=[10, 3, 4]' or 'name=["Best","Mod"]'
         """
         for key, value in kwargs.items():
             self._set(key, ",".join(value), "{}-not-in")
