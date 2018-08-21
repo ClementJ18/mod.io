@@ -123,7 +123,7 @@ instructions_url&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;make&nbsp;and&nbsp;submit&nbsp;mods&nbsp;to&nbsp;your&nbsp;games&nbsp;profile.&nbsp;Filter&nbsp;attribute.<br>
 profile&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;URL&nbsp;to&nbsp;the&nbsp;game's&nbsp;mod.io&nbsp;page.<br>
-tag_options&nbsp;:&nbsp;list[modio.TagOption]<br>
+tag_options&nbsp;:&nbsp;list[<a href="modio.objects.html#TagOption">modio.TagOption</a>]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;List&nbsp;of&nbsp;tags&nbsp;from&nbsp;which&nbsp;mods&nbsp;can&nbsp;pick<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
@@ -132,17 +132,17 @@ depending&nbsp;on&nbsp;what&nbsp;media&nbsp;you&nbsp;desire&nbsp;to&nbsp;upload/
 &nbsp;<br>
 Parameters<br>
 -----------<br>
-logo&nbsp;:&nbsp;str<br>
+logo&nbsp;:&nbsp;Optional[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Path&nbsp;to&nbsp;the&nbsp;file&nbsp;that&nbsp;you&nbsp;desire&nbsp;to&nbsp;be&nbsp;the&nbsp;game's&nbsp;logo.&nbsp;Dimensions&nbsp;must&nbsp;be&nbsp;at&nbsp;least&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;640x360&nbsp;and&nbsp;we&nbsp;recommended&nbsp;you&nbsp;supply&nbsp;a&nbsp;high&nbsp;resolution&nbsp;image&nbsp;with&nbsp;a&nbsp;16&nbsp;/&nbsp;9&nbsp;ratio.&nbsp;mod.io&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;use&nbsp;this&nbsp;logo&nbsp;to&nbsp;create&nbsp;three&nbsp;thumbnails&nbsp;with&nbsp;the&nbsp;dimensions&nbsp;of&nbsp;320x180,&nbsp;640x360&nbsp;and&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;1280x720.<br>
-icon&nbsp;:&nbsp;str<br>
+icon&nbsp;:&nbsp;Optional[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Path&nbsp;to&nbsp;the&nbsp;file&nbsp;that&nbsp;you&nbsp;desire&nbsp;to&nbsp;be&nbsp;the&nbsp;game's&nbsp;icon.&nbsp;Must&nbsp;be&nbsp;gif,&nbsp;jpg&nbsp;or&nbsp;png&nbsp;format&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;cannot&nbsp;exceed&nbsp;1MB&nbsp;in&nbsp;filesize.&nbsp;Dimensions&nbsp;must&nbsp;be&nbsp;at&nbsp;least&nbsp;64x64&nbsp;and&nbsp;a&nbsp;transparent&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;png&nbsp;that&nbsp;works&nbsp;on&nbsp;a&nbsp;colorful&nbsp;background&nbsp;is&nbsp;recommended.&nbsp;mod.io&nbsp;will&nbsp;use&nbsp;this&nbsp;icon&nbsp;to&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;create&nbsp;three&nbsp;thumbnails&nbsp;with&nbsp;the&nbsp;dimensions&nbsp;of&nbsp;64x64,&nbsp;128x128&nbsp;and&nbsp;256x256.<br>
-header&nbsp;:&nbsp;str<br>
+header&nbsp;:&nbsp;Optional[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Path&nbsp;to&nbsp;the&nbsp;file&nbsp;that&nbsp;you&nbsp;desire&nbsp;to&nbsp;be&nbsp;the&nbsp;game's&nbsp;header.&nbsp;Must&nbsp;be&nbsp;gif,&nbsp;jpg&nbsp;or&nbsp;png&nbsp;format&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;cannot&nbsp;exceed&nbsp;256KB&nbsp;in&nbsp;filesize.&nbsp;Dimensions&nbsp;of&nbsp;400x100&nbsp;and&nbsp;a&nbsp;light&nbsp;transparent&nbsp;png&nbsp;that&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;works&nbsp;on&nbsp;a&nbsp;dark&nbsp;background&nbsp;is&nbsp;recommended.<br>
@@ -184,7 +184,12 @@ type&nbsp;:&nbsp;str<br>
 hidden&nbsp;:&nbsp;bool<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Whether&nbsp;or&nbsp;not&nbsp;this&nbsp;group&nbsp;of&nbsp;tags&nbsp;should&nbsp;be&nbsp;hidden&nbsp;from&nbsp;users&nbsp;and&nbsp;mod&nbsp;devs.<br>
 tags&nbsp;:&nbsp;list[str]<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Array&nbsp;of&nbsp;tags&nbsp;that&nbsp;mod&nbsp;creators&nbsp;can&nbsp;apply&nbsp;to&nbsp;their&nbsp;mod</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Array&nbsp;of&nbsp;tags&nbsp;that&nbsp;mod&nbsp;creators&nbsp;can&nbsp;apply&nbsp;to&nbsp;their&nbsp;mod<br>
+<br>
+Returns<br>
+--------<br>
+Message<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;message&nbsp;containing&nbsp;the&nbsp;result&nbsp;of&nbsp;the&nbsp;query&nbsp;if&nbsp;successful.</tt></dd></dl>
 
 <dl><dt><a name="Game-delete_tags"><strong>delete_tags</strong></a>(self, **tags)</dt><dd><tt>Delete&nbsp;one&nbsp;or&nbsp;more&nbsp;tags&nbsp;from&nbsp;a&nbsp;tag&nbsp;option<br>
 &nbsp;<br>
@@ -194,7 +199,13 @@ name&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;of&nbsp;the&nbsp;group&nbsp;from&nbsp;which&nbsp;you&nbsp;wish&nbsp;to&nbsp;delete&nbsp;from<br>
 tags&nbsp;:&nbsp;list[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Optional.&nbsp;Tags&nbsp;to&nbsp;delete&nbsp;from&nbsp;group.&nbsp;If&nbsp;left&nbsp;blank&nbsp;the&nbsp;entire&nbsp;group&nbsp;will&nbsp;be<br>
-&nbsp;&nbsp;&nbsp;&nbsp;deleted</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;deleted<br>
+&nbsp;<br>
+Returns<br>
+--------<br>
+bool<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;True&nbsp;if&nbsp;the&nbsp;tags&nbsp;were&nbsp;sucessfully&nbsp;removed,&nbsp;False&nbsp;if&nbsp;the&nbsp;requests&nbsp;was<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sucessful&nbsp;but&nbsp;the&nbsp;tags&nbsp;was&nbsp;not&nbsp;removed&nbsp;(if&nbsp;the&nbsp;tag&nbsp;wasn't&nbsp;part&nbsp;of&nbsp;the&nbsp;option.)</tt></dd></dl>
 
 <dl><dt><a name="Game-edit"><strong>edit</strong></a>(self, **fields)</dt><dd><tt>Used&nbsp;to&nbsp;edit&nbsp;the&nbsp;game&nbsp;details.&nbsp;For&nbsp;editing&nbsp;the&nbsp;icon,&nbsp;logo&nbsp;or&nbsp;header&nbsp;use&nbsp;:func:`add_media`.<br>
 Sucessful&nbsp;editing&nbsp;will&nbsp;update&nbsp;the&nbsp;game&nbsp;instance.<br>
@@ -333,7 +344,7 @@ filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>
 Returns<br>
 --------<br>
 list<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;<a href="modio.objects.html#TagOption">modio.TagOption</a>&nbsp;instances</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;<a href="modio.objects.html#TagOption"><a href="modio.objects.html#TagOption">modio.TagOption</a></a>&nbsp;instances</tt></dd></dl>
 
 </td></tr></table></td></tr></table>
 </body></html>
