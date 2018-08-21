@@ -1,6 +1,5 @@
 import requests
 import json
-import time
 from typing import Union
 
 from .game import Game
@@ -106,7 +105,6 @@ class Client:
                     errors = None
                 raise UnprocessableEntity(msg, errors)
             elif code == 429:
-                time.sleep(self.rate_retry) #feeble attempt at handling rate limits
                 raise TooManyRequests(msg, self.rate_retry)
                 self.rate_retry = 0
             else:
