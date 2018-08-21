@@ -19,7 +19,7 @@ client.email_request("necro@mordor.com")
 #check your email for the security code
 code = input("Code: ")
 
-oauth2 = client.email_exchange(code)["access_token"]
+oauth2 = client.email_exchange(code)
 
 #your oauth2 token is now stored in the variable
 
