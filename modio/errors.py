@@ -54,8 +54,6 @@ class UnprocessableEntity(modioException):
         super().__init__(msg)
 
 class TooManyRequests(modioException):
-    """You have made too many requests, inspect headers for reset time. If
-    this error occurs, the library will automatically sleep the remaining
-    time before the rest, and the raise this exception."""
+    """You have made too many requests, inspect headers for reset time"""
     def __init__(self, msg, retry):
-        super().__init__("{}. Slept for {}".format(msg, retry))
+        super().__init__("{}. You need to sleep for {} seconds".format(msg, retry))
