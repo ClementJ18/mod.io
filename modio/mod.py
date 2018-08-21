@@ -383,12 +383,12 @@ class Mod:
         if not isinstance(file, NewModFile):
             raise modioException("file argument must be type modio.NewModFile")
 
-        file_d = file.__dict__
+        file_d = file.__dict__.copy()
         files = {"filedata" : file_d.pop("file")}
         try:
             file_json = self._client._post_request(f'/games/{self.game}/mods/{self.id}/files', h_type = 1, data = file_d, files=files)
         finally:
-            files["filedata"].close()
+            file.file.close()
 
         return ModFile(**file_json, game_id=self.game, client=self._client)
 

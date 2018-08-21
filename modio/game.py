@@ -343,7 +343,7 @@ class Game:
         if not isinstance(mod, NewMod):
             raise modioException("mod argument must be type modio.NewMod")
 
-        mod_d = mod.__dict__
+        mod_d = mod.__dict__.copy()
         tags = mod_d.pop("tags")
         files = {"logo":mod_d.pop("logo")}
         for tag in tags:
@@ -352,7 +352,7 @@ class Game:
         try:
             mod_json = self._client._post_request(f'/games/{self.id}/mods', h_type = 1, data = mod_d, files=files)
         finally:
-            files["logo"].close()
+            mod.logo.close()
 
         return Mod(client=self._client, **mod_json)
 
