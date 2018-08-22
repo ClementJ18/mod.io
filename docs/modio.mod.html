@@ -123,6 +123,8 @@ that&nbsp;should&nbsp;be&nbsp;installed&nbsp;for&nbsp;this&nbsp;mod&nbsp;to&nbsp
 adding&nbsp;5&nbsp;dependencies&nbsp;at&nbsp;a&nbsp;time,&nbsp;passing&nbsp;more&nbsp;than&nbsp;5&nbsp;to&nbsp;this&nbsp;function&nbsp;will&nbsp;cause<br>
 additional&nbsp;requests&nbsp;for&nbsp;every&nbsp;5&nbsp;additional&nbsp;dependency.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 ----------<br>
 dependencies&nbsp;:&nbsp;list[int]<br>
@@ -130,6 +132,8 @@ dependencies&nbsp;:&nbsp;list[int]<br>
 
 <dl><dt><a name="Mod-add_file"><strong>add_file</strong></a>(self, file:modio.NewModFile)</dt><dd><tt>Adds&nbsp;a&nbsp;new&nbsp;file&nbsp;to&nbsp;the&nbsp;mod,&nbsp;to&nbsp;do&nbsp;so&nbsp;first&nbsp;construct&nbsp;an&nbsp;instance&nbsp;of&nbsp;NewModFile<br>
 and&nbsp;then&nbsp;pass&nbsp;it&nbsp;to&nbsp;the&nbsp;function.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -147,6 +151,8 @@ ModFile<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;modfile&nbsp;after&nbsp;being&nbsp;processed&nbsp;by&nbsp;the&nbsp;mod.io&nbsp;API</tt></dd></dl>
 
 <dl><dt><a name="Mod-add_media"><strong>add_media</strong></a>(self, **media)</dt><dd><tt>Upload&nbsp;new&nbsp;media&nbsp;to&nbsp;the&nbsp;mod.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -177,6 +183,8 @@ Keys&nbsp;support&nbsp;alphanumeric,&nbsp;'-'&nbsp;and&nbsp;'_'.&nbsp;Total&nbsp
 characters.&nbsp;To&nbsp;add&nbsp;meta-keys&nbsp;which&nbsp;contain&nbsp;a&nbsp;dash&nbsp;in&nbsp;their&nbsp;name&nbsp;they&nbsp;must&nbsp;be&nbsp;passed&nbsp;as&nbsp;an<br>
 upacked&nbsp;dictionnary.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Example<br>
 --------<br>
 mod.add_metadata(difficulty=["hard",&nbsp;"medium",&nbsp;"easy"])<br>
@@ -191,14 +199,20 @@ Returns<br>
 
 <dl><dt><a name="Mod-add_negative_rating"><strong>add_negative_rating</strong></a>(self)</dt><dd><tt>Adds&nbsp;a&nbsp;bad&nbsp;rating&nbsp;to&nbsp;the&nbsp;mod,&nbsp;the&nbsp;author&nbsp;of&nbsp;the&nbsp;rating&nbsp;will&nbsp;be&nbsp;the&nbsp;authenticated&nbsp;user.<br>
 If&nbsp;the&nbsp;mod&nbsp;has&nbsp;already&nbsp;been&nbsp;rated&nbsp;by&nbsp;the&nbsp;user&nbsp;it&nbsp;will&nbsp;return&nbsp;False. &nbsp;If&nbsp;the&nbsp;negative&nbsp;rating<br>
-is&nbsp;successful&nbsp;it&nbsp;will&nbsp;return&nbsp;True</tt></dd></dl>
+is&nbsp;successful&nbsp;it&nbsp;will&nbsp;return&nbsp;True<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br></tt></dd></dl>
 
 <dl><dt><a name="Mod-add_positive_rating"><strong>add_positive_rating</strong></a>(self)</dt><dd><tt>Adds&nbsp;a&nbsp;good&nbsp;rating&nbsp;to&nbsp;the&nbsp;mod,&nbsp;the&nbsp;author&nbsp;of&nbsp;the&nbsp;rating&nbsp;will&nbsp;be&nbsp;the&nbsp;authenticated&nbsp;user.<br>
 If&nbsp;the&nbsp;mod&nbsp;has&nbsp;already&nbsp;been&nbsp;rated&nbsp;by&nbsp;the&nbsp;user&nbsp;it&nbsp;will&nbsp;return&nbsp;False. &nbsp;If&nbsp;the&nbsp;positive&nbsp;rating<br>
-is&nbsp;successful&nbsp;it&nbsp;will&nbsp;return&nbsp;True</tt></dd></dl>
+is&nbsp;successful&nbsp;it&nbsp;will&nbsp;return&nbsp;True<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br></tt></dd></dl>
 
 <dl><dt><a name="Mod-add_tags"><strong>add_tags</strong></a>(self, tags:list)</dt><dd><tt>Add&nbsp;tags&nbsp;to&nbsp;a&nbsp;mod,&nbsp;tags&nbsp;are&nbsp;case&nbsp;insensitive&nbsp;and&nbsp;duplicates&nbsp;will&nbsp;be&nbsp;removed.&nbsp;Tags<br>
 which&nbsp;are&nbsp;not&nbsp;in&nbsp;the&nbsp;game's&nbsp;tag_options&nbsp;will&nbsp;not&nbsp;be&nbsp;added.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -206,6 +220,8 @@ tags&nbsp;:&nbsp;list[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;of&nbsp;tags&nbsp;to&nbsp;be&nbsp;added.</tt></dd></dl>
 
 <dl><dt><a name="Mod-add_team_member"><strong>add_team_member</strong></a>(self, *, email, level, position=None)</dt><dd><tt>Add&nbsp;a&nbsp;user&nbsp;to&nbsp;the&nbsp;mod&nbsp;team.&nbsp;Will&nbsp;fire&nbsp;a&nbsp;MOD_TEAM_CHANGED&nbsp;event.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -219,9 +235,13 @@ level&nbsp;:&nbsp;int<br>
 position&nbsp;:&nbsp;Optional[str]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Title&nbsp;of&nbsp;the&nbsp;user&nbsp;position</tt></dd></dl>
 
-<dl><dt><a name="Mod-delete"><strong>delete</strong></a>(self)</dt><dd><tt>Delete&nbsp;a&nbsp;mod&nbsp;and&nbsp;set&nbsp;its&nbsp;status&nbsp;to&nbsp;deleted.</tt></dd></dl>
+<dl><dt><a name="Mod-delete"><strong>delete</strong></a>(self)</dt><dd><tt>Delete&nbsp;a&nbsp;mod&nbsp;and&nbsp;set&nbsp;its&nbsp;status&nbsp;to&nbsp;deleted.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br></tt></dd></dl>
 
 <dl><dt><a name="Mod-delete_dependencies"><strong>delete_dependencies</strong></a>(self, dependencies:list)</dt><dd><tt>Delete&nbsp;mod&nbsp;dependecies&nbsp;required&nbsp;by&nbsp;this&nbsp;mod.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -229,6 +249,8 @@ dependencies&nbsp;:&nbsp;list[int]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;List&nbsp;of&nbsp;dependencies&nbsp;to&nbsp;remove</tt></dd></dl>
 
 <dl><dt><a name="Mod-delete_media"><strong>delete_media</strong></a>(self, **media)</dt><dd><tt>Delete&nbsp;media&nbsp;from&nbsp;the&nbsp;mod&nbsp;page.&nbsp;<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -244,6 +266,8 @@ meta-values&nbsp;you&nbsp;wish&nbsp;to&nbsp;delete&nbsp;as&nbsp;a&nbsp;list.&nbs
 meta-values&nbsp;for&nbsp;the&nbsp;meta-key&nbsp;will&nbsp;be&nbsp;deleted.&nbsp;To&nbsp;delete&nbsp;meta-keys&nbsp;which&nbsp;contain&nbsp;a&nbsp;dash&nbsp;in&nbsp;their&nbsp;<br>
 name&nbsp;they&nbsp;must&nbsp;be&nbsp;passed&nbsp;as&nbsp;an&nbsp;upacked&nbsp;dictionnary.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Example<br>
 --------<br>
 mod.delete_metadata(difficulty=["easy"])<br>
@@ -258,11 +282,15 @@ mod.delete_metadata(**{"test-var":[]})<br>
 <dl><dt><a name="Mod-delete_tags"><strong>delete_tags</strong></a>(self, tags:list=None)</dt><dd><tt>Delete&nbsp;tags&nbsp;from&nbsp;the&nbsp;mod,&nbsp;tags&nbsp;are&nbsp;case&nbsp;insensitive&nbsp;and&nbsp;duplicates&nbsp;will&nbsp;be&nbsp;removed.&nbsp;Providing<br>
 no&nbsp;arguments&nbsp;will&nbsp;remove&nbsp;every&nbsp;tag&nbsp;from&nbsp;the&nbsp;mod.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 tags&nbsp;:&nbsp;list<br>
 &nbsp;&nbsp;&nbsp;&nbsp;List&nbsp;of&nbsp;tags&nbsp;to&nbsp;remove,&nbsp;if&nbsp;no&nbsp;list&nbsp;is&nbsp;provided,&nbsp;will&nbsp;remove&nbsp;every&nbsp;tag&nbsp;from&nbsp;the&nbsp;mod.</tt></dd></dl>
 
 <dl><dt><a name="Mod-edit"><strong>edit</strong></a>(self, **fields)</dt><dd><tt>Used&nbsp;to&nbsp;edit&nbsp;the&nbsp;mod&nbsp;details.&nbsp;Sucessful&nbsp;editing&nbsp;will&nbsp;update&nbsp;the&nbsp;mod&nbsp;instance.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -303,6 +331,8 @@ metadata&nbsp;:&nbsp;str<br>
 
 <dl><dt><a name="Mod-get_comments"><strong>get_comments</strong></a>(self, *, filter=None)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;the&nbsp;comments&nbsp;for&nbsp;this&nbsp;mod.&nbsp;Takes&nbsp;filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named<br>tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 -----------<br>
 filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
@@ -317,6 +347,8 @@ list[<a href="modio.object.html#Comment">modio.Comment</a>]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Pagination&nbsp;data</tt></dd></dl>
 
 <dl><dt><a name="Mod-get_dependencies"><strong>get_dependencies</strong></a>(self, *, filter=None)</dt><dd><tt>Returns&nbsp;a&nbsp;dict&nbsp;of&nbsp;dependency_id-date_added&nbsp;pairs.&nbsp;Takes&nbsp;filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named<br>tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -333,6 +365,8 @@ dict{id&nbsp;:&nbsp;date}<br>
 
 <dl><dt><a name="Mod-get_events"><strong>get_events</strong></a>(self, *, filter=None)</dt><dd><tt>Get&nbsp;all&nbsp;events&nbsp;for&nbsp;that&nbsp;mod&nbsp;sorted&nbsp;by&nbsp;latest.&nbsp;Takes&nbsp;filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named<br>tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 -----------<br>
 filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
@@ -347,6 +381,8 @@ list[<a href="modio.object.html#Event">modio.Event</a>]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Pagination&nbsp;data</tt></dd></dl>
 
 <dl><dt><a name="Mod-get_file"><strong>get_file</strong></a>(self, id:int)</dt><dd><tt>Get&nbsp;the&nbsp;ModFile&nbsp;with&nbsp;the&nbsp;following&nbsp;ID<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -365,6 +401,8 @@ Returns<br>
 
 <dl><dt><a name="Mod-get_files"><strong>get_files</strong></a>(self, *, filter=None)</dt><dd><tt>Get&nbsp;all&nbsp;mod&nbsp;files&nbsp;for&nbsp;this&nbsp;mod.&nbsp;Takes&nbsp;filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named<br>tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 -----------<br>
 filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
@@ -380,6 +418,8 @@ list[<a href="modio.object.html#ModFile">modio.ModFile</a>]<br>
 
 <dl><dt><a name="Mod-get_metadata"><strong>get_meta</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;dict&nbsp;of&nbsp;metakey-metavalue&nbsp;pairs.&nbsp;This&nbsp;will&nbsp;also&nbsp;updated&nbsp;the&nbsp;mod's&nbsp;kvp&nbsp;attribute.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Returns<br>
 --------<br>
 dict{metakey&nbsp;:&nbsp;[metavalues]}<br>
@@ -389,12 +429,16 @@ dict{metakey&nbsp;:&nbsp;[metavalues]}<br>
 
 <dl><dt><a name="Mod-get_owner"><strong>get_owner</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;original&nbsp;submitter&nbsp;of&nbsp;the&nbsp;resource<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Returns<br>
 --------<br>
 <a href="modio.object.html#User">modio.User</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;User&nbsp;that&nbsp;submitted&nbsp;the&nbsp;resource</tt></dd></dl>
 
 <dl><dt><a name="Mod-get_stats"><strong>get_stats</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;Stats&nbsp;object,&nbsp;representing&nbsp;a&nbsp;series&nbsp;of&nbsp;stats&nbsp;for&nbsp;the&nbsp;mod<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Returns<br>
 -------<br>
@@ -403,6 +447,8 @@ Returns<br>
 
 <dl><dt><a name="Mod-get_tags"><strong>get_tags</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;tags&nbsp;for&nbsp;this&nbsp;mod.&nbsp;Takes&nbsp;filtering&nbsp;arguments.&nbsp;Updates&nbsp;the&nbsp;instance's<br>
 tag&nbsp;attribute.&nbsp;Returns&nbsp;a&nbsp;named<br>tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -420,6 +466,8 @@ dict{name&nbsp;:&nbsp;date_added}<br>
 <dl><dt><a name="Mod-get_team"><strong>get_team</strong></a>(self, *, filter=&lt;class 'filter'&gt;)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;TeamMember&nbsp;object&nbsp;representing&nbsp;the&nbsp;Team&nbsp;in&nbsp;charge&nbsp;of&nbsp;the&nbsp;mod.&nbsp;Takes<br>
 filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named<br>tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 -----------<br>
 filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
@@ -435,11 +483,15 @@ list[<a href="modio.object.html#TeamMember">modio.TeamMember</a>]<br>
 
 <dl><dt><a name="Mod-subscribe"><strong>subscribe</strong></a>(self)</dt><dd><tt>Subscribe&nbsp;to&nbsp;the&nbsp;mod.&nbsp;Returns&nbsp;None&nbsp;if&nbsp;user&nbsp;is&nbsp;already&nbsp;subsribed.&nbsp;<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Returns<br>
 --------<br>
 <a href="#Mod">Mod</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;mod&nbsp;that&nbsp;was&nbsp;just&nbsp;subscribed&nbsp;to,&nbsp;if&nbsp;the&nbsp;user&nbsp;was&nbsp;already&nbsp;subscribed&nbsp;it&nbsp;will&nbsp;return&nbsp;None</tt></dd></dl>
 
-<dl><dt><a name="Mod-unsubscribe"><strong>unsubscribe</strong></a>(self)</dt><dd><tt>Unsubscribe&nbsp;from&nbsp;a&nbsp;mod.&nbsp;Returns&nbsp;None&nbsp;if&nbsp;the&nbsp;user&nbsp;is&nbsp;not&nbsp;subscribed.</tt></dd></dl>
+<dl><dt><a name="Mod-unsubscribe"><strong>unsubscribe</strong></a>(self)</dt><dd><tt>Unsubscribe&nbsp;from&nbsp;a&nbsp;mod.&nbsp;Returns&nbsp;None&nbsp;if&nbsp;the&nbsp;user&nbsp;is&nbsp;not&nbsp;subscribed.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br></tt></dd></dl>
 </td></tr></table></td></tr></table><p>
 </body></html>

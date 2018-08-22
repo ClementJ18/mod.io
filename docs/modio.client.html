@@ -69,6 +69,12 @@ rate_retry&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Is&nbsp;0&nbsp;until&nbsp;the&nbsp;rate_remain&nbsp;is&nbsp;0&nbsp;and&nbsp;becomes&nbsp;0&nbsp;again&nbsp;once&nbsp;the&nbsp;rate&nbsp;limit&nbsp;is&nbsp;reset.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
+
+<dl><dt><a name="Client-close"><strong>close</strong></a>(self)</dt><dd><tt>This&nbsp;function&nbsp;is&nbsp;used&nbsp;to&nbsp;clean&nbsp;up&nbsp;the&nbsp;client&nbsp;in&nbsp;order&nbsp;to&nbsp;close&nbsp;the&nbsp;application&nbsp;that&nbsp;it&nbsp;uses&nbsp;gracefully.&nbsp;This&nbsp;function&nbsp;is&nbsp;unique&nbsp;to&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module.<br>
+At&nbsp;the&nbsp;moment&nbsp;it&nbsp;is&nbsp;only&nbsp;used&nbsp;to&nbsp;close&nbsp;the&nbsp;client's&nbsp;Session.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.</tt></dd></dl>
+
 <dl><dt><a name="Client-email_exchange"><strong>email_exchange</strong></a>(self, code:int)</dt><dd><tt>Exchanges&nbsp;the&nbsp;given&nbsp;5-digit&nbsp;code&nbsp;for&nbsp;an&nbsp;OAuth2&nbsp;token.<br>
 &nbsp;<br>
 In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
