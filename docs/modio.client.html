@@ -71,6 +71,8 @@ rate_retry&nbsp;:&nbsp;int<br>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="Client-email_exchange"><strong>email_exchange</strong></a>(self, code:int)</dt><dd><tt>Exchanges&nbsp;the&nbsp;given&nbsp;5-digit&nbsp;code&nbsp;for&nbsp;an&nbsp;OAuth2&nbsp;token.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 ----------<br>
 code&nbsp;:&nbsp;int<br>
@@ -92,6 +94,8 @@ str<br>
 <dl><dt><a name="Client-email_request"><strong>email_request</strong></a>(self, email:str)</dt><dd><tt>Posts&nbsp;an&nbsp;email&nbsp;request&nbsp;for&nbsp;an&nbsp;OAuth2&nbsp;token.&nbsp;A&nbsp;code&nbsp;will&nbsp;be&nbsp;sent&nbsp;to&nbsp;the&nbsp;given&nbsp;email&nbsp;address<br>
 which&nbsp;can&nbsp;then&nbsp;be&nbsp;entered&nbsp;into&nbsp;:func:`email_exchange`.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 ----------<br>
 email&nbsp;:&nbsp;str<br>
@@ -99,6 +103,8 @@ email&nbsp;:&nbsp;str<br>
 
 <dl><dt><a name="Client-get_game"><strong>get_game</strong></a>(self, id:int)</dt><dd><tt>Queries&nbsp;the&nbsp;mod.io&nbsp;API&nbsp;for&nbsp;the&nbsp;given&nbsp;game&nbsp;ID&nbsp;and&nbsp;if&nbsp;found&nbsp;returns&nbsp;it&nbsp;as&nbsp;a&nbsp;<br>
 <a href="modio.game.html#Game">modio.Game</a>&nbsp;instance.&nbsp;If&nbsp;not&nbsp;found&nbsp;raises&nbsp;NotFound<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -118,6 +124,8 @@ Returns<br>
 <dl><dt><a name="Client-get_games"><strong>get_games</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;games&nbsp;available&nbsp;on&nbsp;mod.io.&nbsp;Takes&nbsp;filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;<br>
 named&nbsp;tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 -----------<br>
 filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
@@ -134,11 +142,15 @@ list[<a href="modio.game.html#Game">modio.Game</a>]<br>
 <dl><dt><a name="Client-get_my_events"><strong>get_my_events</strong></a>(self, *, filter=None)</dt><dd><tt>Get&nbsp;events&nbsp;that&nbsp;have&nbsp;been&nbsp;fired&nbsp;specifically&nbsp;for&nbsp;the&nbsp;authenticated&nbsp;user.&nbsp;Takes<br>
 filtering&nbsp;argmuments.&nbsp;Returns&nbsp;a&nbsp;named&nbsp;tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 -----------<br>
 filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;<a href="modio.objects.html#Filter">modio.Filter</a>&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;results<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
@@ -149,6 +161,8 @@ list[<a href="modio.objects.html#Event">modio.Event</a>]<br>
 
 <dl><dt><a name="Client-get_my_games"><strong>get_my_games</strong></a>(self, filter=None)</dt><dd><tt>Get&nbsp;all&nbsp;the&nbsp;games&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;added&nbsp;or&nbsp;is&nbsp;a&nbsp;team&nbsp;member&nbsp;of.&nbsp;Takes<br>
 filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named&nbsp;tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -171,6 +185,8 @@ list[<a href="modio.game.html#Game">modio.Game</a>]<br>
 <dl><dt><a name="Client-get_my_modfiles"><strong>get_my_modfiles</strong></a>(self, *, filter=None)</dt><dd><tt>Get&nbsp;all&nbsp;the&nbsp;mods&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;uploaded.&nbsp;The&nbsp;returned&nbsp;modfile&nbsp;objects&nbsp;cannot&nbsp;be<br>
 edited&nbsp;or&nbsp;deleted&nbsp;and&nbsp;do&nbsp;not&nbsp;have&nbsp;a&nbsp;`game_id`&nbsp;attribute.&nbsp;Takes&nbsp;filtering&nbsp;arguments.&nbsp;&nbsp;&nbsp;&nbsp;<br>Returns&nbsp;a&nbsp;named&nbsp;tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 -----------<br>
 filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
@@ -191,6 +207,8 @@ list[<a href="modio.objects.html#ModFile">modio.ModFile</a>]<br>
 
 <dl><dt><a name="Client-get_my_mods"><strong>get_my_mods</strong></a>(self, *, filter=None)</dt><dd><tt>Get&nbsp;all&nbsp;the&nbsp;mods&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;added&nbsp;or&nbsp;is&nbsp;a&nbsp;team&nbsp;member&nbsp;of.&nbsp;Takes<br>
 filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named&nbsp;tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -213,6 +231,8 @@ list[<a href="modio.mod.html#Mod">modio.Mod</a>]<br>
 <dl><dt><a name="Client-get_my_subs"><strong>get_my_subs</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;mods&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;is&nbsp;subscribed&nbsp;to.&nbsp;&nbsp;Takes<br>
 filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named&nbsp;tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 -----------<br>
 filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
@@ -232,6 +252,9 @@ list[<a href="modio.mod.html#Mod">modio.Mod</a>]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Pagination&nbsp;data</tt></dd></dl>
 
 <dl><dt><a name="Client-get_my_user"><strong>get_my_user</strong></a>(self)</dt><dd><tt>Gets&nbsp;the&nbsp;authenticated&nbsp;user's&nbsp;details&nbsp;(aka&nbsp;the&nbsp;user&nbsp;who&nbsp;created&nbsp;the&nbsp;API&nbsp;key/access&nbsp;token)<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Raises<br>
 -------<br>
 Forbidden<br>
@@ -243,6 +266,8 @@ Returns<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;authenticated&nbsp;user</tt></dd></dl>
 
 <dl><dt><a name="Client-get_user"><strong>get_user</strong></a>(self, id:int)</dt><dd><tt>Gets&nbsp;a&nbsp;user&nbsp;with&nbsp;the&nbsp;specified&nbsp;ID.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -261,6 +286,8 @@ Returns<br>
 
 <dl><dt><a name="Client-get_users"><strong>get_users</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;users&nbsp;availaible&nbsp;on&nbsp;mod.io.&nbsp;Takes&nbsp;filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named<br>tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Parameters<br>
 -----------<br>
 filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
@@ -276,6 +303,8 @@ list[<a href="modio.objects.html#User">modio.User</a>]<br>
 
 <dl><dt><a name="Client-report"><strong>report</strong></a>(self, *, resource:Union[<a href="modio.game.html#Game">modio.Game</a>, <a href="modio.objects.html#User">modio.User</a>, <a href="modio.mod.html#Mod">modio.Mod</a>, <a href="modio.objects.html#Object">modio.Object</a>], type:int=0, name:str, summary:str)</dt><dd><tt>Used&nbsp;to&nbsp;report&nbsp;for&nbsp;any&nbsp;resource&nbsp;on&nbsp;mod.io.&nbsp;Make&nbsp;sure&nbsp;to&nbsp;read&nbsp;mod.io's&nbsp;ToU&nbsp;to&nbsp;understand<br>
 what&nbsp;is&nbsp;and&nbsp;isn't&nbsp;acceptable<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
