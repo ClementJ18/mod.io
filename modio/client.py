@@ -141,7 +141,7 @@ class Client:
         return headers
 
     def _get_request(self, url, *, h_type=0, **fields):
-        f = fields.pop("filter")
+        f = fields.pop("filter", None)
         filter = (f if f else Filter()).__dict__.copy()
         extra = {**fields, **filter}
 
