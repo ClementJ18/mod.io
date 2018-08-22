@@ -141,8 +141,9 @@ class Client:
         return headers
 
     def _get_request(self, url, *, h_type=0, **fields):
-        filter = (fields.pop("filter") if fields.get("filter") else Filter()).__dict__.copy()
-        extra = {**filter, **fields}
+        f = fields.pop("filter")
+        filter = (f if f else Filter()).__dict__.copy()
+        extra = {**fields, **filter}
 
         if not self.access_token:
             extra["api_key"] = self.api_key
