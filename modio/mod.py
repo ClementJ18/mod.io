@@ -93,7 +93,6 @@ class Mod:
         self.status = attrs.pop("status")
         self.visible = attrs.pop("visible")
         self.game = attrs.pop("game_id")
-        self.submitter = User(**attrs.pop("submitted_by"))
         self.date = attrs.pop("date_added")
         self.updated = attrs.pop("date_updated")
         self.live = attrs.pop("date_live")
@@ -113,6 +112,7 @@ class Mod:
         self._file = attrs.pop("modfile", None)
         self._kvp_raw = attrs.pop("metadata_kvp")
         self.file =  ModFile(**self._file, game_id=self.game, client=self._client) if self._file else None 
+        self.submitter = User(client=self._client, **attrs.pop("submitted_by"))
 
     @property
     def kvp(self):
@@ -308,7 +308,7 @@ class Mod:
             User that submitted the resource
         """
         user_json = self._client._post_request(f"/general/ownership", data={"resource_type" : "mods", "resource_id" : self.id})
-        return User(**user_json)
+        return User(client=self._client, **user_json)
 
     def edit(self, **fields):
         """Used to edit the mod details. Sucessful editing will update the mod instance.
@@ -683,5 +683,37 @@ class Mod:
         """
         data = {"email" : email, "level" : level, "position" : position}
         msg = self._client._post_request(f'/games/{self.game}/mods/{self.id}/team', data=data)
+        return Message(**msg)
+
+    def report(self, name, summary, type = 0):
+        """Report a this mod, make sure to read mod.io's ToU to understand what is
+        and isnt allowed.
+
+        Parameters
+        -----------
+        name : str
+            Name of the report
+        summary : str
+            Detailed description of your report. Make sure you include all relevant information and 
+            links to help moderators investigate and respond appropiately.
+        type : int
+            0 : Generic Report
+            1 : DMCA Report
+
+        Returns
+        --------
+        modio.Message
+            The returned message on the success of the query.
+
+        """
+        fields = {
+            "id" : self.id,
+            "resource" :  "mods",
+            "name" : name,
+            "type" : type,
+            "summary" : summary
+        }
+
+        msg = self.client._post_request('/report', data = fields)
         return Message(**msg)
 

@@ -226,7 +226,7 @@ class Client:
 
         """
         user_json = self._get_request(f"/users/{id}")
-        return User(**user_json)
+        return User(client=self, **user_json)
 
     def get_users(self, *, filter=None):
         """Gets all the users availaible on mod.io. Takes filtering arguments. Returns 
@@ -247,7 +247,7 @@ class Client:
                
         """
         user_json = self._get_request("/users", filter=filter)
-        return Returned([User(**user) for user in user_json["data"]], Pagination(**user_json))
+        return Returned([User(client=self, **user) for user in user_json["data"]], Pagination(**user_json))
     
     def get_my_user(self):
         """Gets the authenticated user's details (aka the user who created the API key/access token)
@@ -263,7 +263,7 @@ class Client:
         
         """
         me_json = self._get_request("/me")
-        return User(**me_json)
+        return User(client=self, **me_json)
 
     def get_my_subs(self, *, filter=None):
         """Gets all the mods the authenticated user is subscribed to.  Takes
@@ -428,53 +428,5 @@ class Client:
         r = self._post_request("/oauth/emailexchange", params={'security_code' : code, "api_key":self.api_key}, h_type=2)
         self.access_token = r["access_token"]
 
-        return r["access_token"]
-
-    def report(self, *, resource : Union[Game, User, Mod, Object], type : int = 0, name : str, summary : str):
-        """Used to report for any resource on mod.io. Make sure to read mod.io's ToU to understand
-        what is and isn't acceptable
-
-        Parameters
-        -----------
-        resource : Union[modio.Game, modio.User, modio.Mod, modio.Object]
-            The resource to report, if it is an instance of a modio.Object it must have an `id`
-            attribute (the id of the resource) and a `resource_name`  atttribute which can be either 
-            'games', 'mods' or 'users'
-        type : int
-            0 : Generic Report
-            1 : DMCA Report
-        name : str
-            Name of the report
-        summary : str
-            Detailed description of your report. Make sure you include all relevant information and 
-            links to help moderators investigate and respond appropiately.
-
-        Raises
-        -------
-        modioException
-            Resource not 'game', 'mod' or 'user'
-
-        Returns
-        -------
-        Message
-            Report status message sent back by mod.io 
-
-
-        """
-        resource_name = resource.__class__.__name__.lower()
-
-        fields = {
-            "id" : resource.id,
-            "resource" :  resource_name + "s" if resource_name != "object" else resource.resource_name,
-            "name" : name,
-            "type" : type,
-            "summary" : summary
-        }
-
-        if fields["resource"] not in ["games", "mods", "users"]:
-            raise modioException("You cannot report this type of resources")
-
-        msg = self._post_request('/report', data = fields)
-
-        return Message(**msg)
+        return r["access_token"]        
         

@@ -14,3 +14,4 @@ new_mod_gen.py
 async_modio
 build
 *.bat
+async_test.py

@@ -156,7 +156,6 @@ class Comment:
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.mod = attrs.pop("mod_id")
-        self.submitter = User(**attrs.pop("submitter"))
         self.date = attrs.pop("date_added")
         self.parent = attrs.pop("reply_id")
         self.position = attrs.pop("thread_position")
@@ -165,6 +164,7 @@ class Comment:
         self.content = attrs.pop("content")
         self._client = attrs.pop("client")
         self._mod = attrs.pop("mod")
+        self.submitter = User(client=self._client, **attrs.pop("submitter"))
 
     def __repr__(self):
         return f"<modio.Comment id={self.id} mod={self.mod}>"
@@ -250,7 +250,7 @@ class ModFile:
             User that submitted the resource
         """
         user_json = self._client._post_request(f"/general/ownership", data={"resource_type" : "files", "resource_id" : self.id})
-        return User(**user_json)
+        return User(client=self._client, **user_json)
 
     def edit(self, **fields):
         """Edit the file's details
@@ -484,9 +484,42 @@ class User:
         self.tz = attrs.pop("timezone")
         self.lang = attrs.pop("language")
         self.profile = attrs.pop("profile_url")
+        self._client = attrs.pop("client")
 
     def __repr__(self):
         return f"<modio.User id={self.id} username={self.username}>"
+
+    def report(self, name, summary, type = 0):
+        """Report a this user, make sure to read mod.io's ToU to understand what is
+        and isnt allowed.
+
+        Parameters
+        -----------
+        name : str
+            Name of the report
+        summary : str
+            Detailed description of your report. Make sure you include all relevant information and 
+            links to help moderators investigate and respond appropiately.
+        type : int
+            0 : Generic Report
+            1 : DMCA Report
+
+        Returns
+        --------
+        modio.Message
+            The returned message on the success of the query.
+
+        """
+        fields = {
+            "id" : self.id,
+            "resource" :  "users",
+            "name" : name,
+            "type" : type,
+            "summary" : summary
+        }
+
+        msg = self.client._post_request('/report', data = fields)
+        return Message(**msg)
 
 class TeamMember(User):
     """Inherits from modio.User. Represents a user as part of a team.
