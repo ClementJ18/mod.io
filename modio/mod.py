@@ -67,6 +67,9 @@ class Mod:
         Tags for this mod. Filter attribute.
     kvp : dict
         Contains key-value metadata. Filter attribute.
+    plaintext : str
+        description field converted into plaintext.
+
 
     Filter-Only Attributes
     -----------------------
@@ -113,6 +116,7 @@ class Mod:
         self._kvp_raw = attrs.pop("metadata_kvp")
         self.file =  ModFile(**self._file, game_id=self.game, client=self._client) if self._file else None 
         self.submitter = User(client=self._client, **attrs.pop("submitted_by"))
+        self.plaintext = attrs.pop("description_plaintext")
 
     @property
     def kvp(self):
