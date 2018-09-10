@@ -385,6 +385,12 @@ class Client:
         """
         files_json = self._get_request("/me/files", filter=filter)
         return Returned([ModFile(**file, client=self) for file in files_json["data"]], Pagination(**files_json))
+
+    def get_my_ratings(self, *, filter=None):
+        """"""
+
+        ratings = self._get_request("/me/ratings", filter=filter)
+        return Returned([Rating(**rating, client=self) for rating in ratings["data"]], Pagination(**ratings))
         
     def email_request(self, email : str):
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address

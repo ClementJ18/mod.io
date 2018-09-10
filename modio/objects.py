@@ -348,6 +348,37 @@ class RatingType(enum.Enum):
     good = 1
     bad = -1
 
+class Rating:
+    """Represents a rating, objects obtained from the get_my_ratings endpoint
+
+    Attributes
+    -----------
+    game_id : int
+        The ID of the game the rated mod is for.
+    mod_id : int
+        The ID of the mod that was rated
+    rating : RatingType
+        The rating type
+    date : int
+        UNIX timestamp of whe the rating was added
+
+    """
+    def __init__(self, **attrs):
+        self.game_id = attrs.pop("game_id")
+        self.mod_id = attrs.pop("mod_id")
+        self.rating = attrs.pop("rating")
+        self.date = attrs.pop("date_added")
+        self._client = attrs.pop("client")
+
+    def delete(self):
+        pass
+
+    def add_good_rating(self):
+        pass
+
+    def add_bad_rating(self):
+        pass
+
 class Stats:
     """Represents a summary of stats for a mod
 
@@ -947,14 +978,17 @@ class Pagination:
         Number of results returned by the request.
     limit : int
         Maximum number of results returned.
-    offsent : int
+    offset : int
         Number of results skipped over
+    total : int
+        Total number of results avalaible for that endpoint
     """
 
     def __init__(self, **attrs):
         self.count = attrs.pop("result_count")
         self.limit = attrs.pop("result_limit")
         self.offset = attrs.pop("result_offset")
+        self.total = attrs.pop("result_total")
 
     def __repr__(self):
         return f"<modio.Pagination count={self.count} limit={self.limit} offset={self.offset}>"
@@ -962,7 +996,7 @@ class Pagination:
     def max(self):
         """Returns True if there are no additional results after this set. Can fail if the returned count is coincidentally
         exactly the same as the limit."""
-        return self.count == self.limit
+        return (self.offset + self.count) == self.total
 
     def min(self):
         """Returns True if there are no additional results before this set."""
