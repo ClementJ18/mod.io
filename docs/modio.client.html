@@ -234,6 +234,28 @@ list[<a href="modio.mod.html#Mod">modio.Mod</a>]<br>
 <a href="modio.objects.html#Pagination">modio.Pagination</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;Pagination&nbsp;data</tt></dd></dl>
 
+<dl><dt><a name="Client-get_my_ratings"><strong>get_my_ratings</strong></a>(self, *, filter=None)</dt><dd><tt>Get&nbsp;all&nbsp;the&nbsp;ratings&nbsp;the&nbsp;authentitated&nbsp;user&nbsp;has&nbsp;submitted.&nbsp;Takes&nbsp;filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named<br>
+with&nbsp;parameter&nbsp;results&nbsp;and&nbsp;pagination.<br>
+&nbsp;<br>
+Paramaters<br>
+-----------<br>
+filter&nbsp;:&nbsp;Optional[<a href="modio.objects.html#Filter">modio.Filter</a>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;instance&nbsp;of&nbsp;modio.Filter&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;filtering,&nbsp;paginating&nbsp;and&nbsp;sorting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results<br>
+&nbsp;<br>
+Raises<br>
+-------<br>
+Forbidden<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;access&nbsp;token&nbsp;is&nbsp;invalid/missing<br>
+&nbsp;<br>
+Returns<br>
+-------<br>
+list[<a href="modio.objects.html#Rating">modio.Rating</a>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;modio.Rating&nbsp;instances&nbsp;representing&nbsp;all&nbsp;ratings&nbsp;the&nbsp;user&nbsp;added.<br>
+<a href="modio.objects.html#Pagination">modio.Pagination</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;Pagination&nbsp;data</tt></dd></dl>
+
+
 <dl><dt><a name="Client-get_my_subs"><strong>get_my_subs</strong></a>(self, *, filter=None)</dt><dd><tt>Gets&nbsp;all&nbsp;the&nbsp;mods&nbsp;the&nbsp;authenticated&nbsp;user&nbsp;is&nbsp;subscribed&nbsp;to.&nbsp;&nbsp;Takes<br>
 filtering&nbsp;arguments.&nbsp;Returns&nbsp;a&nbsp;named&nbsp;tuple&nbsp;with&nbsp;parameters&nbsp;results&nbsp;and&nbsp;pagination.<br>
 &nbsp;<br>
