@@ -156,7 +156,6 @@ class Comment:
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.mod = attrs.pop("mod_id")
-        self.submitter = User(**attrs.pop("submitter"))
         self.date = attrs.pop("date_added")
         self.parent = attrs.pop("reply_id")
         self.position = attrs.pop("thread_position")
@@ -165,6 +164,7 @@ class Comment:
         self.content = attrs.pop("content")
         self._client = attrs.pop("client")
         self._mod = attrs.pop("mod")
+        self.submitter = User(client=self._client, **attrs.pop("submitter"))
 
     def __repr__(self):
         return f"<modio.Comment id={self.id} mod={self.mod}>"
@@ -250,7 +250,7 @@ class ModFile:
             User that submitted the resource
         """
         user_json = self._client._post_request(f"/general/ownership", data={"resource_type" : "files", "resource_id" : self.id})
-        return User(**user_json)
+        return User(client=self._client, **user_json)
 
     def edit(self, **fields):
         """Edit the file's details
@@ -345,8 +345,56 @@ class TagOption:
         return f"<modio.TagOption name={self.name} hidden={self.hidden}>"
 
 class RatingType(enum.Enum):
-    good = 1
-    bad = -1
+    good    = 1
+    neutral = 0
+    bad     = -1
+
+class Rating:
+    """Represents a rating, objects obtained from the get_my_ratings endpoint
+
+    Attributes
+    -----------
+    game : int
+        The ID of the game the rated mod is for.
+    mod : int
+        The ID of the mod that was rated
+    rating : RatingType
+        The rating type
+    date : int
+        UNIX timestamp of whe the rating was added
+
+    """
+    def __init__(self, **attrs):
+        self.game = attrs.pop("game_id")
+        self.mod = attrs.pop("mod_id")
+        self.rating = RatingType(attrs.pop("rating"))
+        self.date = attrs.pop("date_added")
+        self._client = attrs.pop("client")
+
+    def delete(self):
+        """Sets the rating to neutral."""
+        raise NotImplementedError("WIP")
+
+    def _add_rating(self, rating : RatingType):
+        try:
+            checked = self._client._post_request(f'/games/{self.game}/mods/{self.mod}/ratings', data={"rating":rating.value})
+        except BadRequest:
+            return False
+
+        self.get_stats()
+        return True
+
+    def add_positive_rating(self):
+        """Changes the mod rating to positive, the author of the rating will be the authenticated user.
+        If the mod has already been positevely rated by the user it will return False. If the positive rating
+        is successful it will return True"""
+        return self._add_rating(RatingType.good)
+
+    def add_negative_rating(self):
+        """Changes the mod rating to negative, the author of the rating will be the authenticated user.
+        If the mod has already been negatively rated by the user it will return False. If the negative rating
+        is successful it will return True."""
+        return self._add_rating(RatingType.bad)
 
 class Stats:
     """Represents a summary of stats for a mod
@@ -484,9 +532,42 @@ class User:
         self.tz = attrs.pop("timezone")
         self.lang = attrs.pop("language")
         self.profile = attrs.pop("profile_url")
+        self._client = attrs.pop("client")
 
     def __repr__(self):
         return f"<modio.User id={self.id} username={self.username}>"
+
+    def report(self, name, summary, type = 0):
+        """Report a this user, make sure to read mod.io's ToU to understand what is
+        and isnt allowed.
+
+        Parameters
+        -----------
+        name : str
+            Name of the report
+        summary : str
+            Detailed description of your report. Make sure you include all relevant information and 
+            links to help moderators investigate and respond appropiately.
+        type : int
+            0 : Generic Report
+            1 : DMCA Report
+
+        Returns
+        --------
+        modio.Message
+            The returned message on the success of the query.
+
+        """
+        fields = {
+            "id" : self.id,
+            "resource" :  "users",
+            "name" : name,
+            "type" : type,
+            "summary" : summary
+        }
+
+        msg = self.client._post_request('/report', data = fields)
+        return Message(**msg)
 
 class TeamMember(User):
     """Inherits from modio.User. Represents a user as part of a team.
@@ -713,6 +794,7 @@ class Filter:
             "kvp" : "metadata_kvp",
             "expires" : "date_expires",
             "mod" : "mod_id",
+            "game" : "game_id",
             "file" : "modfile",
             "virus" : "virus_positive",
             "size" : "filesize",
@@ -914,14 +996,17 @@ class Pagination:
         Number of results returned by the request.
     limit : int
         Maximum number of results returned.
-    offsent : int
+    offset : int
         Number of results skipped over
+    total : int
+        Total number of results avalaible for that endpoint
     """
 
     def __init__(self, **attrs):
         self.count = attrs.pop("result_count")
         self.limit = attrs.pop("result_limit")
         self.offset = attrs.pop("result_offset")
+        self.total = attrs.pop("result_total")
 
     def __repr__(self):
         return f"<modio.Pagination count={self.count} limit={self.limit} offset={self.offset}>"
@@ -929,7 +1014,7 @@ class Pagination:
     def max(self):
         """Returns True if there are no additional results after this set. Can fail if the returned count is coincidentally
         exactly the same as the limit."""
-        return self.count == self.limit
+        return (self.offset + self.count) == self.total
 
     def min(self):
         """Returns True if there are no additional results before this set."""

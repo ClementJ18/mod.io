@@ -102,7 +102,6 @@ class Game:
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.status = attrs.pop("status")
-        self.submitter = User(**attrs.pop("submitted_by"))
         self.date = attrs.pop("date_added")
         self.updated = attrs.pop("date_updated")
         self.live = attrs.pop("date_live")
@@ -126,7 +125,8 @@ class Game:
         self.tag_options = [TagOption(**tag) for tag in attrs.pop("tag_options", [])]
         self.maturity_options = attrs.pop("maturity_options")
         self._client = attrs.pop("client")
-
+        self.submitter = User(client=self._client, **attrs.pop("submitted_by"))
+        
     def __repr__(self):
         return f'<modio.Game id={self.id} name={self.name}>'
 
@@ -255,7 +255,7 @@ class Game:
             User that submitted the resource
         """
         user_json = self._client._post_request(f"/general/ownership", data={"resource_type" : "games", "resource_id" : self.id})
-        return User(**user_json)
+        return User(client=self._client, **user_json)
 
     def edit(self, **fields):
         """Used to edit the game details. For editing the icon, logo or header use :func:`add_media`.
@@ -453,4 +453,36 @@ class Game:
             self.tag_options.remove(option)
 
         return not isinstance(r, dict)
+
+    def report(self, name, summary, type = 0):
+        """Report a this game, make sure to read mod.io's ToU to understand what is
+        and isnt allowed.
+
+        Parameters
+        -----------
+        name : str
+            Name of the report
+        summary : str
+            Detailed description of your report. Make sure you include all relevant information and 
+            links to help moderators investigate and respond appropiately.
+        type : int
+            0 : Generic Report
+            1 : DMCA Report
+
+        Returns
+        --------
+        modio.Message
+            The returned message on the success of the query.
+
+        """
+        fields = {
+            "id" : self.id,
+            "resource" :  "games",
+            "name" : name,
+            "type" : type,
+            "summary" : summary
+        }
+
+        msg = self.client._post_request('/report', data = fields)
+        return Message(**msg)
 
