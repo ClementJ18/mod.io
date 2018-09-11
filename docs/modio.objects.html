@@ -31,6 +31,8 @@
 </font></dt><dt><font face="helvetica, arial"><a href="modio.objects.html#NewMod">NewMod</a>
 </font></dt><dt><font face="helvetica, arial"><a href="modio.objects.html#NewModFile">NewModFile</a>
 </font></dt><dt><font face="helvetica, arial"><a href="modio.objects.html#Object">Object</a>
+</font></dt><dt><font face="helvetica, arial"><a href="modio.objects.html#Pagination">Pagination</a>
+</font></dt><dt><font face="helvetica, arial"><a href="modio.objects.html#Rating">Rating</a>
 </font></dt><dt><font face="helvetica, arial"><a href="modio.objects.html#Stats">Stats</a>
 </font></dt><dt><font face="helvetica, arial"><a href="modio.objects.html#TagOption">TagOption</a>
 </font></dt><dt><font face="helvetica, arial"><a href="modio.objects.html#User">User</a>
@@ -85,7 +87,9 @@ content&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Content&nbsp;of&nbsp;the&nbsp;comment.&nbsp;Filter&nbsp;attribute.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="Comment-delete"><strong>delete</strong></a>(self)</dt><dd><tt>Remove&nbsp;the&nbsp;comment&nbsp;permanently</tt></dd></dl>
+<dl><dt><a name="Comment-delete"><strong>delete</strong></a>(self)</dt><dd><tt>Remove&nbsp;the&nbsp;comment&nbsp;permanently<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br></tt></dd></dl>
 
 </dl>
 </td></tr></table> <p>
@@ -143,7 +147,7 @@ subscribed&nbsp;:&nbsp;bool<br>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="EventType">class <strong>EventType</strong></a>(<a href="enum.html#Enum">enum.Enum</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="EventType">class <strong>EventType</strong></a>(enum.Enum)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt><a href="#EventType">EventType</a>(value,&nbsp;names=None,&nbsp;*,&nbsp;module=None,&nbsp;qualname=None,&nbsp;type=None,&nbsp;start=1)<br>
@@ -174,7 +178,7 @@ An&nbsp;enumeration.<br>&nbsp;</tt></td></tr>
 <dl><dt><strong>unsubscribe</strong> = &lt;EventType.unsubscribe: 9&gt;</dl>
 
 <hr>
-Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+Data descriptors inherited from enum.Enum:<br>
 <dl><dt><strong>name</strong></dt>
 <dd><tt>The&nbsp;name&nbsp;of&nbsp;the&nbsp;Enum&nbsp;member.</tt></dd>
 </dl>
@@ -366,6 +370,8 @@ is&nbsp;composed&nbsp;of&nbsp;the&nbsp;metakey&nbsp;as&nbsp;the&nbsp;key&nbsp;an
 A&nbsp;object&nbsp;to&nbsp;represents&nbsp;modfiles.&nbsp;If&nbsp;the&nbsp;modfile&nbsp;has&nbsp;been&nbsp;returned&nbsp;for&nbsp;the&nbsp;me/modfile&nbsp;endpoint<br>
 then&nbsp;<a href="#ModFile-edit">edit</a>()&nbsp;and&nbsp;<a href="#ModFile-delete">delete</a>()&nbsp;cannot&nbsp;be&nbsp;called&nbsp;as&nbsp;a&nbsp;game_id&nbsp;is&nbsp;lacking.<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Attributes<br>
 -----------<br>
 id&nbsp;:&nbsp;int<br>
@@ -412,12 +418,16 @@ game&nbsp;:&nbsp;int<br>
 <dl><dt><a name="ModFile-delete"><strong>delete</strong></a>(self)</dt><dd><tt>Deletes&nbsp;the&nbsp;modfile,&nbsp;this&nbsp;will&nbsp;raise&nbsp;an&nbsp;error&nbsp;if&nbsp;the<br>
 file&nbsp;is&nbsp;the&nbsp;active&nbsp;release&nbsp;for&nbsp;the&nbsp;mod<br>
 &nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
+&nbsp;<br>
 Raises<br>
 -------<br>
 Forbidden<br>
 &nbsp;&nbsp;&nbsp;&nbsp;You&nbsp;cannot&nbsp;delete&nbsp;the&nbsp;active&nbsp;release&nbsp;of&nbsp;a&nbsp;mod</tt></dd></dl>
 
 <dl><dt><a name="ModFile-edit"><strong>edit</strong></a>(self, **fields)</dt><dd><tt>Edit&nbsp;the&nbsp;file's&nbsp;details<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>
@@ -432,6 +442,8 @@ metadata_blob&nbsp;:&nbsp;str<br>
 &nbsp;&nbsp;&nbsp;&nbsp;properties&nbsp;such&nbsp;as&nbsp;what&nbsp;version&nbsp;of&nbsp;the&nbsp;game&nbsp;this&nbsp;file&nbsp;is&nbsp;compatible&nbsp;with.</tt></dd></dl>
 
 <dl><dt><a name="ModFile-get_owner"><strong>get_owner</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;original&nbsp;submitter&nbsp;of&nbsp;the&nbsp;resource<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Returns<br>
 --------<br>
@@ -569,10 +581,84 @@ A&nbsp;dud&nbsp;class&nbsp;that&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;replace&
 passed&nbsp;will&nbsp;become&nbsp;attributes.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"></td></tr></table> <p>
+
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="RatingType">class <strong>RatingType</strong></a>(<a href="enum.html#Enum">enum.Enum</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="Pagination">class <strong>Pagination</strong></a>(builtins.object)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Pagination">Pagination</a>(**attrs)<br>
+&nbsp;<br>
+This&nbsp;class&nbsp;is&nbsp;unique&nbsp;to&nbsp;the&nbsp;library&nbsp;and&nbsp;represents&nbsp;the&nbsp;pagination<br>
+data&nbsp;that&nbsp;some&nbsp;of&nbsp;the&nbsp;endpoints&nbsp;return.<br>
+&nbsp;<br>
+Attributes<br>
+-----------<br>
+count&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;results&nbsp;returned&nbsp;by&nbsp;the&nbsp;request.<br>
+limit&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Maximum&nbsp;number&nbsp;of&nbsp;results&nbsp;returned.<br>
+offset&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;results&nbsp;skipped&nbsp;over<br>
+total&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Total&nbsp;number&nbsp;of&nbsp;results&nbsp;avalaible&nbsp;for&nbsp;that&nbsp;endpoint<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Pagination-max"><strong>max</strong></a>(self)</dt><dd><tt>Returns&nbsp;True&nbsp;if&nbsp;there&nbsp;are&nbsp;no&nbsp;additional&nbsp;results&nbsp;after&nbsp;this&nbsp;set.&nbsp;Can&nbsp;fail&nbsp;if&nbsp;the&nbsp;returned&nbsp;count&nbsp;is&nbsp;coincidentally<br>
+exactly&nbsp;the&nbsp;same&nbsp;as&nbsp;the&nbsp;limit.</tt></dd></dl>
+
+<dl><dt><a name="Pagination-min"><strong>min</strong></a>(self)</dt><dd><tt>Returns&nbsp;True&nbsp;if&nbsp;there&nbsp;are&nbsp;no&nbsp;additional&nbsp;results&nbsp;before&nbsp;this&nbsp;set.</tt></dd></dl>
+
+<dl><dt><a name="Pagination-next"><strong>next</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;offset&nbsp;required&nbsp;for&nbsp;the&nbsp;next&nbsp;set&nbsp;of&nbsp;results</tt></dd></dl>
+
+<dl><dt><a name="Pagination-page"><strong>page</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;current&nbsp;page&nbsp;number.&nbsp;Page&nbsp;numbers&nbsp;start&nbsp;at&nbsp;0</tt></dd></dl>
+
+<dl><dt><a name="Pagination-previous"><strong>previous</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;offset&nbsp;required&nbsp;for&nbsp;the&nbsp;previous&nbsp;set&nbsp;of&nbsp;results</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Rating">class <strong>Rating</strong></a>(builtins.object)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Rating">Rating</a>(**attrs)<br>
+&nbsp;<br>
+Represents&nbsp;a&nbsp;rating,&nbsp;objects&nbsp;obtained&nbsp;from&nbsp;the&nbsp;get_my_ratings&nbsp;endpoint<br>
+&nbsp;<br>
+Attributes<br>
+-----------<br>
+game&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;ID&nbsp;of&nbsp;the&nbsp;game&nbsp;the&nbsp;rated&nbsp;mod&nbsp;is&nbsp;for.<br>
+mod&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;ID&nbsp;of&nbsp;the&nbsp;mod&nbsp;that&nbsp;was&nbsp;rated<br>
+rating&nbsp;:&nbsp;<a href="#RatingType">RatingType</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;rating&nbsp;type<br>
+date&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;UNIX&nbsp;timestamp&nbsp;of&nbsp;whe&nbsp;the&nbsp;rating&nbsp;was&nbsp;added<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+
+<dl><dt><a name="Rating-add_negative_rating"><strong>add_negative_rating</strong></a>(self)</dt><dd><tt>Changes&nbsp;the&nbsp;mod&nbsp;rating&nbsp;to&nbsp;negative,&nbsp;the&nbsp;author&nbsp;of&nbsp;the&nbsp;rating&nbsp;will&nbsp;be&nbsp;the&nbsp;authenticated&nbsp;user.<br>
+If&nbsp;the&nbsp;mod&nbsp;has&nbsp;already&nbsp;been&nbsp;negatively&nbsp;rated&nbsp;by&nbsp;the&nbsp;user&nbsp;it&nbsp;will&nbsp;return&nbsp;False.&nbsp;If&nbsp;the&nbsp;negative&nbsp;rating<br>
+is&nbsp;successful&nbsp;it&nbsp;will&nbsp;return&nbsp;True.<br><br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.</tt></dd></dl>
+
+<dl><dt><a name="Rating-add_positive_rating"><strong>add_positive_rating</strong></a>(self)</dt><dd><tt>Changes&nbsp;the&nbsp;mod&nbsp;rating&nbsp;to&nbsp;positive,&nbsp;the&nbsp;author&nbsp;of&nbsp;the&nbsp;rating&nbsp;will&nbsp;be&nbsp;the&nbsp;authenticated&nbsp;user.<br>
+If&nbsp;the&nbsp;mod&nbsp;has&nbsp;already&nbsp;been&nbsp;positevely&nbsp;rated&nbsp;by&nbsp;the&nbsp;user&nbsp;it&nbsp;will&nbsp;return&nbsp;False.&nbsp;If&nbsp;the&nbsp;positive&nbsp;rating<br>
+is&nbsp;successful&nbsp;it&nbsp;will&nbsp;return&nbsp;True<br><br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.</tt></dd></dl>
+
+<dl><dt><a name="Rating-delete"><strong>delete</strong></a>(self)</dt><dd><tt>Sets&nbsp;the&nbsp;rating&nbsp;to&nbsp;neutral.&nbsp;Currently&nbsp;not&nbsp;implemented&nbsp;waiting&nbsp;on&nbsp;the&nbsp;appropriate&nbsp;endpoint.<br><br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.</tt></dd></dl>
+
+</td></tr></table> <p>
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RatingType">class <strong>RatingType</strong></a>(enum.Enum)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt><a href="#RatingType">RatingType</a>(value,&nbsp;names=None,&nbsp;*,&nbsp;module=None,&nbsp;qualname=None,&nbsp;type=None,&nbsp;start=1)<br>
@@ -585,7 +671,7 @@ An&nbsp;enumeration.<br>&nbsp;</tt></td></tr>
 <dl><dt><strong>good</strong> = &lt;RatingType.good: 1&gt;</dl>
 
 <hr>
-Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+Data descriptors inherited from enum.Enum:<br>
 <dl><dt><strong>name</strong></dt>
 <dd><tt>The&nbsp;name&nbsp;of&nbsp;the&nbsp;Enum&nbsp;member.</tt></dd>
 </dl>
@@ -593,8 +679,9 @@ Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
 <dd><tt>The&nbsp;value&nbsp;of&nbsp;the&nbsp;Enum&nbsp;member.</tt></dd>
 </dl>
 <hr>
-Data descriptors inherited from <a href="enum.html#EnumMeta">enum.EnumMeta</a>:<br>
+Data descriptors inherited from enum.EnumMeta:<br>
 </td></tr></table> <p>
+
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -726,7 +813,7 @@ position&nbsp;:&nbsp;str<br>
 -----------------------<br>
 These&nbsp;attributes&nbsp;can&nbsp;only&nbsp;be&nbsp;used&nbsp;at&nbsp;endpoints&nbsp;which&nbsp;return&nbsp;instances<br>
 of&nbsp;this&nbsp;class&nbsp;and&nbsp;takes&nbsp;filter&nbsp;arguments.&nbsp;They&nbsp;are&nbsp;not&nbsp;attached&nbsp;to&nbsp;the<br>
-<a href="builtins.html#object">object</a>&nbsp;itself&nbsp;and&nbsp;trying&nbsp;to&nbsp;access&nbsp;them&nbsp;will&nbsp;cause&nbsp;an&nbsp;AttributeError<br>
+object&nbsp;itself&nbsp;and&nbsp;trying&nbsp;to&nbsp;access&nbsp;them&nbsp;will&nbsp;cause&nbsp;an&nbsp;AttributeError<br>
 &nbsp;<br>
 user_id&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Unique&nbsp;id&nbsp;of&nbsp;the&nbsp;user.&nbsp;&nbsp;<br>
@@ -735,9 +822,13 @@ username&nbsp;:&nbsp;str<br>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
 
-<dl><dt><a name="TeamMember-delete"><strong>delete</strong></a>(self)</dt><dd><tt>Remove&nbsp;the&nbsp;user&nbsp;from&nbsp;the&nbsp;team.&nbsp;Fires&nbsp;a&nbsp;MOD_TEAM_CHANGED&nbsp;event</tt></dd></dl>
+<dl><dt><a name="TeamMember-delete"><strong>delete</strong></a>(self)</dt><dd><tt>Remove&nbsp;the&nbsp;user&nbsp;from&nbsp;the&nbsp;team.&nbsp;Fires&nbsp;a&nbsp;MOD_TEAM_CHANGED&nbsp;event<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br></tt></dd></dl>
 
 <dl><dt><a name="TeamMember-edit"><strong>edit</strong></a>(self, *, level=None, position=None)</dt><dd><tt>Edit&nbsp;a&nbsp;team&nbsp;member's&nbsp;details.<br>
+&nbsp;<br>
+In&nbsp;the&nbsp;async&nbsp;branch&nbsp;of&nbsp;the&nbsp;module,&nbsp;this&nbsp;function&nbsp;is&nbsp;a&nbsp;coroutine.<br>
 &nbsp;<br>
 Parameters<br>
 -----------<br>

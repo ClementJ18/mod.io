@@ -118,6 +118,7 @@ class Mod:
         self.submitter = User(client=self._client, **attrs.pop("submitted_by"))
         self.plaintext = attrs.pop("description_plaintext")
 
+
     @property
     def kvp(self):
         meta = {}
