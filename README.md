@@ -51,4 +51,4 @@ mod = game.get_mod(231)
 ```
 
 ## How to install
-`pip install git+git://github.com/ClementJ18/mod.io.git@v0.2.0`
+`pip install git+git://github.com/ClementJ18/mod.io.git@d500d733c07c20e40a49fa32452b905dcc85b160`
