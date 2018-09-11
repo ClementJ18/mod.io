@@ -345,17 +345,18 @@ class TagOption:
         return f"<modio.TagOption name={self.name} hidden={self.hidden}>"
 
 class RatingType(enum.Enum):
-    good = 1
-    bad = -1
+    good    = 1
+    neutral = 0
+    bad     = -1
 
 class Rating:
     """Represents a rating, objects obtained from the get_my_ratings endpoint
 
     Attributes
     -----------
-    game_id : int
+    game : int
         The ID of the game the rated mod is for.
-    mod_id : int
+    mod : int
         The ID of the mod that was rated
     rating : RatingType
         The rating type
@@ -364,20 +365,36 @@ class Rating:
 
     """
     def __init__(self, **attrs):
-        self.game_id = attrs.pop("game_id")
-        self.mod_id = attrs.pop("mod_id")
-        self.rating = attrs.pop("rating")
+        self.game = attrs.pop("game_id")
+        self.mod = attrs.pop("mod_id")
+        self.rating = RatingType(attrs.pop("rating"))
         self.date = attrs.pop("date_added")
         self._client = attrs.pop("client")
 
     def delete(self):
-        pass
+        """Sets the rating to neutral."""
+        raise NotImplementedError("WIP")
 
-    def add_good_rating(self):
-        pass
+    def _add_rating(self, rating : RatingType):
+        try:
+            checked = self._client._post_request(f'/games/{self.game}/mods/{self.mod}/ratings', data={"rating":rating.value})
+        except BadRequest:
+            return False
 
-    def add_bad_rating(self):
-        pass
+        self.get_stats()
+        return True
+
+    def add_positive_rating(self):
+        """Changes the mod rating to positive, the author of the rating will be the authenticated user.
+        If the mod has already been positevely rated by the user it will return False. If the positive rating
+        is successful it will return True"""
+        return self._add_rating(RatingType.good)
+
+    def add_negative_rating(self):
+        """Changes the mod rating to negative, the author of the rating will be the authenticated user.
+        If the mod has already been negatively rated by the user it will return False. If the negative rating
+        is successful it will return True."""
+        return self._add_rating(RatingType.bad)
 
 class Stats:
     """Represents a summary of stats for a mod
@@ -777,6 +794,7 @@ class Filter:
             "kvp" : "metadata_kvp",
             "expires" : "date_expires",
             "mod" : "mod_id",
+            "game" : "game_id",
             "file" : "modfile",
             "virus" : "virus_positive",
             "size" : "filesize",
