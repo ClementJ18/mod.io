@@ -1009,7 +1009,7 @@ class Pagination:
         self.total = attrs.pop("result_total")
 
     def __repr__(self):
-        return f"<modio.Pagination count={self.count} limit={self.limit} offset={self.offset}>"
+        return f"<modio.Pagination count={self.count} limit={self.limit} offset={self.offset} total={self.total}>"
 
     def max(self):
         """Returns True if there are no additional results after this set. Can fail if the returned count is coincidentally
@@ -1021,12 +1021,14 @@ class Pagination:
         return self.offset == 0
 
     def next(self):
-        """Returns the offset required for the next set of results"""
-        return self.offset + self.limit
+        """Returns the offset required for the next set of results. If the max results have been reached the returns the
+        current offset."""
+        return self.offset + self.limit if not self.max() else self.offset
 
     def previous(self):
-        """Returns the offset required for the previous set of results"""
-        return self.offset - self.limit
+        """Returns the offset required for the previous set of results. If the min results have been reached the returns the
+        current offset."""
+        return self.offset - self.limit  if not self.min() else self.offset
 
     def page(self):
         """Returns the current page number. Page numbers start at 0"""
