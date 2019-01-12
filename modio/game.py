@@ -2,84 +2,50 @@ from .mod import Mod
 from .objects import *
 from .errors import modioException
 from .utils import *
+from .enums import *
 
 import json
 
 class Game:
-    """Represents an instance of a modio.Game. Do not create manually.
+    """Represents an instance of a Game. Do not create manually.
     
     Attributes
     -----------
     id : int
         ID of the game. Filter attribute.
-    status : int
+    status : Status
         Status of the game. Filter attribute.
-        0 : Not accepted
-        1 : Accepted (default)
-        2 : Archived (default)
-        3 : Deleted
-    submitter : modio.User
+    submitter : User
         Instance of the modio user having submitted the game. Filter 
         attribute.
-    date : int
+    date : datetime.datetime
         UNIX timestamp of the date the game was registered. Filter attribute.
-    updated : int
+    updated : datetime.datetime
         UNIX timestamp of the date the game was last updated. Filter attribute.
-    live : int
+    live : datetime.datetime
         UNIX timestamp of the date the game went live. Filter attribute.
-    presentation : int
+    presentation : Presentation
         Filter attribute.
-        0 : Display mods for that game in a grid on mod.io
-        1 : Display mods for that game in a table on mod.io
-    submission : int
+    submission : Submission
         Filter attribute.
-        0 : Mod uploads must occur via a tool created by the game developers
-        1 : Mod uploads can occur from anywhere, including the website and API
-    curation : int
+    curation : Curation
         Filter attribute.
-        0 : No curation: Mods are immediately available to play
-        1 : Paid curation: Mods are immediately available to play unless 
-        they choose to receive donations. These mods must be accepted to be listed
-        2 : Full curation: All mods must be accepted by someone to be listed
-    community : int
+    community : Community
         Filter attribute.
-        0 : All of the options below are disabled
-        1 : Discussion board enabled
-        2 : Guides and news enabled
-        ? : Above options can be added together to create custom settings (e.g 3 : 
-        discussion board, guides and news enabled)
-    revenue : int
+    revenue : Revenue
         Filter attribute.
-        0 : All of the options below are disabled
-        1 : Allow mods to be sold
-        2 : Allow mods to receive donations
-        4 : Allow mods to be traded
-        8 : Allow mods to control supply and scarcity
-        ? : Above options can be added together to create custom settings (e.g 3 :
-        allow mods to be sold and receive donations)
-    api : int
+    api : APIAccess
         Filter attribute.
-        0 : All of the options below are disabled
-        1 : Allow 3rd parties to access this games API endpoints
-        2 : Allow mods to be downloaded directly (if disabled all download URLs will 
-        contain a frequently changing verification hash to stop unauthorized use)
-        ? : Above options can be added together to create custom settings (e.g 3 : 
-        allow 3rd parties to access this games API endpoints and allow mods to be
-        downloaded directly)
-    maturity_options : int
+    maturity_options : MaturityOptions
         Filter attribute.
-        0 : Don't allow mod developpers to decide whether or not to flag their mod as 
-        containing mature content (if game devs wish to handle it)
-        1 : Allow mod developpers to decide whether or not to flag their mod as 
-        containing mature content
     ugc : str
         Word used to describe user-generated content (mods, items, addons etc).
         Filter attribute.
-    icon : modio.Image
+    icon : Image
         The game icon
-    logo : modio.Image
+    logo : Image
         The game logo
-    header : modio.Image
+    header : Image
         The game header
     name : str
         Name of the game. Filter attribute.
@@ -89,28 +55,28 @@ class Game:
         Summary of the game. Filter attribute.
     instructions : str
         Instructions on uploading mods for this game, only applicable
-        if :attr:`submissions` equals 0
+        if :attr:`submission` equals 0
     instructions_url : str
         Link to a mod.io guide, your modding wiki or a page where modders can learn how to 
         make and submit mods to your games profile. Filter attribute.
     profile : str
         URL to the game's mod.io page.
-    tag_options : list[modio.TagOption]
+    tag_options : list[TagOption]
         List of tags from which mods can pick
 
     """
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
-        self.status = attrs.pop("status")
-        self.date = attrs.pop("date_added")
-        self.updated = attrs.pop("date_updated")
-        self.live = attrs.pop("date_live")
-        self.presentation = attrs.pop("presentation_option")
-        self.submission = attrs.pop("submission_option")
-        self.curation = attrs.pop("curation_option")
-        self.community = attrs.pop("community_options")
-        self.revenue = attrs.pop("revenue_options")
-        self.api = attrs.pop("api_access_options", )
+        self.status = Status(attrs.pop("status"))
+        self.date = _get_date(attrs.pop("date_added"))
+        self.updated = _get_date(attrs.pop("date_updated"))
+        self.live = _get_date(attrs.pop("date_live"))
+        self.presentation = Presentation(attrs.pop("presentation_option"))
+        self.submission = Submission(attrs.pop("submission_option"))
+        self.curation = Curation(attrs.pop("curation_option"))
+        self.community = Community(attrs.pop("community_options"))
+        self.revenue = Revenue(attrs.pop("revenue_options"))
+        self.api = APIAccess(attrs.pop("api_access_options", ))
         self.ugc = attrs.pop("ugc_name")
         self.icon = Image(**attrs.pop("icon", None))
         self.logo = Image(**attrs.pop("logo", None))
@@ -128,7 +94,7 @@ class Game:
         self.submitter = User(client=self._client, **attrs.pop("submitted_by"))
         
     def __repr__(self):
-        return f'<modio.Game id={self.id} name={self.name}>'
+        return f'<Game id={self.id} name={self.name}>'
 
     def _all_tags(self):
         tag_list = []
@@ -140,7 +106,7 @@ class Game:
 
     def get_mod(self, id : int):
         """Queries the mod.io API for the given mod ID and if found returns it as a 
-        modio.Mod instance. If not found raises NotFound
+        Mod instance. If not found raises NotFound
 
         Parameters
         -----------
@@ -167,15 +133,15 @@ class Game:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
-        list[modio.Mod]
-            A list of modio.Mod instances
-        modio.Pagination
+        list[Mod]
+            A list of Mod instances
+        Pagination
             Pagination data
                
         """
@@ -188,15 +154,15 @@ class Game:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
-        list[modio.Event]
-            A list of modio.Event instances
-        modio.Pagination
+        list[Event]
+            A list of Event instances
+        Pagination
             Pagination data
                
         """
@@ -210,15 +176,15 @@ class Game:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
-        list[modio.TagOption]
-            A list of modio.TagOption instances
-        modio.Pagination
+        list[TagOption]
+            A list of TagOption instances
+        Pagination
             Pagination data
                
         """
@@ -232,15 +198,15 @@ class Game:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
-        list[modio.Stats]
+        list[Stats]
             List of all the mod stats
-        modio.Pagination
+        Pagination
             Pagination data
         """
         stats_json = self._client._get_request(f"/games/{self.id}/mods/stats", filter=filter)
@@ -263,9 +229,8 @@ class Game:
 
         Parameters
         -----------
-        status : int
-            0 : Not accepted
-            1 : Accepted
+        status : Status
+            Game status
         name : str
             Name of the game, cannot exceed 80 characters
         name_id : str
@@ -278,45 +243,22 @@ class Game:
             Link to guide where modders can learn to make and submit mods
         ugc_name : str
             Word used to describe user-generated content (mods, items, addons etc).
-        presentation : int
-            0 : Display mods for that game in a grid on mod.io
-            1 : Display mods for that game in a table on mod.io
-        submission : int
-            0 : Mod uploads must occur via a tool created by the game developers
-            1 : Mod uploads can occur from anywhere, including the website and API
-        curation : int
-            0 : No curation: Mods are immediately available to play
-            1 : Paid curation: Mods are immediately available to play unless 
-            they choose to receive donations. These mods must be accepted to be listed
-            2 : Full curation: All mods must be accepted by someone to be listed
-        community : int
-            0 : All of the options below are disabled
-            1 : Discussion board enabled
-            2 : Guides and news enabled
-            ? : Above options can be added together to create custom settings (e.g 3 : 
-            discussion board, guides and news enabled)
-        revenue : int
-            0 : All of the options below are disabled
-            1 : Allow mods to be sold
-            2 : Allow mods to receive donations
-            4 : Allow mods to be traded
-            8 : Allow mods to control supply and scarcity
-            ? : Above options can be added together to create custom settings (e.g 3 :
-            allow mods to be sold and receive donations)
-        api : int
-            0 : All of the options below are disabled
-            1 : Allow 3rd parties to access this games API endpoints
-            2 : Allow mods to be downloaded directly (if disabled all download URLs will 
-            contain a frequently changing verification hash to stop unauthorized use)
-            ? : Above options can be added together to create custom settings (e.g 3 : 
-            allow 3rd parties to access this games API endpoints and allow mods to be
-            downloaded directly)
-        maturity : int
-            0 : Don't allow mod developpers to decide whether or not to flag their mod as 
-            containing mature content (if game devs wish to handle it)
-            1 : Allow mod developpers to decide whether or not to flag their mod as 
-            containing mature content"""
+        presentation : Presentation
+            How to display the game's mods on modio
+        submission : Submissions
+            Pick how mods can be uploaded
+        curation : Curation
+            Pick moderation levels of mods
+        community : Community
+            Change the community options of mods
+        revenue : Revenue
+            Change the revenue settings for mods
+        api : APIAccess
+            Change the api access of the mods
+        maturity : Maturity
+            Chose whether or not to allow mature content"""
 
+        fields = _clean_and_convert(fields)
         game_json = self._client._put_request(f'/games/{self.id}', data = fields)
         self.__init__(self._client, **game_json)
 
@@ -325,23 +267,23 @@ class Game:
         
         Parameters
         -----------
-        mod : modio.NewMod
+        mod : NewMod
             The mod to be submitted
 
         Raises
         -------
         modioException
-            Not instance of modio.NewMod or submissions from 3rd party disabled
+            Not instance of NewMod or submissions from 3rd party disabled
         ValueError
             One of the requirements for a parameter has not been met.
 
         Returns
         --------
-        modio.Mod
+        Mod
             The newly created mod
         """
         if not isinstance(mod, NewMod):
-            raise modioException("mod argument must be type modio.NewMod")
+            raise modioException("mod argument must be type NewMod")
 
         mod_d = mod.__dict__.copy()
         tags = mod_d.pop("tags")
@@ -465,13 +407,12 @@ class Game:
         summary : str
             Detailed description of your report. Make sure you include all relevant information and 
             links to help moderators investigate and respond appropiately.
-        type : int
-            0 : Generic Report
-            1 : DMCA Report
+        type : Report
+            Report type
 
         Returns
         --------
-        modio.Message
+        Message
             The returned message on the success of the query.
 
         """
@@ -479,7 +420,7 @@ class Game:
             "id" : self.id,
             "resource" :  "games",
             "name" : name,
-            "type" : type,
+            "type" : type.value,
             "summary" : summary
         }
 

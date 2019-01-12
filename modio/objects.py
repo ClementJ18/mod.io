@@ -1,7 +1,8 @@
-from .errors import modioException
+from .errors import modioException, BadRequest
+from .utils import concat_docs, _lib_to_api, _convert_date
+from .enums import *
 
 import hashlib
-import enum
 from collections import namedtuple
 import time
 
@@ -28,7 +29,7 @@ class Message:
         return f"{self.code} : {self.message}"
 
     def __repr__(self):
-        return f"<modio.Message code={self.code}>"
+        return f"<Message code={self.code}>"
 
 class Image:
     """A representation of a modio image, which stand for the Logo, Icon
@@ -42,13 +43,13 @@ class Image:
     original : str
         Link to the original file
     small : str
-        A link to a smaller version of the image, processed by modio. Size varies based
+        A link to a smaller version of the image, processed by  Size varies based
         on the object being processed. Can be None.
     medium : str
-        A link to a medium version of the image, processed by modio. Size varies based
+        A link to a medium version of the image, processed by  Size varies based
         on the object being processed. Can be None.
     large : str
-        A link to a large version of the image, processed by modio. Size varies based
+        A link to a large version of the image, processed by  Size varies based
         on the object being processed. Can be None.
 
     """
@@ -61,21 +62,7 @@ class Image:
         self.large = list(attrs.values())[4] if len(attrs) > 4 else None
 
     def __repr__(self):
-        return f"<modio.Image filename={self.filename} original={self.original}>"    
-
-class EventType(enum.Enum):
-    """An enum to render all event types easy to compare."""
-    file_changed  = 0
-    available     = 1
-    unavailable   = 2
-    edited        = 3
-    deleted       = 4
-    team_changed  = 5
-    team_join     = 6
-    team_leave    = 7
-    subscribe     = 8
-    unsubscribe   = 9
-    other         = 10    
+        return f"<Image filename={self.filename} original={self.original}>"     
 
 class Event:
     """Represents a mod event. 
@@ -88,9 +75,9 @@ class Event:
         ID of the mod this event is from. Filter attribute.
     user : int
         ID of the user that made the change. Filter attribute.
-    date : int
+    date : datetime.datetime
         UNIX timestamp of the event occurrence. Filter attribute.
-    type : enum.EventType
+    type : EventType
         Type of the event. Filter attribute.
 
     Filter-Only Attributes
@@ -109,7 +96,7 @@ class Event:
     """
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
-        self.date = attrs.pop("date_added")
+        self.date = _convert_date(attrs.pop("date_added"))
         self._raw_type = attrs.pop("event_type")
         self.mod = attrs.pop("mod_id")
         self.user = attrs.pop("user_id")
@@ -122,7 +109,7 @@ class Event:
             return EventType[self._raw_type.replace("USER_", "").lower()]
 
     def __repr__(self):
-        return f"<modio.Event id={self.id} type={self.type.name} mod={self.mod}>"
+        return f"<Event id={self.id} type={self.type.name} mod={self.mod}>"
 
 class Comment:
     """Represents a comment on a mod page.
@@ -133,9 +120,9 @@ class Comment:
         ID of the comment. Filter attribute.
     mod : id
         ID of the mod this comment is from. Filter attribute.
-    submitter : modio.User
+    submitter : User
         Istance of the user that submitted the comment. Filter attribute.
-    date : int
+    date : datetime.datetime
         Unix timestamp of date the comment was posted. Filter attribute.
     parent : int
         ID of the parent this comment is replying to. 0 if comment
@@ -156,7 +143,7 @@ class Comment:
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.mod = attrs.pop("mod_id")
-        self.date = attrs.pop("date_added")
+        self.date = _convert_date(attrs.pop("date_added"))
         self.parent = attrs.pop("reply_id")
         self.position = attrs.pop("thread_position")
         self.karma = attrs.pop("karma")
@@ -167,7 +154,7 @@ class Comment:
         self.submitter = User(client=self._client, **attrs.pop("submitter"))
 
     def __repr__(self):
-        return f"<modio.Comment id={self.id} mod={self.mod}>"
+        return f"<Comment id={self.id} mod={self.mod}>"
 
     def delete(self):
         """Remove the comment"""
@@ -184,18 +171,12 @@ class ModFile:
         ID of the modfile. Filter attribute.
     mod : int
         ID of the mod it was added for. Filter attribute.
-    date : int
+    date : datetime.datetime
         UNIX timestamp of the date the modfile was submitted. Filter attribute.
-    scanned : int
+    scanned : datetime.datetime
         UNIX timestamp of the date the file was virus scanned. Filter attribute.
-    virus_status : int
+    virus_status : VirusStatus
         Current status of the virus scan for the file. Filter attribute.
-        0 : Not scanned
-        1 : Scan complete
-        2 : In progress
-        3 : Too large to scan
-        4 : File not found
-        5 : Error Scanning
     virus : bool
         True if a virus was detected, False if it wasn't. Filter attribute.
     virus_hash : str
@@ -212,10 +193,10 @@ class ModFile:
         Changelog for the file. Filter attribute.
     metadata : str
         Metadata stored by the game developer for this file. Filter attribute.
-    download : dict
-        Contains download data
-        'binary_url' : url to download file
-        'date_expires' : UNIX timestamp of when the url expires
+    url : str
+        url to download file
+    expire : datetime.datetime
+        UNIX timestamp of when the url expires
     game : int
         ID of the game of the mod this file belongs to. Can be None if this file
         was returned from the me/modfiles endpoint.
@@ -225,7 +206,7 @@ class ModFile:
         self.mod = attrs.pop("mod_id")
         self.date = attrs.pop("date_added")
         self.scanned = attrs.pop("date_scanned")
-        self.virus_status = attrs.pop("virus_status")
+        self.virus_status = VirusStatus(attrs.pop("virus_status"))
         self.virus = bool(attrs.pop("virus_positive"))
         self.virus_hash = attrs.pop("virustotal_hash")
         self.size = attrs.pop("filesize")
@@ -234,12 +215,14 @@ class ModFile:
         self.version = attrs.pop("version")
         self.changelog = attrs.pop("changelog")
         self.metadata = attrs.pop("metadata_blob")
-        self.download = attrs.pop("download")
-        self._game_id = attrs.pop("game_id", None)
+        download = attrs.pop("download")
+        self.url = download["binary_url"]
+        self.expires = _convert_date(download["date_expires"])
+        self.game = attrs.pop("game_id", None)
         self._client = attrs.pop("client")
 
     def __repr__(self):
-        return f"<modio.ModFile id={self.id} name={self.filename} version={self.version}>"
+        return f"<ModFile id={self.id} name={self.filename} version={self.version}>"
 
     def get_owner(self):
         """Returns the original submitter of the resource
@@ -271,7 +254,7 @@ class ModFile:
             raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
 
         file_json = self._client._put_request(f'/games/{self._game_id}/mods/{self.mod}/files/{self.id}', data = fields)
-        self.__init__(client=self._client, game_id=self._game_id, **file_json)
+        self.__init__(client=self._client, game_id=self.game, **file_json)
 
     def delete(self):
         """Deletes the modfile, this will raise an error if the
@@ -282,7 +265,7 @@ class ModFile:
         Forbidden
             You cannot delete the active release of a mod
         """
-        if not self._game_id:
+        if not self.game:
             raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
             
         r = self.client._delete_request(f'/games/{self._game_id}/mods/{self.mod}/files/{self.id}')
@@ -296,7 +279,7 @@ class ModFile:
         bool
             True if it's still valid, else False
         """
-        return self.download["date_expires"] <= time.time()
+        return self.expires.total_seconds() >= time.time()
 
 class ModMedia:
     """Represents all the media for a mod.
@@ -307,7 +290,7 @@ class ModMedia:
         A list of youtube links
     sketchfab : list[str]
         A list of SketchFab links
-    images : list[modio.Image]
+    images : list[Image]
         A list of image objects (gallery)
 
     """
@@ -342,12 +325,7 @@ class TagOption:
         self.tags = attrs.pop("tags", [])
 
     def __repr__(self):
-        return f"<modio.TagOption name={self.name} hidden={self.hidden}>"
-
-class RatingType(enum.Enum):
-    good    = 1
-    neutral = 0
-    bad     = -1
+        return f"<TagOption name={self.name} hidden={self.hidden}>"
 
 class Rating:
     """Represents a rating, objects obtained from the get_my_ratings endpoint
@@ -360,7 +338,7 @@ class Rating:
         The ID of the mod that was rated
     rating : RatingType
         The rating type
-    date : int
+    date : datetime.datetime
         UNIX timestamp of whe the rating was added
 
     """
@@ -368,7 +346,7 @@ class Rating:
         self.game = attrs.pop("game_id")
         self.mod = attrs.pop("mod_id")
         self.rating = RatingType(attrs.pop("rating"))
-        self.date = attrs.pop("date_added")
+        self.date = _convert_date(attrs.pop("date_added"))
         self._client = attrs.pop("client")
 
     def delete(self):
@@ -377,11 +355,10 @@ class Rating:
 
     def _add_rating(self, rating : RatingType):
         try:
-            checked = self._client._post_request(f'/games/{self.game}/mods/{self.mod}/ratings', data={"rating":rating.value})
+            self._client._post_request(f'/games/{self.game}/mods/{self.mod}/ratings', data={"rating":rating.value})
         except BadRequest:
             return False
 
-        self.get_stats()
         return True
 
     def add_positive_rating(self):
@@ -427,7 +404,7 @@ class Stats:
     text : str
         Textual representation of the rating in format. This is currently not updated
         by the lib so you'll have to poll the resource's endpoint again.
-    expires : int
+    expires : datetime.datetime
         Unix timestamp until this mods's statistics are considered stale. Endpoint
         should be polled again when this expires.
     """
@@ -437,7 +414,7 @@ class Stats:
         self.rank_total = attrs.pop("popularity_rank_total_mods")
         self.downloads = attrs.pop("downloads_total")
         self.subscribers = attrs.pop("subscribers_total")
-        self.expires = attrs.pop("date_expires")
+        self.expires = _convert_date(attrs.pop("date_expires"))
         self.total = attrs.pop("ratings_total")
         self.positive = attrs.pop("ratings_positive")
         self.negative = attrs.pop("ratings_negative")
@@ -446,7 +423,7 @@ class Stats:
         self.text = attrs.pop("ratings_display_text")
 
     def __repr__(self):
-        return f"<modio.Stats id={self.id} expired={self.is_stale()}>"
+        return f"<Stats id={self.id} expired={self.is_stale()}>"
 
     def is_stale(self):
         """Returns a bool depending on whether or not the stats are considered stale.
@@ -470,7 +447,7 @@ class Tag:
     of this class and takes filter arguments. They are not attached to the
     object itself and trying to access them will cause an AttributeError
 
-    date : int
+    date : datetime.datetime
         Unix timestamp of date tag was added.
     tag : str
         String representation of the tag.
@@ -504,9 +481,9 @@ class User:
         Subdomain name of the user. For example: https://mod.io/members/username-id-here. Filter attribute.
     username : str
         Name of the user. Filter attribute.
-    last_online : int
+    last_online : datetime.datetime
         Unix timestamp of date the user was last online.
-    avatar : modio.Image
+    avatar : Image
         Contains avatar data
     tz : str
         Timezone of the user, format is country/city. Filter attribute.
@@ -520,11 +497,11 @@ class User:
         self.id = attrs.pop("id")
         self.name_id = attrs.pop("name_id")
         self.username = attrs.pop("username")
-        self.last_online = attrs.pop("date_online")
+        self.last_online = _convert_date(attrs.pop("date_online"))
 
         avatar = attrs.pop("avatar")
 
-        if len(avatar.keys()) > 0:
+        if avatar.keys():
             self.avatar = Image(**avatar)
         else:
             self.avatar = None
@@ -535,7 +512,7 @@ class User:
         self._client = attrs.pop("client")
 
     def __repr__(self):
-        return f"<modio.User id={self.id} username={self.username}>"
+        return f"<User id={self.id} username={self.username}>"
 
     def report(self, name, summary, type = 0):
         """Report a this user, make sure to read mod.io's ToU to understand what is
@@ -548,13 +525,12 @@ class User:
         summary : str
             Detailed description of your report. Make sure you include all relevant information and 
             links to help moderators investigate and respond appropiately.
-        type : int
-            0 : Generic Report
-            1 : DMCA Report
+        type : Report
+            Type of the report
 
         Returns
         --------
-        modio.Message
+        Message
             The returned message on the success of the query.
 
         """
@@ -562,31 +538,16 @@ class User:
             "id" : self.id,
             "resource" :  "users",
             "name" : name,
-            "type" : type,
+            "type" : type.value,
             "summary" : summary
         }
 
         msg = self.client._post_request('/report', data = fields)
         return Message(**msg)
 
+@concat_docs
 class TeamMember(User):
-    """Inherits from modio.User. Represents a user as part of a team.
-    
-    Attributes
-    -----------
-    team_id : int
-        The id of the user in the context of their team, not the same as
-        user id. Filter attribute.
-    level : int
-        Level of permissions the user has. Filter attribute.
-        1 : Moderator
-        4 : Creator
-        8 : Administrator
-    date : int
-        Unix timestamp of the date the user was added to the team. Filter attribute.
-    position : str
-        Custom title given to the user in this team. Filter attribute.
-
+    """Inherits from User. Represents a user as part of a team.
     Filter-Only Attributes
     -----------------------
     These attributes can only be used at endpoints which return instances
@@ -597,6 +558,20 @@ class TeamMember(User):
         Unique id of the user.  
     username : str
         Username of the user. 
+    
+    Attributes
+    -----------
+    team_id : int
+        The id of the user in the context of their team, not the same as
+        user id. Filter attribute.
+    level : Level
+        Permission level of the user
+    date : datetime.datetime
+        Unix timestamp of the date the user was added to the team. Filter attribute.
+    position : str
+        Custom title given to the user in this team. Filter attribute.
+    mod : Mod
+        The mod object the team is attached to.
 
     """
     def __init__(self, **attrs):
@@ -606,32 +581,29 @@ class TeamMember(User):
         self.date = attrs.pop("date_added")
         self.position = attrs.pop("position")
         self._client = attrs.pop("client")
-        self._mod = attrs.pop("mod")
+        self.mod = attrs.pop("mod")
 
     def __repr__(self):
-        return f"<modio.TeamMember team_id={self.team_id} id={self.id} level={self.level}>"
+        return f"<TeamMember team_id={self.team_id} id={self.id} level={self.level}>"
 
     def edit(self, *, level=None, position=None):
         """Edit a team member's details.
 
         Parameters
         -----------
-        level : Optional[int]
-            Level of permissions the user has
-            1 : Moderator
-            4 : Creator
-            8 : Administrator
+        level : Optional[Level]
+            Level of permissions to grant the user
         position : Optional[str]
             Custom title given to the user in this team.
 
         """
-        data = {"level" : level, "position" : position}
-        msg = self._client._put_request(f'/games/{self._mod.game}/mods/{self._mod.id}/team/{self.team_id}', data=data)
+        data = {"level" : level.value, "position" : position}
+        msg = self._client._put_request(f'/games/{self.mod.game}/mods/{self._mod.id}/team/{self.team_id}', data=data)
         return Message(**msg)
 
     def delete(self):
         """Remove the user from the team. Fires a MOD_TEAM_CHANGED event"""
-        r = self._client._delete_request(f'/games/{self._mod.game}/mods/{self._mod.id}/team/{self.team_id}')
+        r = self._client._delete_request(f'/games/{self.mod.game}/mods/{self._mod.id}/team/{self.team_id}')
         return r
     
 
@@ -657,15 +629,8 @@ class NewMod:
     metadata : Optional[str]
         Metadata stored by developers which may include properties on how information 
         required. Optional.
-    maturity : int
+    maturity : Maturity
         Choose if the mod contains mature content. 
-        0 : None
-        1 : Alcohol
-        2 : Drugs
-        4 : Violence
-        8 : Explicit
-        ? : Above options can be added together to create custom settings (e.g 3 : 
-        alcohol and drugs present)
     """
     def __init__(self, **attrs):
         self.name = attrs.pop("name")
@@ -675,7 +640,7 @@ class NewMod:
         self.homepage = attrs.pop("homepage", None)
         self.metadata_blob = attrs.pop("metadata", None)
         self.stock = attrs.pop("stock", 0)
-        self.maturity_option = attrs.pop("maturity", 0)
+        self.maturity_option = attrs.pop("maturity", Maturity.none).value
         self.tags = []
 
     def add_tags(self, tags):
@@ -770,52 +735,6 @@ class Filter:
             self._set(key, value)
 
     def _set(self, key, value, text="{}"):
-        _lib_to_api = {
-            "date" : "date_added",
-            "metadata" : "metadata_blob",
-            "key" : "metakey",
-            "value" : "metavalue",
-            "maturity": "maturity_option",
-            "type" : "event_type",
-            "presentation" : "presentation_option",
-            "curation" : "curation_option",
-            "community" : "community_options",
-            "submission" : "submission_option",
-            "revenue" : "revenue_options",
-            "api" : "api_access_options",
-            "ugc" : "ugc_name",
-            "profile" : "profile_url",
-            "homepage" : "homepage_url",
-            "submitter" : "submitted_by",
-            "game" : "game_id",
-            "live" : "date_live",
-            "updated" : "date_updated",
-            "team_id" : "id",
-            "kvp" : "metadata_kvp",
-            "expires" : "date_expires",
-            "mod" : "mod_id",
-            "game" : "game_id",
-            "file" : "modfile",
-            "virus" : "virus_positive",
-            "size" : "filesize",
-            "hash" : "filehash",
-            "rank" : "popularity_rank_position",
-            "rank_total" : "popularity_rank_position",
-            "downloads" : "downloads_total",
-            "subscribers" : "subscribers_total",
-            "positive" : "ratings_positive",
-            "negative": "ratings_negative",
-            "sort_downloads" : "downloads",
-            "sort_popular" : "popular",
-            "sort_subscribers" : "subscribers",
-            "sort_rating" : "rating",
-            "member_id" : "id",
-            "parent" : "reply_id",
-            "position": "thread_position",
-            "tz" : "timezone",
-            "lang": "language"
-        }
-
         try:
             key = _lib_to_api[key]
         except KeyError:
@@ -826,6 +745,9 @@ class Filter:
                 value = f"MOD{'_' if value != EventType.file_changed else ''}{value.name.upper()}"
             else:
                 value = f"USER_{value.name.upper()}"
+
+        if isinstance(value, enum.Enum):
+            value = value.value
 
         self.__setattr__(text.format(key), value)
 
@@ -886,8 +808,8 @@ class Filter:
     def values_in(self, **kwargs):
         """Where the supplied list of values appears in the preceding column value. This is equivalent 
         to SQL's IN. There are not set parameters, this methods takes any named keywords and values as lists
-         and transforms them into arguments that will be passed to the request. 
-         E.g. 'id=[10, 3, 4]' or 'name=["Best","Mod"]'
+        and transforms them into arguments that will be passed to the request. 
+        E.g. 'id=[10, 3, 4]' or 'name=["Best","Mod"]'
         """
         for key, value in kwargs.items():
             self._set(key, ",".join(str(x) for x in value), "{}-in")
@@ -896,8 +818,8 @@ class Filter:
     def values_not_in(self, **kwargs):
         """Where the supplied list of values does NOT appears in the preceding column value. This is equivalent 
         to SQL's NOT IN. There are not set parameters, this methods takes any named keywords and values as lists
-         and transforms them into arguments that will be passed to the request. 
-         E.g. 'id=[10, 3, 4]' or 'name=["Best","Mod"]'
+        and transforms them into arguments that will be passed to the request. 
+        E.g. 'id=[10, 3, 4]' or 'name=["Best","Mod"]'
         """
         for key, value in kwargs.items():
             self._set(key, ",".join(str(x) for x in value), "{}-not-in")
@@ -952,7 +874,7 @@ class Filter:
     def sort(self, key, *, reverse=False):
         """Allows you to sort the results by the value of a top level column with a single value.
 
-        Paramters
+        Parameters
         ----------
         key : str
             The column by which to sort the results
@@ -1009,7 +931,7 @@ class Pagination:
         self.total = attrs.pop("result_total")
 
     def __repr__(self):
-        return f"<modio.Pagination count={self.count} limit={self.limit} offset={self.offset} total={self.total}>"
+        return f"<Pagination count={self.count} limit={self.limit} offset={self.offset} total={self.total}>"
 
     def max(self):
         """Returns True if there are no additional results after this set. Can fail if the returned count is coincidentally
@@ -1046,4 +968,3 @@ class Object:
 
     def __repr__(self):
         return str(self.__dict__)
-

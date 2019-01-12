@@ -44,15 +44,15 @@ class Client:
         Is 0 until the rate_remain is 0 and becomes 0 again once the rate limit is reset. 
     """
 
-    def __init__(self, **fields):
-        self.api_key = fields.pop("api_key", None)
-        self.access_token = fields.pop("auth", None)
-        self.lang = fields.pop("lang", "en")
-        self.version = fields.pop("version", "v1")
+    def __init__(self, *, api_key = None, auth = None, lang = "en", version = "v1", test = False):
+        self.api_key = api_key
+        self.access_token = auth
+        self.lang = lang
+        self.version = version
         self.rate_limit = None
         self.rate_remain = None
         self.rate_retry = 0
-        self._test = fields.pop("test", False)
+        self._test = test
         
         #check o auth 2 token
         if self.access_token:
@@ -69,7 +69,7 @@ class Client:
             return f"https://api.mod.io/{self.version}"
 
     def __repr__(self):
-        return f"<modio.Client rate_limit={self.rate_limit} rate_retry={self.rate_retry} rate_remain={self.rate_remain}>"
+        return f"<Client rate_limit={self.rate_limit} rate_retry={self.rate_retry} rate_remain={self.rate_remain}>"
     
     def _error_check(self, r):
         """Updates the rate-limit attributes and check validity of the request."""
@@ -166,7 +166,7 @@ class Client:
 
     def get_game(self, id : int):
         """Queries the mod.io API for the given game ID and if found returns it as a 
-        modio.Game instance. If not found raises NotFound
+        Game instance. If not found raises NotFound
 
         Parameters
         -----------
@@ -193,15 +193,15 @@ class Client:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
-        list[modio.Game]
-            A list of modio.Game instances
-        modio.Pagination
+        list[Game]
+            A list of Game instances
+        Pagination
             Pagination data       
         """
         game_json = self._get_request('/games', filter=filter)
@@ -235,15 +235,15 @@ class Client:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
-        list[modio.User]
-            A list of modio.User instances
-        modio.Pagination
+        list[User]
+            A list of User instances
+        Pagination
             Pagination data
                
         """
@@ -272,8 +272,8 @@ class Client:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Raises
@@ -283,9 +283,9 @@ class Client:
 
         Returns
         -------
-        list[modio.Mod]
-            A list of modio.Mod instances representing all mods the user is subscribed to
-        modio.Pagination
+        list[Mod]
+            A list of Mod instances representing all mods the user is subscribed to
+        Pagination
             Pagination data
         """
         mod_json = self._get_request("/me/subscribed", filter=filter)
@@ -297,15 +297,15 @@ class Client:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
-        list[modio.Events]
+        list[Events]
             list of events related to the user
-        modio.Pagination
+        Pagination
             Pagination data
         """
         events_json = self._get_request("/me/events", filter=filter)
@@ -317,8 +317,8 @@ class Client:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Raises
@@ -328,9 +328,9 @@ class Client:
 
         Returns
         -------
-        list[modio.Game]
-            A list of modio.Game instances representing all games the user is added or is team member of
-        modio.Pagination
+        list[Game]
+            A list of Game instances representing all games the user is added or is team member of
+        Pagination
             Pagination data
         """
         game_json = self._get_request("/me/games", filter=filter)
@@ -342,8 +342,8 @@ class Client:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Raises
@@ -353,9 +353,9 @@ class Client:
 
         Returns
         -------
-        list[modio.Mod]
-            A list of modio.Mod instances representing all mods the user is added or is team member of
-        modio.Pagination
+        list[Mod]
+            A list of Mod instances representing all mods the user is added or is team member of
+        Pagination
             Pagination data
         """
         mod_json = self._get_request("/me/mods", filter=filter)
@@ -368,8 +368,8 @@ class Client:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Raises
@@ -379,9 +379,9 @@ class Client:
 
         Returns
         -------
-        list[modio.ModFile]
-            A list of modio.ModFile instances representing all modfiles the user added.
-        modio.Pagination
+        list[ModFile]
+            A list of ModFile instances representing all modfiles the user added.
+        Pagination
             Pagination data
         """
         files_json = self._get_request("/me/files", filter=filter)
@@ -391,10 +391,10 @@ class Client:
         """Get all the ratings the authentitated user has submitted. Takes filtering arguments. Returns a named
         with parameter results and pagination.
 
-        Paramaters
+        Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Raises
@@ -404,9 +404,9 @@ class Client:
 
         Returns
         -------
-        list[modio.Rating]
-            A list of modio.Rating instances representing all ratings the user added.
-        modio.Pagination
+        list[Rating]
+            A list of Rating instances representing all ratings the user added.
+        Pagination
             Pagination data
         """
 

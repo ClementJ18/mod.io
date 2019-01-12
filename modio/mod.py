@@ -2,6 +2,7 @@ import time
 
 from .objects import *
 from .errors import modioException, BadRequest
+from .utils import _convert_date, _clean_and_convert
 
 class Mod:
     """Represent a modio mod object.
@@ -10,27 +11,21 @@ class Mod:
     -----------
     id : int
         ID of the mod. Filter attribute.
-    status : int
+    status : Status
         Status of the mod. Filter attribute.
-        0 : Not Accepted
-        1 : Accepted
-        2 : Archived (potentially out of date or incompatible)
-        3 : Deleted
-    visible : int
+    visible : Visibility
         Visibility of the mod. Filter attribute.
-        0 : Hidden
-        1 : Public
     game : int
         ID of the game the mod is for. Filter attribute.
-    submitter : modio.User
+    submitter : User
         Instance of the modio User that submitted the mod. Filter attribute.
-    date : int
+    date : datetime.datetime
         UNIX timestamp of the date the mod was registered. Filter attribute.
-    updated : int
+    updated : datetime.datetime
         UNIX timestamp of the date the mod was last updated. Filter attribute.
-    live : int
+    live : datetime.datetime
         UNIX timestamp of the date the mod went live. Filter attribute.
-    logo : modio.Image
+    logo : Image
         The mod logo
     homepage : str
         Link to the homepage of the mod, can be None. Filter attribute.
@@ -46,22 +41,15 @@ class Mod:
     metadata : str
         Metadata stored by developers which may include properties on how information 
         required. Can be None. Filter attribute.
-    maturity : int
+    maturity : Maturity
         Maturity option of the mod. Filter attribute.
-        0 : None
-        1 : Alcohol
-        2 : Drugs
-        4 : Violence
-        8 : Explicit
-        ? : Above options can be added together to create custom settings (e.g 3 : 
-        alcohol and drugs present)
     profile : str
         URL of the mod's modio profile
-    file : modio.ModFile
+    file : ModFile
         Latest release instance. Can be None. Filter attribute.
-    media : modio.ModMedia
+    media : ModMedia
         Contains mod media data (links and images)
-    rating : modio.Stats
+    rating : Stats
         Summary of all rating for this mod
     tags : dict
         Tags for this mod. Filter attribute.
@@ -93,12 +81,12 @@ class Mod:
     """
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
-        self.status = attrs.pop("status")
-        self.visible = attrs.pop("visible")
+        self.status = Status(attrs.pop("status"))
+        self.visible = Visibility(attrs.pop("visible"))
         self.game = attrs.pop("game_id")
-        self.date = attrs.pop("date_added")
-        self.updated = attrs.pop("date_updated")
-        self.live = attrs.pop("date_live")
+        self.date = _convert_date(attrs.pop("date_added"))
+        self.updated = _convert_date(attrs.pop("date_updated"))
+        self.live = _convert_date(attrs.pop("date_live"))
         self.logo = Image(**attrs.pop("logo"))
         self.homepage = attrs.pop("homepage_url", None)
         self.name = attrs.pop("name")
@@ -108,7 +96,7 @@ class Mod:
         self.metadata = attrs.pop("metadata_blob")
         self.profile = attrs.pop("profile_url")
         self.media = ModMedia(**attrs.pop("media"))
-        self.maturity = attrs.pop("maturity_option")
+        self.maturity = Maturity(attrs.pop("maturity_option"))
         self.stats = Stats(**attrs.pop("stats"))
         self.tags = {tag["name"] : tag["date_added"] for tag in attrs.pop("tags", [])}
         self._client = attrs.pop("client")
@@ -131,7 +119,7 @@ class Mod:
         return meta
 
     def __repr__(self):
-        return f"<modio.Mod id={self.id} name={self.name} game={self.game}>"   
+        return f"<Mod id={self.id} name={self.name} game={self.game}>"   
 
     def get_file(self, id : int):
         """Get the Mod File with the following ID
@@ -160,15 +148,15 @@ class Mod:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
         
         Returns
         --------
-        list[modio.ModFile]
+        list[ModFile]
             List of all modfiles for this mod
-        modio.Pagination
+        Pagination
             Pagination data
         """
         files_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/files", filter=filter)
@@ -180,15 +168,15 @@ class Mod:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
-        list[modio.Events]
+        list[Events]
             List of all the events for this mod
-        modio.Pagination
+        Pagination
             Pagination data
 
         """
@@ -201,20 +189,20 @@ class Mod:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
         dict{name : date_added}
             dict of tags with the names as keys and date_added as values
-        modio.Pagination
+        Pagination
             Pagination data
 
         """
         tag_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/tags", filter=filter)
-        self.tags = new_tags = {tag["name"] : tag["date_added"] for tag in tag_json["data"]}
+        self.tags = new_tags = {tag["name"] : _convert_date(tag["date_added"]) for tag in tag_json["data"]}
         return Returned(new_tags, Pagination(**tag_json))
 
     def get_metadata(self):
@@ -224,7 +212,7 @@ class Mod:
         --------
         dict{metakey : list[metavalue]}
             dict of metadata
-        modio.Pagination
+        Pagination
             Pagination data
         """
         meta_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/metadatakvp")
@@ -237,20 +225,20 @@ class Mod:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
         dict{id : date}
             dict of dependencies
-        modio.Pagination
+        Pagination
             Pagination data
 
         """
         depen_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/dependencies", filter=filter)
-        return Returned({dependecy["mod_id"] : dependecy["date_added"] for dependecy in depen_json["data"]}, Pagination(**depen_json))
+        return Returned({dependecy["mod_id"] : _convert_date(dependecy["date_added"]) for dependecy in depen_json["data"]}, Pagination(**depen_json))
 
     def get_team(self, *, filter=filter):
         """Returns a list of TeamMember object representing the Team in charge of the mod. Takes
@@ -258,15 +246,15 @@ class Mod:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
-        list[modio.TeamMember]
+        list[TeamMember]
             List of team members
-        modio.Pagination
+        Pagination
             Pagination data
 
         """
@@ -278,15 +266,15 @@ class Mod:
 
         Parameters
         -----------
-        filter : Optional[modio.Filter]
-            A instance of modio.Filter to be used for filtering, paginating and sorting 
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting 
             results
 
         Returns
         --------
-        list[modio.Comment]
+        list[Comment]
             List of comments.
-        modio.Pagination
+        Pagination
             Pagination data
         """
         comment_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/comments", filter=filter)
@@ -320,14 +308,10 @@ class Mod:
 
         Parameters
         -----------
-        status : int
+        status : Status
             For game admins only.
-            0 : Not accepted
-            1 : Accepted
-            2 : Archived
-        visible : int
-            0 : Hidden
-            1 : Public
+        visible : Visibility
+            Modify the game visibility
         name : str
             Name of the mod, cannot exceed 80 characters
         name_id : str
@@ -342,19 +326,13 @@ class Mod:
             URL to the official homepage for this mod.
         stock : str
             Maximium number of subscribers for this mod. A value of 0 disables this limit.
-        maturity : int
+        maturity : Maturity
             Maturity option of the mod. 
-            0 : None
-            1 : Alcohol
-            2 : Drugs
-            4 : Violence
-            8 : Explicit
-            ? : Above options can be added together to create custom settings (e.g 3 : 
-            alcohol and drugs present)
         metadata : str
                 Metadata stored by the mod developer which may include properties as to how 
                 the item works, or other information you need to display.
         """
+        fields = _clean_and_convert(fields)
         mod_json = self._client._put_request(f'/games/{self.game}/mods/{self.id}', data = fields)
         return self.__init__(self._client, **mod_json)
 
@@ -376,7 +354,7 @@ class Mod:
         Raises
         -------
         modioException
-            file argument must be type modio.NewModFile
+            file argument must be type NewModFile
 
         Returns
         --------
@@ -385,7 +363,7 @@ class Mod:
 
         """
         if not isinstance(file, NewModFile):
-            raise modioException("file argument must be type modio.NewModFile")
+            raise modioException("file argument must be type NewModFile")
 
         file_d = file.__dict__.copy()
         files = {"filedata" : file_d.pop("file")}
@@ -527,6 +505,7 @@ class Mod:
         no arguments will remove every tag from the mod.
 
         Parameters
+        -----------
         tags : list
             List of tags to remove, if no list is provided, will remove every tag from the mod.
 
@@ -579,16 +558,15 @@ class Mod:
 
         Example
         --------
-        mod.add_metadata(difficulty=["hard", "medium", "easy"])
+        `mod.add_metadata(difficulty=["hard", "medium", "easy"])`
             This will add the values "hard", "medium" and "easy" to the meta key "difficulty"
-        mod.add_metadata(**{"test-var": ["test1", "test2", "test3"]})
+        `mod.add_metadata(**{"test-var": ["test1", "test2", "test3"]})`
             This will add the values "test1", "test2" and "test3" to meta key "test-var"
 
         Returns
         --------
         Message
             message on the status of the successful added meta data
-
         """
         metadata_d = {}
         index = 0
@@ -677,16 +655,13 @@ class Mod:
         -----------
         email : str
             mod.io email of the user you wish to add
-        level : int
+        level : Level
             Level of permissions you grant the user
-            1 : Moderator
-            4 : Creator
-            8 : Administrator
         position : Optional[str]
             Title of the user position
 
         """
-        data = {"email" : email, "level" : level, "position" : position}
+        data = {"email" : email, "level" : level.value, "position" : position}
         msg = self._client._post_request(f'/games/{self.game}/mods/{self.id}/team', data=data)
         return Message(**msg)
 
@@ -701,13 +676,12 @@ class Mod:
         summary : str
             Detailed description of your report. Make sure you include all relevant information and 
             links to help moderators investigate and respond appropiately.
-        type : int
-            0 : Generic Report
-            1 : DMCA Report
+        type : Report
+            Type of the report
 
         Returns
         --------
-        modio.Message
+        Message
             The returned message on the success of the query.
 
         """
@@ -715,7 +689,7 @@ class Mod:
             "id" : self.id,
             "resource" :  "mods",
             "name" : name,
-            "type" : type,
+            "type" : type.value,
             "summary" : summary
         }
 
