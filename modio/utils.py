@@ -81,12 +81,41 @@ def get(iterable, **fields):
 
     return e_list
 
+# def flatten(comments):
+#     """
+#     Returns a 'flattened' list of comments where children of comments are added right
+#     after the parent comment so:
+    
+#     [ Comment1 ]
+#         ├── Comment2\n
+#             ├── Comment3\n
+#             └── Comment4\n
+#         └── Comment5
+
+#     would become:
+    
+#     [Comment1, Comment2, Comment3, Comment4, Comment5]
+    
+#     Returns
+#     --------
+#     list[Comment]
+#         The flattened list of comments
+#     """
+#     top_list = []
+#     for comment in comments:
+#         top_list.append(comment)
+#         for child in comment.children:
+#             top_list.append(child)
+#             top_list.extend(child.children)
+
+#     return top_list
+
 _lib_to_api = {
+    "maturity": "maturity_option",
     "date" : "date_added",
     "metadata" : "metadata_blob",
     "key" : "metakey",
     "value" : "metavalue",
-    "maturity": "maturity_option",
     "type" : "event_type",
     "presentation" : "presentation_option",
     "curation" : "curation_option",
@@ -147,4 +176,4 @@ def _clean_and_convert(fields):
     return new_fields
 
 def _convert_date(time):
-    return datetime.utcfromtimestamp(time)
+    return datetime.datetime.utcfromtimestamp(time)

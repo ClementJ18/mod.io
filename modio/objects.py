@@ -7,7 +7,20 @@ from collections import namedtuple
 import time
 
 
-Returned = namedtuple("Returned", "results pagination")
+_Returned = namedtuple("Returned", "results pagination")
+
+class Returned(_Returned):
+    """A named tuple returned by certain methods which return multiple results 
+    and need to return pagination data along with it. 
+
+    Attributes
+    ----------
+    results : List[Any]
+        The list of results returned
+    pagination : Pagination
+        Pagination metadata attached to the results
+    """
+    pass
 
 class Message:
     """A simple representation of a modio Message, used when modio returns
@@ -118,17 +131,17 @@ class Comment:
     -----------
     id : int
         ID of the comment. Filter attribute.
-    mod : id
-        ID of the mod this comment is from. Filter attribute.
-    submitter : User
+    mod : Mod
+        The mod the comment has been posted on. Filter attribute.
+    user : User
         Istance of the user that submitted the comment. Filter attribute.
     date : datetime.datetime
         Unix timestamp of date the comment was posted. Filter attribute.
     parent : int
         ID of the parent this comment is replying to. 0 if comment
         is not a reply. Filter attribute.
-    position : str
-        Level of nesting. Filter attribute. How it works:
+    position : int
+        The position of the comment. Filter attribute. How it works:
         - The first comment will have the position '01'.
         - The second comment will have the position '02'.
         - If someone responds to the second comment the position will be '02.01'.
@@ -139,6 +152,11 @@ class Comment:
         Total karma received from guests for this comment
     content : str
         Content of the comment. Filter attribute.
+    children : List[Comment]
+        List of comment replying to this one
+    level : int
+        The level of nesting from 1 to 3 where one is top level and three is
+        the deepest level
     """
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
@@ -146,19 +164,21 @@ class Comment:
         self.date = _convert_date(attrs.pop("date_added"))
         self.parent = attrs.pop("reply_id")
         self.position = attrs.pop("thread_position")
+        self.level = len(self.position.split("."))
         self.karma = attrs.pop("karma")
         self.karma_guest = attrs.pop("karma_guest")
         self.content = attrs.pop("content")
         self._client = attrs.pop("client")
-        self._mod = attrs.pop("mod")
-        self.submitter = User(client=self._client, **attrs.pop("submitter"))
+        self.mod = attrs.pop("mod")
+        self.submitter = User(client=self._client, **attrs.pop("user"))
+        self.children = []
 
     def __repr__(self):
-        return f"<Comment id={self.id} mod={self.mod}>"
+        return f"<Comment id={self.id} mod={self.mod.id}>"
 
     def delete(self):
         """Remove the comment"""
-        r = self._client._delete_request(f'/games/{self._mod.game}/mods/{self._mod.id}/comments/{self.id}')
+        r = self._client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}')
         return r
 
 class ModFile:
@@ -250,10 +270,13 @@ class ModFile:
             Metadata stored by the game developer which may include 
             properties such as what version of the game this file is compatible with.
         """
-        if not self._game_id:
+        if not self.game:
             raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
 
-        file_json = self._client._put_request(f'/games/{self._game_id}/mods/{self.mod}/files/{self.id}', data = fields)
+        file_json = self._client._put_request(f'/games/{self.game}/mods/{self.mod}/files/{self.id}', data = fields)
+        if "code" in file_json:
+            return
+
         self.__init__(client=self._client, game_id=self.game, **file_json)
 
     def delete(self):
@@ -268,10 +291,10 @@ class ModFile:
         if not self.game:
             raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
             
-        r = self.client._delete_request(f'/games/{self._game_id}/mods/{self.mod}/files/{self.id}')
+        r = self._client._delete_request(f'/games/{self.game}/mods/{self.mod}/files/{self.id}')
         return r
 
-    def url_expired(self):
+    def url_is_expired(self):
         """Check if the url is still valid for this modfile
 
         Returns
@@ -279,18 +302,18 @@ class ModFile:
         bool
             True if it's still valid, else False
         """
-        return self.expires.total_seconds() >= time.time()
+        return self.expires.timestamp() < time.time()
 
 class ModMedia:
     """Represents all the media for a mod.
 
     Attributes
     -----------
-    youtube : list[str]
+    youtube : List[str]
         A list of youtube links
-    sketchfab : list[str]
+    sketchfab : List[str]
         A list of SketchFab links
-    images : list[Image]
+    images : List[Image]
         A list of image objects (gallery)
 
     """
@@ -314,7 +337,7 @@ class TagOption:
     hidden : bool
         Whether or not the tag is only accessible to game admins, used
         for internal mod filtering.
-    tags : list[str]
+    tags : List[str]
         Array of tags for this group
 
     """
@@ -433,7 +456,7 @@ class Stats:
         bool
             True if stats are expired, False else.
         """
-        return time.time() <= self.expires
+        return self.expires.timestamp() < time.time()
 
 class Tag:
     """mod.io Tag objects are represented as dictionnaries and are returned
@@ -514,7 +537,7 @@ class User:
     def __repr__(self):
         return f"<User id={self.id} username={self.username}>"
 
-    def report(self, name, summary, type = 0):
+    def report(self, name, summary, type = Report(0)):
         """Report a this user, make sure to read mod.io's ToU to understand what is
         and isnt allowed.
 
@@ -542,7 +565,7 @@ class User:
             "summary" : summary
         }
 
-        msg = self.client._post_request('/report', data = fields)
+        msg = self._client._post_request('/report', data = fields)
         return Message(**msg)
 
 @concat_docs
@@ -575,12 +598,12 @@ class TeamMember(User):
 
     """
     def __init__(self, **attrs):
-        super().__init__(**attrs.pop("user"))
+        self._client = attrs.pop("client")
+        super().__init__(**attrs.pop("user"), client=self._client)
         self.team_id = attrs.pop("id")
         self.level = attrs.pop("level")
         self.date = attrs.pop("date_added")
         self.position = attrs.pop("position")
-        self._client = attrs.pop("client")
         self.mod = attrs.pop("mod")
 
     def __repr__(self):
@@ -598,12 +621,12 @@ class TeamMember(User):
 
         """
         data = {"level" : level.value, "position" : position}
-        msg = self._client._put_request(f'/games/{self.mod.game}/mods/{self._mod.id}/team/{self.team_id}', data=data)
+        msg = self._client._put_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}', data=data)
         return Message(**msg)
 
     def delete(self):
         """Remove the user from the team. Fires a MOD_TEAM_CHANGED event"""
-        r = self._client._delete_request(f'/games/{self.mod.game}/mods/{self._mod.id}/team/{self.team_id}')
+        r = self._client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}')
         return r
     
 
@@ -620,50 +643,44 @@ class NewMod:
         exceed 80 characters
     summary : str
         Brief overview of the mod, cannot exceed 250 characters.
-    description :str
+    description : Optional[str]
         Detailed description of the mod, supports HTML.
     homepage : Optional[str]
         Official homepage for your mod. Must be a valid URL. Optional
-    stock : int
+    stock : Optional[int]
         Maximium number of subscribers for this mod. Optional, if not included disables
     metadata : Optional[str]
         Metadata stored by developers which may include properties on how information 
-        required. Optional.
-    maturity : Maturity
-        Choose if the mod contains mature content. 
+        required. Optional. E.g. `"rogue,hd,high-res,4k,hd textures"`
+    maturity : Optional[Maturity]
+        Choose if the mod contains mature content.
+    visible : Optional[Visibility]
+        Visibility status of the mod 
+    logo : str
+        Path to the file. If on windows, must have \\ escaped.
     """
     def __init__(self, **attrs):
         self.name = attrs.pop("name")
         self.name_id = attrs.pop("name_id", None)
         self.summary = attrs.pop("summary")
-        self.description = attrs.pop("description")
+        self.description = attrs.pop("description", None)
         self.homepage = attrs.pop("homepage", None)
         self.metadata_blob = attrs.pop("metadata", None)
         self.stock = attrs.pop("stock", 0)
         self.maturity_option = attrs.pop("maturity", Maturity.none).value
-        self.tags = []
+        self.visible = attrs.pop("visible", Visibility.public).value
+        self.logo = attrs.pop("logo")
+        self.tags = set()
 
-    def add_tags(self, tags):
+    def add_tags(self, *tags):
         """Used to add tags to the mod, returns self for fluid chaining.
 
         Parameters
         -----------
-        tags : list[str]
+        tags : List[str]
             List of tags, duplicate tags will be ignord.
         """
-        self.tags += [tag for tag in tags if tag not in self.tags]
-
-        return self
-
-    def add_logo(self, path):
-        """Used to add a logo to the new mod, returns self for fluid chaining.
-
-        Parameters
-        -----------
-        path : str
-            Path to the file. If on windows, must have \\ escaped.
-        """
-        self.logo = open(path, "rb")
+        self.tags = self.tags | set(tags)
 
         return self
 
@@ -688,7 +705,7 @@ class NewModFile:
         self.version = attrs.pop("version")
         self.changelog = attrs.pop("changelog")
         self.active = attrs.pop("active", True)
-        self.metadata_blob = attrs.pop("metadata")
+        self.metadata_blob = attrs.pop("metadata", None)
 
     def _file_hash(self, file):
         hash_md5 = hashlib.md5()
@@ -700,13 +717,23 @@ class NewModFile:
     def add_file(self, path):
         """Used to add a file.
 
+        The binary file for the release. For compatibility you should 
+        ZIP the base folder of your mod, or if it is a collection of files 
+        which live in a pre-existing game folder, you should ZIP those files. 
+        Your file must meet the following conditions:
+
+            - File must be zipped and cannot exceed 10GB in filesize
+            - Mods which span multiple game directories are not supported 
+                unless the game manages this
+            - Mods which overwrite files are not supported unless the game manages this
+
         Parameters
         -----------
         path : str
             Path to file, if on windows must be \\ escaped.
 
         """
-        self.file = open(path, "rb")
+        self.file = path
         self.filehash = self._file_hash(path)
 
         return self

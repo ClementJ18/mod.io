@@ -154,10 +154,8 @@ class Mod:
         
         Returns
         --------
-        list[ModFile]
-            List of all modfiles for this mod
-        Pagination
-            Pagination data
+        Returned
+            The results and pagination tuple from this request
         """
         files_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/files", filter=filter)
         return Returned([ModFile(**file, game_id=self.game, client=self._client) for file in files_json["data"]], Pagination(**files_json))
@@ -174,10 +172,8 @@ class Mod:
 
         Returns
         --------
-        list[Events]
-            List of all the events for this mod
-        Pagination
-            Pagination data
+        Returned
+            The results and pagination tuple from this request
 
         """
         event_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/events", filter=filter)
@@ -195,10 +191,8 @@ class Mod:
 
         Returns
         --------
-        dict{name : date_added}
-            dict of tags with the names as keys and date_added as values
-        Pagination
-            Pagination data
+        Returned
+            The results and pagination tuple from this request
 
         """
         tag_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/tags", filter=filter)
@@ -210,10 +204,8 @@ class Mod:
 
         Returns
         --------
-        dict{metakey : list[metavalue]}
-            dict of metadata
-        Pagination
-            Pagination data
+        Returned
+            The results and pagination tuple from this request
         """
         meta_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/metadatakvp")
         self._kvp_raw = meta_json["data"]
@@ -231,10 +223,8 @@ class Mod:
 
         Returns
         --------
-        dict{id : date}
-            dict of dependencies
-        Pagination
-            Pagination data
+        Returned
+            The results and pagination tuple from this request
 
         """
         depen_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/dependencies", filter=filter)
@@ -252,17 +242,17 @@ class Mod:
 
         Returns
         --------
-        list[TeamMember]
-            List of team members
-        Pagination
-            Pagination data
+        Returned
+            The results and pagination tuple from this request
 
         """
         team_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/team", filter=filter)
         return Returned([TeamMember(**member, client=self._client, mod=self) for member in team_json["data"]], Pagination(**team_json))
 
     def get_comments(self, *, filter=None):
-        """Returns a list of all the comments for this mod. Takes filtering arguments
+        """Returns a list of all the top level comments for this mod wih comments replying
+        to top level comments stored in the children attribute. This can be flattened using
+        the utils.flatten function. Takes filtering arguments
 
         Parameters
         -----------
@@ -272,13 +262,25 @@ class Mod:
 
         Returns
         --------
-        list[Comment]
-            List of comments.
-        Pagination
-            Pagination data
+        Returned
+            The results and pagination tuple from this request
         """
         comment_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/comments", filter=filter)
         return Returned([Comment(**comment, client=self._client, mod=self) for comment in comment_json["data"]], Pagination(**comment_json))
+
+        # comments = []
+        # for comment_d in comment_json["data"]:
+        #     comment = Comment(**comment_d, client=self._client, mod=self)
+        #     try:
+        #         if comment.level == 1:
+        #             comments.append(comment)
+        #         elif comment.level == 2:
+        #             comments[-1].children.append(comment)
+        #         elif comment.level == 3:
+        #             comments[-1].children[-1].children.append(comment)
+        #     except IndexError:
+        #         comments.append(comment)
+
 
     def get_stats(self):
         """Returns a Stats object, representing a series of stats for the mod
@@ -334,7 +336,7 @@ class Mod:
         """
         fields = _clean_and_convert(fields)
         mod_json = self._client._put_request(f'/games/{self.game}/mods/{self.id}', data = fields)
-        return self.__init__(self._client, **mod_json)
+        return self.__init__(client=self._client, **mod_json)
 
     def delete(self):
         """Delete a mod and set its status to deleted."""
@@ -366,33 +368,31 @@ class Mod:
             raise modioException("file argument must be type NewModFile")
 
         file_d = file.__dict__.copy()
-        files = {"filedata" : file_d.pop("file")}
-        try:
-            file_json = self._client._post_request(f'/games/{self.game}/mods/{self.id}/files', h_type = 1, data = file_d, files=files)
-        finally:
-            file.file.close()
+        file_file = file_d.pop("file")
+
+        with open(file_file, "rb") as f:
+            file_json = self._client._post_request(f'/games/{self.game}/mods/{self.id}/files', h_type = 1, data = file_d, files={"filedata" : f})
 
         return ModFile(**file_json, game_id=self.game, client=self._client)
 
-    def add_media(self, **media):
+    def add_media(self, *, logo = None, images = [], youtube = [], sketchfab = []):
         """Upload new media to the mod.
 
         Parameters
         -----------
-        logo : str
+        logo : Optional[str]
             Path to the logo file. If on windows, must be \\ escaped. Image file which will represent 
             your mods logo. Must be gif, jpg or png format and cannot exceed 8MB in filesize. Dimensions 
             must be at least 640x360 and we recommended you supply a high resolution image with a 16 / 9 
             ratio. mod.io will use this logo to create three thumbnails with the dimensions of 320x180, 
             640x360 and 1280x720.
-        images : Union[str, list]
-            Can be either the path to a .zip file containing all the images or a list of paths to multiple
+        images : Optional[Union[str, list]]
+            Can be either the path to a file called .zip file containing all the images or a list of paths to multiple
             image files. If on windows, must be \\ escaped. Only valid gif, jpg and png images in the zip file 
-            will be processed. Alternatively you can POST one or more images to this endpoint and they will be 
-            detected and added to the mods gallery.
-        youtube : list[str]
+            will be processed. 
+        youtube : Optional[List[str]]
             List of youtube links to be added to the gallery
-        sketchfab : list[str]
+        sketchfab : Optional[List[str]]
             List of sketchfab links to the be added to the gallery.
 
         Returns
@@ -400,60 +400,57 @@ class Mod:
         Message
             A message confirming the submission of the media
         """
-        logo = media.pop("logo", None)
+        media = {}
+
         if logo:
             media["logo"] = open(logo, "rb")
 
-        images = media.pop("images", None)
         if isinstance(images, str):
-            images = {"images" : ("image.zip", open(images))}
+            images_d = {"images" : ("image.zip", open(images, "rb"))}
         elif isinstance(images, list):
-            images = {f"images[{images.index(image)}]" : open(image) for image in images}
+            images_d = {f"image{images.index(image)}" : open(image, "rb") for image in images}
             
-        yt = media.pop("youtube", [])
-        yt = {f"youtube[{yt.index(link)}]" : link for link in yt}
+        yt = {f"youtube[{youtube.index(link)}]" : link for link in youtube}
+        sketch = {f"sketchfab[{sketchfab.index(link)}]" : link for link in sketchfab}
 
-        sketch = media.pop("sketchfab", [])
-        sketch = {f"sketchfab[{yt.index(link)}]" : link for link in sketch}
-
-        media = {**media, **yt, **sketch, **images}
+        media = {**media, **images_d}
+        links = {**yt, **sketch}
 
         try:
-            media_json = self._client._post_request(f'/games/{self.game}/mods/{self.id}/media', h_type = 1, files = media)
+            media_json = self._client._post_request(f'/games/{self.game}/mods/{self.id}/media', h_type = 1, files = media, data = links)
         finally:
-            media["logo"].close()
-            for image in images.values():
-                image.close()
-
+            if logo:
+                media["logo"].close()
+            if isinstance(images, str):
+                images_d["images"][1].close()
+            elif isinstance(images, list):
+                for image in images_d.values():
+                    image.close()
 
         return Message(**media_json)
 
-    def delete_media(self, **media):
+    def delete_media(self, *, images = [], youtube = [], sketchfab = []):
         """Delete media from the mod page. 
 
         Parameters
         -----------
-        images : Optional[list[str]]
+        images : Optional[List[str]]
             Optional. List of image filenames that you want to delete
-        youtube : Optional[list[str]]
+        youtube : Optional[List[str]]
             Optional. List of youtube links that you want to delete
-        sketchfab : Optional[list[str]]
+        sketchfab : Optional[List[str]]
             Optional. List sketchfab links that you want to delete
         """
-        images = media.pop("images", [])
         images = {f"images[{images.index(image)}]" : image for image in images}
+        yt = {f"youtube[{youtube.index(link)}]" : link for link in youtube}
+        sketch = {f"sketchfab[{sketchfab.index(link)}]" : link for link in sketchfab}
+        fields = {**images, **yt, **sketch}
 
-        yt = media.pop("youtube", [])
-        yt = {f"youtube[{yt.index(link)}]" : link for link in yt}
-
-        sketch = media.pop("sketchfab", [])
-        sketch = {f"sketchfab[{sketch.index(link)}]" : link for link in sketch}
-
-        r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/media')
+        r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/media', data = fields)
         return r
 
     def subscribe(self):
-        """Subscribe to the mod. Returns None if user is already subsribed. 
+        """Subscribe to the mod. Returns None if user is already subscribed. 
 
         Returns
         --------
@@ -462,7 +459,7 @@ class Mod:
         """
         try:
             mod_json = self._client._post_request(f'/games/{self.game}/mods/{self.id}/subscribe')
-            return Mod(self._client, **mod_json)
+            return Mod(client=self._client, **mod_json)
         except BadRequest:
             pass
 
@@ -475,20 +472,20 @@ class Mod:
         except BadRequest:
             pass
 
-    def add_tags(self, tags : list):
+    def add_tags(self, *tags):
         """Add tags to a mod, tags are case insensitive and duplicates will be removed. Tags
         which are not in the game's tag_options will not be added.
 
         Parameters
         -----------
-        tags : list[str]
+        tags : List[str]
             list of tags to be added. 
 
         """
         self.get_tags()
         tags = list(set([tag.lower() for tag in tags if tag.lower() not in self.tags.keys()]))
         
-        if len(tags) < 1:
+        if not tags:
             raise modioException("No unique tags were submitted")
 
         fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags}
@@ -500,7 +497,7 @@ class Mod:
 
         return Message(**message)
 
-    def delete_tags(self, tags : list = None):
+    def delete_tags(self, *tags):
         """Delete tags from the mod, tags are case insensitive and duplicates will be removed. Providing
         no arguments will remove every tag from the mod.
 
@@ -516,10 +513,10 @@ class Mod:
         else:
             tags = list(self.tags.keys())
 
-        if len(tags) < 1:
+        if not tags:
             raise modioException("No unique tags were submitted")
 
-        fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags} if len(tags) > 0 else {"tags[]":""}
+        fields = {f"tags[{tags.index(tag)}]" : tag for tag in tags} if tags else {"tags[]":""}
 
         r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/tags', data = fields)
 
@@ -530,7 +527,7 @@ class Mod:
 
     def _add_rating(self, rating : RatingType):
         try:
-            checked = self._client._post_request(f'/games/{self.game}/mods/{self.id}/ratings', data={"rating":rating.value})
+            self._client._post_request(f'/games/{self.game}/mods/{self.id}/ratings', data={"rating":rating.value})
         except BadRequest:
             return False
 
@@ -609,7 +606,7 @@ class Mod:
         r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/metadatakvp', data=metadata_d)
 
         for key, values in metadata.items():
-            if len(values) == 0:
+            if not values:
                 self._kvp_raw = [x for x in self._kvp_raw if x["metakey"] != key]
             else:
                 self._kvp_raw = [x for x in self._kvp_raw if x["metakey"] != key and x["metavalue"] not in values]
@@ -618,18 +615,20 @@ class Mod:
 
     def add_dependencies(self, dependencies : list):
         """Add mod dependencies required by the corresponding mod. A dependency is a mod 
-        that should be installed for this mod to run. Since the API officially only supports
-        adding 5 dependencies at a time, passing more than 5 to this function will cause
-        additional requests for every 5 additional dependency.
-
+        that should be installed for this mod to run. 
         Parameters
         ----------
-        dependencies : list[int]
-            List of mod ids to submit as dependencies.
+        dependencies : List[Union[int, Mod]]
+            List of mod ids to submit as dependencies. 
 
         """
-        while len(dependencies) > 0:
-            dependency = {f"dependencies[{dependencies.index(data)}]" : data for data in dependencies[:5]}
+        #for future
+        # dependency = {f"dependencies[{dependencies.index(data)}]" : getattr(data, "id", data) for data in dependencies}
+        # r = self._client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependency)
+        # return Message(**r)
+
+        while dependencies:
+            dependency = {f"dependencies[{dependencies.index(data)}]" : getattr(data, "id", data) for data in dependencies[:5]}
             dependencies = dependencies[5:]
 
             r = self._client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependency)
@@ -641,14 +640,23 @@ class Mod:
 
         Parameters
         -----------
-        dependencies : list[int]
+        dependencies : List[Union[int, Mod]]
             List of dependencies to remove
         """
-        dependecy = {f"dependencies[{dependencies.index(data)}]" : data for data in dependencies}
-        r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependecy)
+        #for future
+        # dependency = {f"dependencies[{dependencies.index(data)}]" : getattr(data, "id", data) for data in dependencies}
+        # r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependency)
+        # return Message(**r)
+
+        r = None
+        while dependencies:
+            dependency = {f"dependencies[{dependencies.index(data)}]" : getattr(data, "id", data) for data in dependencies[:5]}
+            dependencies = dependencies[5:]
+            r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependency)
+        
         return r
 
-    def add_team_member(self, *, email, level, position=None):
+    def add_team_member(self, email, level, *, position=None):
         """Add a user to the mod team. Will fire a MOD_TEAM_CHANGED event.
 
         Parameters
@@ -665,7 +673,7 @@ class Mod:
         msg = self._client._post_request(f'/games/{self.game}/mods/{self.id}/team', data=data)
         return Message(**msg)
 
-    def report(self, name, summary, type = 0):
+    def report(self, name, summary, type = Report(0)):
         """Report a this mod, make sure to read mod.io's ToU to understand what is
         and isnt allowed.
 
@@ -693,6 +701,6 @@ class Mod:
             "summary" : summary
         }
 
-        msg = self.client._post_request('/report', data = fields)
+        msg = self._client._post_request('/report', data = fields)
         return Message(**msg)
 

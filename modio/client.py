@@ -56,7 +56,10 @@ class Client:
         
         #check o auth 2 token
         if self.access_token:
-            self.get_my_user()
+            try:
+                self.get_my_user()
+            except Forbidden:
+                raise Forbidden("Invalid token, are you using the right environment?")
         else:
             #check api key if no o auth 2
             self.get_games()
@@ -199,10 +202,8 @@ class Client:
 
         Returns
         --------
-        list[Game]
-            A list of Game instances
-        Pagination
-            Pagination data       
+        Returned
+            The results and pagination tuple from this request    
         """
         game_json = self._get_request('/games', filter=filter)
         return Returned([Game(client=self, **game) for game in game_json["data"]], Pagination(**game_json))
@@ -241,10 +242,8 @@ class Client:
 
         Returns
         --------
-        list[User]
-            A list of User instances
-        Pagination
-            Pagination data
+        Returned
+            The results and pagination tuple from this request
                
         """
         user_json = self._get_request("/users", filter=filter)
@@ -282,11 +281,9 @@ class Client:
             The access token is invalid/missing
 
         Returns
-        -------
-        list[Mod]
-            A list of Mod instances representing all mods the user is subscribed to
-        Pagination
-            Pagination data
+        --------
+        Returned
+            The results and pagination tuple from this request
         """
         mod_json = self._get_request("/me/subscribed", filter=filter)
         return Returned([Mod(client=self, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
@@ -303,10 +300,8 @@ class Client:
 
         Returns
         --------
-        list[Events]
-            list of events related to the user
-        Pagination
-            Pagination data
+        Returned
+            The results and pagination tuple from this request
         """
         events_json = self._get_request("/me/events", filter=filter)
         return Returned([Event(**event) for event in events_json["data"]], Pagination(**events_json))
@@ -327,11 +322,9 @@ class Client:
             The access token is invalid/missing
 
         Returns
-        -------
-        list[Game]
-            A list of Game instances representing all games the user is added or is team member of
-        Pagination
-            Pagination data
+        --------
+        Returned
+            The results and pagination tuple from this request
         """
         game_json = self._get_request("/me/games", filter=filter)
         return Returned([Game(client=self, **game) for game in game_json["data"]], Pagination(**game_json))
@@ -352,11 +345,9 @@ class Client:
             The access token is invalid/missing
 
         Returns
-        -------
-        list[Mod]
-            A list of Mod instances representing all mods the user is added or is team member of
-        Pagination
-            Pagination data
+        --------
+        Returned
+            The results and pagination tuple from this request
         """
         mod_json = self._get_request("/me/mods", filter=filter)
         return Returned([Mod(client=self, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
@@ -378,11 +369,9 @@ class Client:
             The access token is invalid/missing
 
         Returns
-        -------
-        list[ModFile]
-            A list of ModFile instances representing all modfiles the user added.
-        Pagination
-            Pagination data
+        --------
+        Returned
+            The results and pagination tuple from this request
         """
         files_json = self._get_request("/me/files", filter=filter)
         return Returned([ModFile(**file, client=self) for file in files_json["data"]], Pagination(**files_json))
@@ -403,11 +392,9 @@ class Client:
             The access token is invalid/missing
 
         Returns
-        -------
-        list[Rating]
-            A list of Rating instances representing all ratings the user added.
-        Pagination
-            Pagination data
+        --------
+        Returned
+            The results and pagination tuple from this request
         """
 
         ratings = self._get_request("/me/ratings", filter=filter)
@@ -455,5 +442,11 @@ class Client:
         r = self._post_request("/oauth/emailexchange", params={'security_code' : code, "api_key":self.api_key}, h_type=2)
         self.access_token = r["access_token"]
 
-        return r["access_token"]        
+        return r["access_token"]   
+
+    def steam_auth(self, code):
+        pass
+
+    def account_link(self, service, email):
+        pass     
         

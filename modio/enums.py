@@ -20,7 +20,7 @@ class Presentation(enum.Enum):
     grid  = 0
     table = 1
 
-class Submissions(enum.Enum):
+class Submission(enum.Enum):
     """
     0 : Mod uploads must occur via a tool created by the game developers
     1 : Mod uploads can occur from anywhere, including the website and API
