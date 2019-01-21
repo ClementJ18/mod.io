@@ -62,7 +62,7 @@ Installation
 -------------
 ::
 
-   pip install git+git://github.com/ClementJ18/mod.io.git@d500d733c07c20e40a49fa32452b905dcc85b160
+   pip install -U git+git://github.com/ClementJ18/mod.io.git@0.2
 
 
 .. toctree::
