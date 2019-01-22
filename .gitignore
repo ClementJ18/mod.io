@@ -1,17 +1,2 @@
-
-auth.txt
-moddb_wrapper/test.py
-archive/test.txt
-archive/layout_wrapper.txt
-archive/moddb_objects.py
-archive/objects.py
-archive/oo_layout.txt
 *.pyc
 test.py
-raw_docs
-client_test.py
-new_mod_gen.py
-async_modio
-build
-*.bat
-async_test.py

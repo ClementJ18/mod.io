@@ -1,0 +1,309 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Errors and Exceptions &#8212; mod.io 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Enumerators" href="enums.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-modio.errors">
+<span id="errors-and-exceptions"></span><h1>Errors and Exceptions<a class="headerlink" href="#module-modio.errors" title="Permalink to this headline">¶</a></h1>
+<dl class="exception">
+<dt id="modio.errors.BadRequest">
+<em class="property">exception </em><code class="descclassname">modio.errors.</code><code class="descname">BadRequest</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/errors.html#BadRequest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.errors.BadRequest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modio.errors.modioException" title="modio.errors.modioException"><code class="xref py py-class docutils literal notranslate"><span class="pre">modio.errors.modioException</span></code></a></p>
+<p>Server cannot process the request due to malformed syntax or invalid request message framing.</p>
+<dl class="attribute">
+<dt id="modio.errors.BadRequest.args">
+<code class="descname">args</code><a class="headerlink" href="#modio.errors.BadRequest.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.errors.BadRequest.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modio.errors.BadRequest.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="modio.errors.Forbidden">
+<em class="property">exception </em><code class="descclassname">modio.errors.</code><code class="descname">Forbidden</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/errors.html#Forbidden"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.errors.Forbidden" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modio.errors.modioException" title="modio.errors.modioException"><code class="xref py py-class docutils literal notranslate"><span class="pre">modio.errors.modioException</span></code></a></p>
+<p>You do not have permission to perform the requested action.</p>
+<dl class="attribute">
+<dt id="modio.errors.Forbidden.args">
+<code class="descname">args</code><a class="headerlink" href="#modio.errors.Forbidden.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.errors.Forbidden.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modio.errors.Forbidden.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="modio.errors.Gone">
+<em class="property">exception </em><code class="descclassname">modio.errors.</code><code class="descname">Gone</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/errors.html#Gone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.errors.Gone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modio.errors.modioException" title="modio.errors.modioException"><code class="xref py py-class docutils literal notranslate"><span class="pre">modio.errors.modioException</span></code></a></p>
+<p>The requested resource is no longer available.</p>
+<dl class="attribute">
+<dt id="modio.errors.Gone.args">
+<code class="descname">args</code><a class="headerlink" href="#modio.errors.Gone.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.errors.Gone.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modio.errors.Gone.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="modio.errors.MethodNotAllowed">
+<em class="property">exception </em><code class="descclassname">modio.errors.</code><code class="descname">MethodNotAllowed</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/errors.html#MethodNotAllowed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.errors.MethodNotAllowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modio.errors.modioException" title="modio.errors.modioException"><code class="xref py py-class docutils literal notranslate"><span class="pre">modio.errors.modioException</span></code></a></p>
+<p>The method of your request is incorrect.</p>
+<dl class="attribute">
+<dt id="modio.errors.MethodNotAllowed.args">
+<code class="descname">args</code><a class="headerlink" href="#modio.errors.MethodNotAllowed.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.errors.MethodNotAllowed.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modio.errors.MethodNotAllowed.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="modio.errors.NotAcceptable">
+<em class="property">exception </em><code class="descclassname">modio.errors.</code><code class="descname">NotAcceptable</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/errors.html#NotAcceptable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.errors.NotAcceptable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modio.errors.modioException" title="modio.errors.modioException"><code class="xref py py-class docutils literal notranslate"><span class="pre">modio.errors.modioException</span></code></a></p>
+<p>You supplied or requested an incorrect Content-Type.</p>
+<dl class="attribute">
+<dt id="modio.errors.NotAcceptable.args">
+<code class="descname">args</code><a class="headerlink" href="#modio.errors.NotAcceptable.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.errors.NotAcceptable.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modio.errors.NotAcceptable.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="modio.errors.NotFound">
+<em class="property">exception </em><code class="descclassname">modio.errors.</code><code class="descname">NotFound</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/errors.html#NotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.errors.NotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modio.errors.modioException" title="modio.errors.modioException"><code class="xref py py-class docutils literal notranslate"><span class="pre">modio.errors.modioException</span></code></a></p>
+<p>The resource requested could not be found.</p>
+<dl class="attribute">
+<dt id="modio.errors.NotFound.args">
+<code class="descname">args</code><a class="headerlink" href="#modio.errors.NotFound.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.errors.NotFound.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modio.errors.NotFound.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="modio.errors.TooManyRequests">
+<em class="property">exception </em><code class="descclassname">modio.errors.</code><code class="descname">TooManyRequests</code><span class="sig-paren">(</span><em>msg</em>, <em>retry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/errors.html#TooManyRequests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.errors.TooManyRequests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modio.errors.modioException" title="modio.errors.modioException"><code class="xref py py-class docutils literal notranslate"><span class="pre">modio.errors.modioException</span></code></a></p>
+<p>You have made too many requests, inspect headers for reset time</p>
+<dl class="attribute">
+<dt id="modio.errors.TooManyRequests.args">
+<code class="descname">args</code><a class="headerlink" href="#modio.errors.TooManyRequests.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.errors.TooManyRequests.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modio.errors.TooManyRequests.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="modio.errors.Unauthorized">
+<em class="property">exception </em><code class="descclassname">modio.errors.</code><code class="descname">Unauthorized</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/errors.html#Unauthorized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.errors.Unauthorized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modio.errors.modioException" title="modio.errors.modioException"><code class="xref py py-class docutils literal notranslate"><span class="pre">modio.errors.modioException</span></code></a></p>
+<p>Your API key/access token is incorrect.</p>
+<dl class="attribute">
+<dt id="modio.errors.Unauthorized.args">
+<code class="descname">args</code><a class="headerlink" href="#modio.errors.Unauthorized.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.errors.Unauthorized.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modio.errors.Unauthorized.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="modio.errors.UnprocessableEntity">
+<em class="property">exception </em><code class="descclassname">modio.errors.</code><code class="descname">UnprocessableEntity</code><span class="sig-paren">(</span><em>msg</em>, <em>errors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/errors.html#UnprocessableEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.errors.UnprocessableEntity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modio.errors.modioException" title="modio.errors.modioException"><code class="xref py py-class docutils literal notranslate"><span class="pre">modio.errors.modioException</span></code></a></p>
+<p>The request was well formed but unable to be followed due to semantic errors.</p>
+<dl class="attribute">
+<dt id="modio.errors.UnprocessableEntity.errors">
+<code class="descname">errors</code><a class="headerlink" href="#modio.errors.UnprocessableEntity.errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dict of parameters that returned an error and the error they returned</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.errors.UnprocessableEntity.args">
+<code class="descname">args</code><a class="headerlink" href="#modio.errors.UnprocessableEntity.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.errors.UnprocessableEntity.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modio.errors.UnprocessableEntity.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="modio.errors.modioException">
+<em class="property">exception </em><code class="descclassname">modio.errors.</code><code class="descname">modioException</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/errors.html#modioException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.errors.modioException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Base exception for the lib</p>
+<dl class="attribute">
+<dt id="modio.errors.modioException.args">
+<code class="descname">args</code><a class="headerlink" href="#modio.errors.modioException.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.errors.modioException.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modio.errors.modioException.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">mod.io</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="game.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mod.html">Mod</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objects.html">Misc mod.io Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="enums.html">Enumerators</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Errors and Exceptions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="enums.html" title="previous chapter">Enumerators</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Clement Julia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/errors.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

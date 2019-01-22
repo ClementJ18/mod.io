@@ -1,0 +1,527 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>modio.game &#8212; mod.io 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for modio.game</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.mod</span> <span class="k">import</span> <span class="n">Mod</span>
+<span class="kn">from</span> <span class="nn">.objects</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="k">import</span> <span class="n">modioException</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">_convert_date</span><span class="p">,</span> <span class="n">_clean_and_convert</span><span class="p">,</span> <span class="n">find</span>
+<span class="kn">from</span> <span class="nn">.enums</span> <span class="k">import</span> <span class="n">Submission</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+
+<div class="viewcode-block" id="Game"><a class="viewcode-back" href="../../game.html#modio.game.Game">[docs]</a><span class="k">class</span> <span class="nc">Game</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Represents an instance of a Game. Do not create manually.</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    -----------</span>
+<span class="sd">    id : int</span>
+<span class="sd">        ID of the game. Filter attribute.</span>
+<span class="sd">    status : Status</span>
+<span class="sd">        Status of the game. Filter attribute.</span>
+<span class="sd">    submitter : User</span>
+<span class="sd">        Instance of the modio user having submitted the game. Filter </span>
+<span class="sd">        attribute.</span>
+<span class="sd">    date : datetime.datetime</span>
+<span class="sd">        UNIX timestamp of the date the game was registered. Filter attribute.</span>
+<span class="sd">    updated : datetime.datetime</span>
+<span class="sd">        UNIX timestamp of the date the game was last updated. Filter attribute.</span>
+<span class="sd">    live : datetime.datetime</span>
+<span class="sd">        UNIX timestamp of the date the game went live. Filter attribute.</span>
+<span class="sd">    presentation : Presentation</span>
+<span class="sd">        Filter attribute.</span>
+<span class="sd">    submission : Submission</span>
+<span class="sd">        Filter attribute.</span>
+<span class="sd">    curation : Curation</span>
+<span class="sd">        Filter attribute.</span>
+<span class="sd">    community : Community</span>
+<span class="sd">        Filter attribute.</span>
+<span class="sd">    revenue : Revenue</span>
+<span class="sd">        Filter attribute.</span>
+<span class="sd">    api : APIAccess</span>
+<span class="sd">        Filter attribute.</span>
+<span class="sd">    maturity_options : MaturityOptions</span>
+<span class="sd">        Filter attribute.</span>
+<span class="sd">    ugc : str</span>
+<span class="sd">        Word used to describe user-generated content (mods, items, addons etc).</span>
+<span class="sd">        Filter attribute.</span>
+<span class="sd">    icon : Image</span>
+<span class="sd">        The game icon</span>
+<span class="sd">    logo : Image</span>
+<span class="sd">        The game logo</span>
+<span class="sd">    header : Image</span>
+<span class="sd">        The game header</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the game. Filter attribute.</span>
+<span class="sd">    name_id : str</span>
+<span class="sd">        sub_domain name for the game (https://name_id.mod.io). Filter attribute.</span>
+<span class="sd">    summary : str</span>
+<span class="sd">        Summary of the game. Filter attribute.</span>
+<span class="sd">    instructions : str</span>
+<span class="sd">        Instructions on uploading mods for this game, only applicable</span>
+<span class="sd">        if :attr:`submission` equals 0</span>
+<span class="sd">    instructions_url : str</span>
+<span class="sd">        Link to a mod.io guide, your modding wiki or a page where modders can learn how to </span>
+<span class="sd">        make and submit mods to your games profile. Filter attribute.</span>
+<span class="sd">    profile : str</span>
+<span class="sd">        URL to the game&#39;s mod.io page.</span>
+<span class="sd">    tag_options : List[TagOption]</span>
+<span class="sd">        List of tags from which mods can pick</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">_convert_date</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;date_added&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="n">_convert_date</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;date_updated&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">live</span> <span class="o">=</span> <span class="n">_convert_date</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;date_live&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">presentation</span> <span class="o">=</span> <span class="n">Presentation</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;presentation_option&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span> <span class="o">=</span> <span class="n">Submission</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;submission_option&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curation</span> <span class="o">=</span> <span class="n">Curation</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;curation_option&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">community</span> <span class="o">=</span> <span class="n">Community</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;community_options&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">revenue</span> <span class="o">=</span> <span class="n">Revenue</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;revenue_options&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">APIAccess</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;api_access_options&quot;</span><span class="p">,</span> <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ugc</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;ugc_name&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="o">**</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;icon&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logo</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="o">**</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;logo&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="o">**</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">homepage</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;homepage&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_id</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;name_id&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;instructions&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instructions_url</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;instructions_url&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profile</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;profile_url&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag_options</span> <span class="o">=</span> <span class="p">[</span><span class="n">TagOption</span><span class="p">(</span><span class="o">**</span><span class="n">tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tag_options&quot;</span><span class="p">,</span> <span class="p">[])]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maturity_options</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;maturity_options&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;client&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submitter</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;submitted_by&quot;</span><span class="p">))</span>
+        
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;&lt;Game id=</span><span class="si">{self.id}</span><span class="s1"> name=</span><span class="si">{self.name}</span><span class="s1">&gt;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">_all_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tag_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_options</span><span class="p">:</span>
+            <span class="n">tag_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">tag_list</span>
+
+
+<div class="viewcode-block" id="Game.get_mod"><a class="viewcode-back" href="../../game.html#modio.game.Game.get_mod">[docs]</a>    <span class="k">def</span> <span class="nf">get_mod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span> <span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Queries the mod.io API for the given mod ID and if found returns it as a </span>
+<span class="sd">        Mod instance. If not found raises NotFound</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        id : int</span>
+<span class="sd">            The ID of the mod to query the API for</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        NotFound</span>
+<span class="sd">            A mod with the supplied id was not found.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        :class: `Mod`</span>
+<span class="sd">            The mod with the given ID</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mod_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;/games/</span><span class="si">{self.id}</span><span class="s2">/mods/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Mod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">,</span> <span class="o">**</span><span class="n">mod_json</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Game.get_mods"><a class="viewcode-back" href="../../game.html#modio.game.Game.get_mods">[docs]</a>    <span class="k">def</span> <span class="nf">get_mods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets all the mods available for the game. Takes filtering arguments. Returns a </span>
+<span class="sd">        named tuple with parameters results and pagination.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request</span>
+<span class="sd">               </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mod_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;/games/</span><span class="si">{self.id}</span><span class="s2">/mods&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">Mod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">,</span> <span class="o">**</span><span class="n">mod</span><span class="p">)</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">mod_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">mod_json</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Game.get_mod_events"><a class="viewcode-back" href="../../game.html#modio.game.Game.get_mod_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_mod_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets all the mod events available for this game sorted by latest event first. Takes </span>
+<span class="sd">        filtering arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request</span>
+<span class="sd">               </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">event_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;/games/</span><span class="si">{self.id}</span><span class="s2">/mods/events&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">Event</span><span class="p">(</span><span class="o">**</span><span class="n">event</span><span class="p">)</span> <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">event_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">event_json</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Game.get_tag_options"><a class="viewcode-back" href="../../game.html#modio.game.Game.get_tag_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_tag_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets all the game tags available for this game. Takes filtering</span>
+<span class="sd">        arguments. Updates the tag_option attribute</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request</span>
+<span class="sd">               </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tag_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;/games/</span><span class="si">{self.id}</span><span class="s2">/tags&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag_options</span> <span class="o">=</span> <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">TagOption</span><span class="p">(</span><span class="o">**</span><span class="n">tag_option</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag_option</span> <span class="ow">in</span> <span class="n">tag_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">tag_json</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Game.get_stats"><a class="viewcode-back" href="../../game.html#modio.game.Game.get_stats">[docs]</a>    <span class="k">def</span> <span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the stat objects for all the mods of this game. Takes </span>
+<span class="sd">        filtering arguments</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stats_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;/games/</span><span class="si">{self.id}</span><span class="s2">/mods/stats&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">Stats</span><span class="p">(</span><span class="o">**</span><span class="n">stats</span><span class="p">)</span> <span class="k">for</span> <span class="n">stats</span> <span class="ow">in</span> <span class="n">stats_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">stats_json</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Game.get_owner"><a class="viewcode-back" href="../../game.html#modio.game.Game.get_owner">[docs]</a>    <span class="k">def</span> <span class="nf">get_owner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the original submitter of the resource</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        User</span>
+<span class="sd">            User that submitted the resource</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_post_request</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;/general/ownership&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;resource_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;games&quot;</span><span class="p">,</span> <span class="s2">&quot;resource_id&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">User</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">,</span> <span class="o">**</span><span class="n">user_json</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Game.edit"><a class="viewcode-back" href="../../game.html#modio.game.Game.edit">[docs]</a>    <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">fields</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Used to edit the game details. For editing the icon, logo or header use :func:`add_media`.</span>
+<span class="sd">        Sucessful editing will update the game instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        status : Status</span>
+<span class="sd">            Game status</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the game, cannot exceed 80 characters</span>
+<span class="sd">        name_id : str</span>
+<span class="sd">            Subdomain for the game, cannot exceed 20 characters</span>
+<span class="sd">        summary : str</span>
+<span class="sd">            Explaination of game mod support, cannot exceed 250 characters</span>
+<span class="sd">        instructions : str</span>
+<span class="sd">            Instructions and link creators should follow to upload mods.</span>
+<span class="sd">        instructions_url : str</span>
+<span class="sd">            Link to guide where modders can learn to make and submit mods</span>
+<span class="sd">        ugc_name : str</span>
+<span class="sd">            Word used to describe user-generated content (mods, items, addons etc).</span>
+<span class="sd">        presentation : Presentation</span>
+<span class="sd">            How to display the game&#39;s mods on modio</span>
+<span class="sd">        submission : Submissions</span>
+<span class="sd">            Pick how mods can be uploaded</span>
+<span class="sd">        curation : Curation</span>
+<span class="sd">            Pick moderation levels of mods</span>
+<span class="sd">        community : Community</span>
+<span class="sd">            Change the community options of mods</span>
+<span class="sd">        revenue : Revenue</span>
+<span class="sd">            Change the revenue settings for mods</span>
+<span class="sd">        api : APIAccess</span>
+<span class="sd">            Change the api access of the mods</span>
+<span class="sd">        maturity_options : MaturityOptions</span>
+<span class="sd">            Chose whether or not to allow mature content&quot;&quot;&quot;</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">_clean_and_convert</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+        <span class="n">game_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_put_request</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;/games/</span><span class="si">{self.id}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">,</span> <span class="o">**</span><span class="n">game_json</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Game.add_mod"><a class="viewcode-back" href="../../game.html#modio.game.Game.add_mod">[docs]</a>    <span class="k">def</span> <span class="nf">add_mod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mod</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a mod to this game.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        mod : NewMod</span>
+<span class="sd">            The mod to be submitted</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        modioException</span>
+<span class="sd">            Not instance of NewMod or submissions from 3rd party disabled</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            One of the requirements for a parameter has not been met.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Mod</span>
+<span class="sd">            The newly created mod</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">NewMod</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">modioException</span><span class="p">(</span><span class="s2">&quot;mod argument must be type NewMod&quot;</span><span class="p">)</span>
+
+        <span class="n">mod_d</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mod_d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tags&quot;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+            <span class="n">mod_d</span><span class="p">[</span><span class="n">f</span><span class="s2">&quot;tags[{tags.index(tag)}]&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mod_d</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;logo&quot;</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">mod_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_post_request</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;/games/</span><span class="si">{self.id}</span><span class="s1">/mods&#39;</span><span class="p">,</span> <span class="n">h_type</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mod_d</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;logo&quot;</span><span class="p">:</span> <span class="n">f</span><span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">Mod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">,</span> <span class="o">**</span><span class="n">mod_json</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Game.add_media"><a class="viewcode-back" href="../../game.html#modio.game.Game.add_media">[docs]</a>    <span class="k">def</span> <span class="nf">add_media</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">logo</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">icon</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Upload new media to to the game. This function can take between 1 to 3 arguments</span>
+<span class="sd">        depending on what media you desire to upload/update</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        logo : Optional[str]</span>
+<span class="sd">            Path to the file that you desire to be the game&#39;s logo. Dimensions must be at least </span>
+<span class="sd">            640x360 and we recommended you supply a high resolution image with a 16 / 9 ratio. mod.io </span>
+<span class="sd">            will use this logo to create three thumbnails with the dimensions of 320x180, 640x360 and </span>
+<span class="sd">            1280x720.</span>
+<span class="sd">        icon : Optional[str]</span>
+<span class="sd">            Path to the file that you desire to be the game&#39;s icon. Must be gif, jpg or png format </span>
+<span class="sd">            and cannot exceed 1MB in filesize. Dimensions must be at least 64x64 and a transparent </span>
+<span class="sd">            png that works on a colorful background is recommended. mod.io will use this icon to </span>
+<span class="sd">            create three thumbnails with the dimensions of 64x64, 128x128 and 256x256.</span>
+<span class="sd">        header : Optional[str]</span>
+<span class="sd">            Path to the file that you desire to be the game&#39;s header. Must be gif, jpg or png format </span>
+<span class="sd">            and cannot exceed 256KB in filesize. Dimensions of 400x100 and a light transparent png that </span>
+<span class="sd">            works on a dark background is recommended.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Message</span>
+<span class="sd">            A message containing the result of the query if successful.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">media</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">logo</span><span class="p">:</span>
+            <span class="n">media</span><span class="p">[</span><span class="s2">&quot;logo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">logo</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">icon</span><span class="p">:</span>
+            <span class="n">media</span><span class="p">[</span><span class="s2">&quot;icon&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">icon</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">header</span><span class="p">:</span>
+            <span class="n">media</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_post_request</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;/games/</span><span class="si">{self.id}</span><span class="s1">/media&#39;</span><span class="p">,</span> <span class="n">h_type</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">files</span> <span class="o">=</span> <span class="n">media</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">media</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">image</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">Message</span><span class="p">(</span><span class="o">**</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Game.add_tag_options"><a class="viewcode-back" href="../../game.html#modio.game.Game.add_tag_options">[docs]</a>    <span class="k">def</span> <span class="nf">add_tag_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tags</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">hidden</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="s1">&#39;dropdown&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add tags which mods can apply to their profiles. If the tag names already exists,</span>
+<span class="sd">        settings such as hidden or type will be overwritten to the values provided and all the </span>
+<span class="sd">        tags will be added to the group.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the tag group</span>
+<span class="sd">        type : Optional[str]</span>
+<span class="sd">            Defaults to dropdown</span>
+<span class="sd">            dropdown : Mods can select only one tag from this group, dropdown menu shown on site profile.</span>
+<span class="sd">            checkboxes : Mods can select multiple tags from this group, checkboxes shown on site profile.</span>
+<span class="sd">        hidden : Optional[bool]</span>
+<span class="sd">            Whether or not this group of tags should be hidden from users and mod devs. Defaults to False</span>
+<span class="sd">        tags : Optional[List[str]]</span>
+<span class="sd">            Array of tags that mod creators can apply to their mod</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="s2">&quot;tags[{tags.index(tag)}]&quot;</span> <span class="p">:</span> <span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">}</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">hidden</span><span class="p">),</span> <span class="o">**</span><span class="n">tags</span><span class="p">}</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_post_request</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;/games/</span><span class="si">{self.id}</span><span class="s1">/tags&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">tags</span><span class="p">)</span>
+
+        <span class="n">tag_option</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_options</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tag_option</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tag_options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TagOption</span><span class="p">(</span><span class="o">**</span><span class="n">tags</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag_option</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+            <span class="n">tag_option</span><span class="o">.</span><span class="n">hidden</span> <span class="o">=</span> <span class="n">hidden</span>
+            <span class="n">tag_option</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Message</span><span class="p">(</span><span class="o">**</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Game.delete_tag_options"><a class="viewcode-back" href="../../game.html#modio.game.Game.delete_tag_options">[docs]</a>    <span class="k">def</span> <span class="nf">delete_tag_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tags</span> <span class="o">=</span> <span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Delete one or more tags from a tag option</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the group from which you wish to delete from</span>
+<span class="sd">        tags : Optional[List[str]]</span>
+<span class="sd">            Optional. Tags to delete from group. If left blank the entire group will be</span>
+<span class="sd">            deleted</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Returns True if the tags were sucessfully removed, False if the requests was</span>
+<span class="sd">            sucessful but the tags was not removed (if the tag wasn&#39;t part of the option.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="s2">&quot;tags[{tags.index(tag)}]&quot;</span> <span class="p">:</span> <span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">}</span> <span class="k">if</span> <span class="n">tags</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;tags[]&quot;</span><span class="p">:</span><span class="s2">&quot;&quot;</span><span class="p">}</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_delete_request</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;/games/</span><span class="si">{self.id}</span><span class="s1">/tags&#39;</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+
+        <span class="n">option</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_options</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tags</span><span class="p">:</span>
+            <span class="n">option</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">option</span><span class="o">.</span><span class="n">tags</span> <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tag_options</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Game.report"><a class="viewcode-back" href="../../game.html#modio.game.Game.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">summary</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">Report</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;Report a this game, make sure to read mod.io&#39;s ToU to understand what is</span>
+<span class="sd">        and isnt allowed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the report</span>
+<span class="sd">        summary : str</span>
+<span class="sd">            Detailed description of your report. Make sure you include all relevant information and </span>
+<span class="sd">            links to help moderators investigate and respond appropiately.</span>
+<span class="sd">        type : Report</span>
+<span class="sd">            Report type</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Message</span>
+<span class="sd">            The returned message on the success of the query.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s2">&quot;resource&quot;</span> <span class="p">:</span>  <span class="s2">&quot;games&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="nb">type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;summary&quot;</span> <span class="p">:</span> <span class="n">summary</span>
+        <span class="p">}</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_post_request</span><span class="p">(</span><span class="s1">&#39;/report&#39;</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Message</span><span class="p">(</span><span class="o">**</span><span class="n">msg</span><span class="p">)</span></div></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">mod.io</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../client.html">Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../game.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mod.html">Mod</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../objects.html">Misc mod.io Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../filtering&amp;sorting.html">Filtering, Sorting and Pagination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../enums.html">Enumerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../errors.html">Errors and Exceptions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Clement Julia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

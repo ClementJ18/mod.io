@@ -1,0 +1,941 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Mod &#8212; mod.io 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Misc mod.io Models" href="objects.html" />
+    <link rel="prev" title="Games" href="game.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-modio.mod">
+<span id="mod"></span><h1>Mod<a class="headerlink" href="#module-modio.mod" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="modio.mod.Mod">
+<em class="property">class </em><code class="descclassname">modio.mod.</code><code class="descname">Mod</code><span class="sig-paren">(</span><em>**attrs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent a modio mod object.</p>
+<dl class="attribute">
+<dt id="modio.mod.Mod.id">
+<code class="descname">id</code><a class="headerlink" href="#modio.mod.Mod.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the mod. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.status">
+<code class="descname">status</code><a class="headerlink" href="#modio.mod.Mod.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Status of the mod. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="enums.html#modio.enums.Status" title="modio.enums.Status">Status</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.visible">
+<code class="descname">visible</code><a class="headerlink" href="#modio.mod.Mod.visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visibility of the mod. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="enums.html#modio.enums.Visibility" title="modio.enums.Visibility">Visibility</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.game">
+<code class="descname">game</code><a class="headerlink" href="#modio.mod.Mod.game" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the game the mod is for. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.submitter">
+<code class="descname">submitter</code><a class="headerlink" href="#modio.mod.Mod.submitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instance of the modio User that submitted the mod. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.User" title="modio.objects.User">User</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.date">
+<code class="descname">date</code><a class="headerlink" href="#modio.mod.Mod.date" title="Permalink to this definition">¶</a></dt>
+<dd><p>UNIX timestamp of the date the mod was registered. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.7)">datetime.datetime</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.updated">
+<code class="descname">updated</code><a class="headerlink" href="#modio.mod.Mod.updated" title="Permalink to this definition">¶</a></dt>
+<dd><p>UNIX timestamp of the date the mod was last updated. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.7)">datetime.datetime</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.live">
+<code class="descname">live</code><a class="headerlink" href="#modio.mod.Mod.live" title="Permalink to this definition">¶</a></dt>
+<dd><p>UNIX timestamp of the date the mod went live. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.7)">datetime.datetime</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.logo">
+<code class="descname">logo</code><a class="headerlink" href="#modio.mod.Mod.logo" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mod logo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Image" title="modio.objects.Image">Image</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.homepage">
+<code class="descname">homepage</code><a class="headerlink" href="#modio.mod.Mod.homepage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Link to the homepage of the mod, can be None. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.name">
+<code class="descname">name</code><a class="headerlink" href="#modio.mod.Mod.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the mod. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.name_id">
+<code class="descname">name_id</code><a class="headerlink" href="#modio.mod.Mod.name_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>sub_domain mod for the game (<a class="reference external" href="https://game_name.mod.io/name_id">https://game_name.mod.io/name_id</a>). Filter
+attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.summary">
+<code class="descname">summary</code><a class="headerlink" href="#modio.mod.Mod.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary of the mod. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.description">
+<code class="descname">description</code><a class="headerlink" href="#modio.mod.Mod.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detailed description of the mod, supports HTML. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.metadata">
+<code class="descname">metadata</code><a class="headerlink" href="#modio.mod.Mod.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Metadata stored by developers which may include properties on how information
+required. Can be None. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.maturity">
+<code class="descname">maturity</code><a class="headerlink" href="#modio.mod.Mod.maturity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maturity option of the mod. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="enums.html#modio.enums.Maturity" title="modio.enums.Maturity">Maturity</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.profile">
+<code class="descname">profile</code><a class="headerlink" href="#modio.mod.Mod.profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>URL of the mod’s modio profile</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.file">
+<code class="descname">file</code><a class="headerlink" href="#modio.mod.Mod.file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Latest release instance. Can be None. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.ModFile" title="modio.objects.ModFile">ModFile</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.media">
+<code class="descname">media</code><a class="headerlink" href="#modio.mod.Mod.media" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains mod media data (links and images)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.ModMedia" title="modio.objects.ModMedia">ModMedia</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.rating">
+<code class="descname">rating</code><a class="headerlink" href="#modio.mod.Mod.rating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary of all rating for this mod</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Stats" title="modio.objects.Stats">Stats</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.tags">
+<code class="descname">tags</code><a class="headerlink" href="#modio.mod.Mod.tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tags for this mod. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.kvp">
+<code class="descname">kvp</code><a class="headerlink" href="#modio.mod.Mod.kvp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains key-value metadata. Filter attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.mod.Mod.plaintext">
+<code class="descname">plaintext</code><a class="headerlink" href="#modio.mod.Mod.plaintext" title="Permalink to this definition">¶</a></dt>
+<dd><p>description field converted into plaintext.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Filter-Only Attributes</p>
+<p>These attributes can only be used at endpoints which return instances
+of this class and takes filter arguments. They are not attached to the
+object itself and trying to access them will cause an AttributeError</p>
+<dl class="docutils">
+<dt>sort_downloads <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Sort argument, provide to sort function to sort by most/least
+downloaded</dd>
+<dt>sort_popular <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Sort argument, provide to sort function to sort by most/least
+popular</dd>
+<dt>sort_rating <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Sort argument, provide to sort function to sort by weighed
+rating</dd>
+<dt>sort_subscribers <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Sort argument, provide to sort function to sort by most/least
+subscribers</dd>
+</dl>
+<dl class="method">
+<dt id="modio.mod.Mod.add_dependencies">
+<code class="descname">add_dependencies</code><span class="sig-paren">(</span><em>dependencies: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_dependencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add mod dependencies required by the corresponding mod. A dependency is a mod
+that should be installed for this mod to run.
+:param dependencies: List of mod ids to submit as dependencies.
+:type dependencies: List[Union[int, Mod]]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.add_file">
+<code class="descname">add_file</code><span class="sig-paren">(</span><em>file: modio.objects.NewModFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new file to the mod, to do so first construct an instance of NewModFile
+and then pass it to the function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file</strong> (<a class="reference internal" href="objects.html#modio.objects.NewModFile" title="modio.objects.NewModFile"><em>NewModFile</em></a>) – The mod file to upload</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">modioException</span></code> – file argument must be type NewModFile</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The modfile after being processed by the mod.io API</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.ModFile" title="modio.objects.ModFile">ModFile</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.add_media">
+<code class="descname">add_media</code><span class="sig-paren">(</span><em>*</em>, <em>logo=None</em>, <em>images=[]</em>, <em>youtube=[]</em>, <em>sketchfab=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_media"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_media" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload new media to the mod.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>logo</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em>) – Path to the logo file. If on windows, must be escaped. Image file which will represent
+your mods logo. Must be gif, jpg or png format and cannot exceed 8MB in filesize. Dimensions
+must be at least 640x360 and we recommended you supply a high resolution image with a 16 / 9
+ratio. mod.io will use this logo to create three thumbnails with the dimensions of 320x180,
+640x360 and 1280x720.</li>
+<li><strong>images</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>]</em><em>]</em>) – Can be either the path to a file called .zip file containing all the images or a list of paths to multiple
+image files. If on windows, must be escaped. Only valid gif, jpg and png images in the zip file
+will be processed.</li>
+<li><strong>youtube</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em><em>]</em>) – List of youtube links to be added to the gallery</li>
+<li><strong>sketchfab</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em><em>]</em>) – List of sketchfab links to the be added to the gallery.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A message confirming the submission of the media</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="objects.html#modio.objects.Message" title="modio.objects.Message">Message</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.add_metadata">
+<code class="descname">add_metadata</code><span class="sig-paren">(</span><em>**metadata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add metadate key-value pairs to the mod. To submit new meta data, pass meta data keys
+as keyword arguments and meta data value as a list of values. E.g pistol_dmg = [800, 400].
+Keys support alphanumeric, ‘-‘ and ‘_’. Total lengh of key and values cannot exceed 255
+characters. To add meta-keys which contain a dash in their name they must be passed as an
+upacked dictionnary.</p>
+<p class="rubric">Example</p>
+<dl class="docutils">
+<dt><cite>mod.add_metadata(difficulty=[“hard”, “medium”, “easy”])</cite></dt>
+<dd>This will add the values “hard”, “medium” and “easy” to the meta key “difficulty”</dd>
+<dt><cite>mod.add_metadata(**{“test-var”: [“test1”, “test2”, “test3”]})</cite></dt>
+<dd>This will add the values “test1”, “test2” and “test3” to meta key “test-var”</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">message on the status of the successful added meta data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Message" title="modio.objects.Message">Message</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.add_negative_rating">
+<code class="descname">add_negative_rating</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_negative_rating"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_negative_rating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a bad rating to the mod, the author of the rating will be the authenticated user.
+If the mod has already been rated by the user it will return False. If the negative rating
+is successful it will return True.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.add_positive_rating">
+<code class="descname">add_positive_rating</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_positive_rating"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_positive_rating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a good rating to the mod, the author of the rating will be the authenticated user.
+If the mod has already been rated by the user it will return False. If the positive rating
+is successful it will return True</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.add_tags">
+<code class="descname">add_tags</code><span class="sig-paren">(</span><em>*tags</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add tags to a mod, tags are case insensitive and duplicates will be removed. Tags
+which are not in the game’s tag_options will not be added.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tags</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em>) – list of tags to be added.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.add_team_member">
+<code class="descname">add_team_member</code><span class="sig-paren">(</span><em>email</em>, <em>level</em>, <em>*</em>, <em>position=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_team_member"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_team_member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a user to the mod team. Will fire a MOD_TEAM_CHANGED event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>email</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – mod.io email of the user you wish to add</li>
+<li><strong>level</strong> (<a class="reference internal" href="enums.html#modio.enums.Level" title="modio.enums.Level"><em>Level</em></a>) – Level of permissions you grant the user</li>
+<li><strong>position</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em>) – Title of the user position</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a mod and set its status to deleted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.delete_dependencies">
+<code class="descname">delete_dependencies</code><span class="sig-paren">(</span><em>dependencies: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.delete_dependencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.delete_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete mod dependecies required by this mod.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dependencies</strong> (<em>List</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><a class="reference internal" href="#modio.mod.Mod" title="modio.mod.Mod"><em>Mod</em></a><em>]</em><em>]</em>) – List of dependencies to remove</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.delete_media">
+<code class="descname">delete_media</code><span class="sig-paren">(</span><em>*</em>, <em>images=[]</em>, <em>youtube=[]</em>, <em>sketchfab=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.delete_media"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.delete_media" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete media from the mod page.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>images</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em><em>]</em>) – Optional. List of image filenames that you want to delete</li>
+<li><strong>youtube</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em><em>]</em>) – Optional. List of youtube links that you want to delete</li>
+<li><strong>sketchfab</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em><em>]</em>) – Optional. List sketchfab links that you want to delete</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.delete_metadata">
+<code class="descname">delete_metadata</code><span class="sig-paren">(</span><em>**metadata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.delete_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.delete_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes metadata from a mod. To do so pass the meta-key as a keyword argument and the
+meta-values you wish to delete as a list. You can pass an empty list in which case all
+meta-values for the meta-key will be deleted. To delete meta-keys which contain a dash in their
+name they must be passed as an upacked dictionnary.</p>
+<p class="rubric">Example</p>
+<dl class="docutils">
+<dt>mod.delete_metadata(difficulty=[“easy”])</dt>
+<dd>This will remove the value “easy” from the meta key “difficulty”</dd>
+<dt>mod.delete_metadata(difficulty=[])</dt>
+<dd>This will remove the meta key “difficulty”</dd>
+<dt>mod.delete_metadata(<a href="#id1"><span class="problematic" id="id2">**</span></a>{“test-var”: [“test1”]})</dt>
+<dd>This will remove the value “test1” from the meta key “test-var”</dd>
+<dt>mod.delete_metadata(<a href="#id3"><span class="problematic" id="id4">**</span></a>{“test-var”:[]})</dt>
+<dd>This will remove the meta key “test-var”</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.delete_tags">
+<code class="descname">delete_tags</code><span class="sig-paren">(</span><em>*tags</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.delete_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.delete_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete tags from the mod, tags are case insensitive and duplicates will be removed. Providing
+no arguments will remove every tag from the mod.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tags</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List of tags to remove, if no list is provided, will remove every tag from the mod.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.edit">
+<code class="descname">edit</code><span class="sig-paren">(</span><em>**fields</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.edit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.edit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to edit the mod details. Sucessful editing will update the mod instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>status</strong> (<a class="reference internal" href="enums.html#modio.enums.Status" title="modio.enums.Status"><em>Status</em></a>) – For game admins only.</li>
+<li><strong>visible</strong> (<a class="reference internal" href="enums.html#modio.enums.Visibility" title="modio.enums.Visibility"><em>Visibility</em></a>) – Modify the game visibility</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of the mod, cannot exceed 80 characters</li>
+<li><strong>name_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Subdomain for the mod, cannot exceed 80 characters</li>
+<li><strong>summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Summary of the mod, cannot exceed 250 characters</li>
+<li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Detailed description for your mod, which can include details such as
+‘About’, ‘Features’, ‘Install Instructions’, ‘FAQ’, etc. HTML supported
+and encouraged.</li>
+<li><strong>homepage</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – URL to the official homepage for this mod.</li>
+<li><strong>stock</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Maximium number of subscribers for this mod. A value of 0 disables this limit.</li>
+<li><strong>maturity</strong> (<a class="reference internal" href="enums.html#modio.enums.Maturity" title="modio.enums.Maturity"><em>Maturity</em></a>) – Maturity option of the mod.</li>
+<li><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Metadata stored by the mod developer which may include properties as to how
+the item works, or other information you need to display.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.get_comments">
+<code class="descname">get_comments</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_comments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_comments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of all the top level comments for this mod wih comments replying
+to top level comments stored in the children attribute. This can be flattened using
+the utils.flatten function. Takes filtering arguments</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.get_dependencies">
+<code class="descname">get_dependencies</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_dependencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict of dependency_id-date_added pairs. Takes filtering arguments. Returns
+a named tuple with parameters results and pagination.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.get_events">
+<code class="descname">get_events</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all events for that mod sorted by latest. Takes filtering arguments. Returns ,
+a named tuple with parameters results and pagination.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.get_file">
+<code class="descname">get_file</code><span class="sig-paren">(</span><em>id: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the Mod File with the following ID</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – ID of the mod file you wish to retrieve</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NotFound</span></code> – A mod with that ID has not been found</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The found modfile</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.ModFile" title="modio.objects.ModFile">ModFile</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.get_files">
+<code class="descname">get_files</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all mod files for this mod. Takes filtering arguments. Returns a named tuple
+with parameters results and pagination.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.get_metadata">
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict of metakey-metavalue pairs. This will also update the mod’s kvp attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.get_owner">
+<code class="descname">get_owner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_owner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_owner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the original submitter of the resource</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">User that submitted the resource</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.User" title="modio.objects.User">User</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.get_stats">
+<code class="descname">get_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Stats object, representing a series of stats for the mod</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The stats summary object for the mod.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Stats" title="modio.objects.Stats">Stats</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.get_tags">
+<code class="descname">get_tags</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all the tags for this mod. Takes filtering arguments. Updates the instance’s
+tag attribute. Returns a named tuple with parameters results and pagination.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.get_team">
+<code class="descname">get_team</code><span class="sig-paren">(</span><em>*</em>, <em>filter=&lt;class 'filter'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_team"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_team" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of TeamMember object representing the Team in charge of the mod. Takes
+filtering arguments</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">kvp</code></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.report">
+<code class="descname">report</code><span class="sig-paren">(</span><em>name</em>, <em>summary</em>, <em>type=&lt;Report.generic: 0&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report a this mod, make sure to read mod.io’s ToU to understand what is
+and isnt allowed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of the report</li>
+<li><strong>summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Detailed description of your report. Make sure you include all relevant information and
+links to help moderators investigate and respond appropiately.</li>
+<li><strong>type</strong> (<a class="reference internal" href="enums.html#modio.enums.Report" title="modio.enums.Report"><em>Report</em></a>) – Type of the report</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The returned message on the success of the query.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="objects.html#modio.objects.Message" title="modio.objects.Message">Message</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.subscribe">
+<code class="descname">subscribe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.subscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.subscribe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subscribe to the mod. Returns None if user is already subscribed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The mod that was just subscribed to, if the user was already subscribed it will return None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#modio.mod.Mod" title="modio.mod.Mod">Mod</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.mod.Mod.unsubscribe">
+<code class="descname">unsubscribe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.unsubscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.unsubscribe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unsubscribe from a mod. Returns None if the user is not subscribed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">mod.io</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="game.html">Games</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Mod</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objects.html">Misc mod.io Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="enums.html">Enumerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and Exceptions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="game.html" title="previous chapter">Games</a></li>
+      <li>Next: <a href="objects.html" title="next chapter">Misc mod.io Models</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Clement Julia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/mod.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

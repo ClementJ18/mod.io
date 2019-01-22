@@ -1,0 +1,470 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Client &#8212; mod.io 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Games" href="game.html" />
+    <link rel="prev" title="Welcome to modio’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="client">
+<h1>Client<a class="headerlink" href="#client" title="Permalink to this headline">¶</a></h1>
+<p>The Client object is the base class from which all the requests are made, this is where you can get your games, authentify and get the models for your authenticated user.</p>
+<span class="target" id="module-modio.client"></span><dl class="class">
+<dt id="modio.client.Client">
+<em class="property">class </em><code class="descclassname">modio.client.</code><code class="descname">Client</code><span class="sig-paren">(</span><em>*</em>, <em>api_key=None</em>, <em>auth=None</em>, <em>lang='en'</em>, <em>version='v1'</em>, <em>test=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represents the base-level client to make requests to the mod.io API with. Upon
+initializiation the Client will confirm the api key and O Auth 2 token.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>api_key</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em>) – The api key that will be used to authenticate the bot while it makes most of
+its GET requests. This can be generated on the mod.io website. Optional if an access
+token is supplied.</li>
+<li><strong>auth</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em>) – The O Auth 2 token that will be used to make more complex GET requests and to make
+POST requests. This can either be generated using the library’s oauth2 functions
+or through the mod.io website. This is referred as an access token in the rest of
+the documentation. If an access token is supplied it will be used for all requests.</li>
+<li><strong>lang</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em>) – The mod.io API provides localization for a collection of languages. To specify
+responses from the API to be in a particular language, simply provide the lang
+parameter with an ISO 639 compliant language code. Default is US English.</li>
+<li><strong>test</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>]</em>) – Whether or not to use the mod.io test environment. If not included will default to False.</li>
+<li><strong>version</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em>) – An optional keyword argument to allow you to pick a specific version of the API to query,
+usually you shouldn’t need to change this. Default is the latest supported version.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="modio.client.Client.rate_limit">
+<code class="descname">rate_limit</code><a class="headerlink" href="#modio.client.Client.rate_limit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of requests that can be made using the supplied API Key/access token.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.client.Client.rate_remain">
+<code class="descname">rate_remain</code><a class="headerlink" href="#modio.client.Client.rate_remain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of requests remaining. Once this number hits 0 the requests will become
+rejected and the library will sleep until the limit resets then raise 429 TooManyRequests.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.client.Client.rate_retry">
+<code class="descname">rate_retry</code><a class="headerlink" href="#modio.client.Client.rate_retry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of seconds until the rate limits are reset for this API Key/access token.
+Is 0 until the rate_remain is 0 and becomes 0 again once the rate limit is reset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="modio.client.Client.BASE_PATH">
+<code class="descname">BASE_PATH</code><a class="headerlink" href="#modio.client.Client.BASE_PATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.account_link">
+<code class="descname">account_link</code><span class="sig-paren">(</span><em>service</em>, <em>email</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.account_link"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.account_link" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.email_exchange">
+<code class="descname">email_exchange</code><span class="sig-paren">(</span><em>code: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.email_exchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.email_exchange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exchanges the given 5-digit code for an OAuth2 token.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>code</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – A 5-digit code received by email less than 15 minutes ago</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">Unauthorized</span></code> – Invalid security code</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – Security code was not 5 digits long</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The access code. The access code will also be added directly to the Client’s <cite>access_token</cite>
+attribute.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.email_request">
+<code class="descname">email_request</code><span class="sig-paren">(</span><em>email: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.email_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.email_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Posts an email request for an OAuth2 token. A code will be sent to the given email address
+which can then be entered into <a class="reference internal" href="#modio.client.Client.email_exchange" title="modio.client.Client.email_exchange"><code class="xref py py-func docutils literal notranslate"><span class="pre">email_exchange()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>email</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A valid email to which the 5-digit code will be sent</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.get_game">
+<code class="descname">get_game</code><span class="sig-paren">(</span><em>id: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_game"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_game" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the mod.io API for the given game ID and if found returns it as a
+Game instance. If not found raises NotFound</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The ID of the game to query the API for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NotFound</span></code> – A game with the supplied id was not found.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The game with the given ID</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="game.html#modio.game.Game" title="modio.game.Game">Game</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.get_games">
+<code class="descname">get_games</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_games"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_games" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all the games available on mod.io. Takes filtering arguments. Returns a
+named tuple with parameters results and pagination.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.get_my_events">
+<code class="descname">get_my_events</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get events that have been fired specifically for the authenticated user. Takes
+filtering argmuments</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.get_my_games">
+<code class="descname">get_my_games</code><span class="sig-paren">(</span><em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_games"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_games" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all the games the authenticated user added or is a team member of. Takes
+filtering arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Forbidden</span></code> – The access token is invalid/missing</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.get_my_modfiles">
+<code class="descname">get_my_modfiles</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_modfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_modfiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all the mods the authenticated user uploaded. The returned modfile objects cannot be
+edited or deleted and do not have a <cite>game_id</cite> attribute. Takes filtering arguments. Returns
+a named tuple with parameters results and pagination.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Forbidden</span></code> – The access token is invalid/missing</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.get_my_mods">
+<code class="descname">get_my_mods</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_mods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_mods" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all the mods the authenticated user added or is a team member of. Takes
+filtering arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Forbidden</span></code> – The access token is invalid/missing</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.get_my_ratings">
+<code class="descname">get_my_ratings</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_ratings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_ratings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all the ratings the authentitated user has submitted. Takes filtering arguments. Returns a named
+with parameter results and pagination.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Forbidden</span></code> – The access token is invalid/missing</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.get_my_subs">
+<code class="descname">get_my_subs</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_subs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_subs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all the mods the authenticated user is subscribed to.  Takes
+filtering arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Forbidden</span></code> – The access token is invalid/missing</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.get_my_user">
+<code class="descname">get_my_user</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the authenticated user’s details (aka the user who created the API key/access token)
+:raises: <code class="xref py py-exc docutils literal notranslate"><span class="pre">Forbidden</span></code> – The access token is invalid/missing</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The authenticated user</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.User" title="modio.objects.User">User</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.get_user">
+<code class="descname">get_user</code><span class="sig-paren">(</span><em>id: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a user with the specified ID.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The ID of the user to query the API for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NotFound</span></code> – A user with the supplied id was not found.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The user with the given ID</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.User" title="modio.objects.User">User</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.get_users">
+<code class="descname">get_users</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_users"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_users" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all the users availaible on mod.io. Takes filtering arguments. Returns
+a named tuple with parameters results and pagination.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="objects.html#modio.objects.Filter" title="modio.objects.Filter"><em>Filter</em></a><em>]</em>) – A instance of Filter to be used for filtering, paginating and sorting
+results</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The results and pagination tuple from this request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.Returned" title="modio.objects.Returned">Returned</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modio.client.Client.steam_auth">
+<code class="descname">steam_auth</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.steam_auth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.steam_auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">mod.io</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="game.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mod.html">Mod</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objects.html">Misc mod.io Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="enums.html">Enumerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and Exceptions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to modio’s documentation!</a></li>
+      <li>Next: <a href="game.html" title="next chapter">Games</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Clement Julia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/client.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

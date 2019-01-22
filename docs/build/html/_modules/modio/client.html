@@ -1,0 +1,553 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>modio.client &#8212; mod.io 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for modio.client</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">.game</span> <span class="k">import</span> <span class="n">Game</span>
+<span class="kn">from</span> <span class="nn">.mod</span> <span class="k">import</span> <span class="n">Mod</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.objects</span> <span class="k">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="Client"><a class="viewcode-back" href="../../client.html#modio.client.Client">[docs]</a><span class="k">class</span> <span class="nc">Client</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Represents the base-level client to make requests to the mod.io API with. Upon</span>
+<span class="sd">    initializiation the Client will confirm the api key and O Auth 2 token.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    api_key : Optional[str]</span>
+<span class="sd">        The api key that will be used to authenticate the bot while it makes most of </span>
+<span class="sd">        its GET requests. This can be generated on the mod.io website. Optional if an access </span>
+<span class="sd">        token is supplied.</span>
+<span class="sd">    auth : Optional[str]</span>
+<span class="sd">        The O Auth 2 token that will be used to make more complex GET requests and to make</span>
+<span class="sd">        POST requests. This can either be generated using the library&#39;s oauth2 functions</span>
+<span class="sd">        or through the mod.io website. This is referred as an access token in the rest of</span>
+<span class="sd">        the documentation. If an access token is supplied it will be used for all requests.</span>
+<span class="sd">    lang : Optional[str]</span>
+<span class="sd">        The mod.io API provides localization for a collection of languages. To specify </span>
+<span class="sd">        responses from the API to be in a particular language, simply provide the lang </span>
+<span class="sd">        parameter with an ISO 639 compliant language code. Default is US English.</span>
+<span class="sd">    test : Optional[bool]</span>
+<span class="sd">        Whether or not to use the mod.io test environment. If not included will default to False.</span>
+<span class="sd">    version : Optional[str]</span>
+<span class="sd">        An optional keyword argument to allow you to pick a specific version of the API to query,</span>
+<span class="sd">        usually you shouldn&#39;t need to change this. Default is the latest supported version.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    -----------</span>
+<span class="sd">    rate_limit : int</span>
+<span class="sd">        Number of requests that can be made using the supplied API Key/access token.</span>
+<span class="sd">    rate_remain : int</span>
+<span class="sd">        Number of requests remaining. Once this number hits 0 the requests will become </span>
+<span class="sd">        rejected and the library will sleep until the limit resets then raise 429 TooManyRequests.</span>
+<span class="sd">    rate_retry : int</span>
+<span class="sd">        Number of seconds until the rate limits are reset for this API Key/access token.</span>
+<span class="sd">        Is 0 until the rate_remain is 0 and becomes 0 again once the rate limit is reset. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">api_key</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">auth</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">lang</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;v1&quot;</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">api_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="o">=</span> <span class="n">auth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate_remain</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate_retry</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_test</span> <span class="o">=</span> <span class="n">test</span>
+        
+        <span class="c1">#check o auth 2 token</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_my_user</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">Forbidden</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">Forbidden</span><span class="p">(</span><span class="s2">&quot;Invalid token, are you using the right environment?&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#check api key if no o auth 2</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_games</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">BASE_PATH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;https://api.test.mod.io/</span><span class="si">{self.version}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;https://api.mod.io/</span><span class="si">{self.version}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;&lt;Client rate_limit=</span><span class="si">{self.rate_limit}</span><span class="s2"> rate_retry=</span><span class="si">{self.rate_retry}</span><span class="s2"> rate_remain=</span><span class="si">{self.rate_remain}</span><span class="s2">&gt;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">_error_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Updates the rate-limit attributes and check validity of the request.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X-RateLimit-Limit&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate_remain</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X-RateLimit-Remaining&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_remain</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate_retry</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X-Ratelimit-RetryAfter&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">204</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">r</span>
+
+        <span class="n">request_json</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">request_json</span><span class="p">:</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">request_json</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">][</span><span class="s2">&quot;code&quot;</span><span class="p">]</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">request_json</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">][</span><span class="s2">&quot;message&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">400</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BadRequest</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">Unauthorized</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">403</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">Forbidden</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">NotFound</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">405</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MethodNotAllowed</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">406</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">NotAcceptable</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">410</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">Gone</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">422</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;errors&quot;</span> <span class="ow">in</span> <span class="n">request_json</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]:</span>
+                    <span class="n">errors</span> <span class="o">=</span> <span class="n">request_json</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">][</span><span class="s2">&quot;errors&quot;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">errors</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">raise</span> <span class="n">UnprocessableEntity</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">429</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">TooManyRequests</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_retry</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rate_retry</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">modioException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">request_json</span>
+
+    <span class="k">def</span> <span class="nf">_define_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">h_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">#regular O auth 2 header when submitting data</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+              <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;Bearer &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">,</span>
+              <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/x-www-form-urlencoded&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;Accept-Language&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="n">h_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1">#o auth 2 header for submitting multipart/data, had to remove Content-Type</span>
+            <span class="c1">#because it is already added by the requests lib when defining a files parameter</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+              <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;Bearer &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">,</span>
+              <span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;Accept-Language&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="n">h_type</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1">#header to use when making calls using the api key, the key itself is added in</span>
+            <span class="c1">#the parameters in the methods below</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+              <span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;Accept-Language&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">,</span>
+              <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/x-www-form-urlencoded&#39;</span>
+            <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">headers</span>
+
+    <span class="k">def</span> <span class="nf">_get_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">h_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">fields</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filter&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">filter</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span> <span class="k">if</span> <span class="n">f</span> <span class="k">else</span> <span class="n">Filter</span><span class="p">())</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">fields</span><span class="p">,</span> <span class="o">**</span><span class="nb">filter</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">:</span>
+            <span class="n">extra</span><span class="p">[</span><span class="s2">&quot;api_key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span>
+            <span class="n">h_type</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="n">r</span>  <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BASE_PATH</span> <span class="o">+</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_define_headers</span><span class="p">(</span><span class="n">h_type</span><span class="p">),</span> <span class="n">params</span><span class="o">=</span><span class="n">extra</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_check</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_post_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">h_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">fields</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BASE_PATH</span> <span class="o">+</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_define_headers</span><span class="p">(</span><span class="n">h_type</span><span class="p">),</span> <span class="o">**</span><span class="n">fields</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_check</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_put_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">h_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">fields</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BASE_PATH</span> <span class="o">+</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_define_headers</span><span class="p">(</span><span class="n">h_type</span><span class="p">),</span> <span class="o">**</span><span class="n">fields</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_check</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_delete_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">h_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">fields</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BASE_PATH</span> <span class="o">+</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_define_headers</span><span class="p">(</span><span class="n">h_type</span><span class="p">),</span> <span class="o">**</span><span class="n">fields</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_check</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Client.get_game"><a class="viewcode-back" href="../../client.html#modio.client.Client.get_game">[docs]</a>    <span class="k">def</span> <span class="nf">get_game</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span> <span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Queries the mod.io API for the given game ID and if found returns it as a </span>
+<span class="sd">        Game instance. If not found raises NotFound</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        id : int</span>
+<span class="sd">            The ID of the game to query the API for</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        NotFound</span>
+<span class="sd">            A game with the supplied id was not found.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Game</span>
+<span class="sd">            The game with the given ID</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">game_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;/games/</span><span class="si">{id}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Game</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">game_json</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Client.get_games"><a class="viewcode-back" href="../../client.html#modio.client.Client.get_games">[docs]</a>    <span class="k">def</span> <span class="nf">get_games</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets all the games available on mod.io. Takes filtering arguments. Returns a </span>
+<span class="sd">        named tuple with parameters results and pagination.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request    </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">game_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="s1">&#39;/games&#39;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">Game</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">game</span><span class="p">)</span> <span class="k">for</span> <span class="n">game</span> <span class="ow">in</span> <span class="n">game_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">game_json</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Client.get_user"><a class="viewcode-back" href="../../client.html#modio.client.Client.get_user">[docs]</a>    <span class="k">def</span> <span class="nf">get_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span> <span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets a user with the specified ID.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        id : int</span>
+<span class="sd">            The ID of the user to query the API for</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        NotFound</span>
+<span class="sd">            A user with the supplied id was not found.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        User</span>
+<span class="sd">            The user with the given ID</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;/users/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">User</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">user_json</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Client.get_users"><a class="viewcode-back" href="../../client.html#modio.client.Client.get_users">[docs]</a>    <span class="k">def</span> <span class="nf">get_users</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets all the users availaible on mod.io. Takes filtering arguments. Returns </span>
+<span class="sd">        a named tuple with parameters results and pagination.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request</span>
+<span class="sd">               </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="s2">&quot;/users&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">User</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">user</span><span class="p">)</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">user_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">user_json</span><span class="p">))</span></div>
+    
+<div class="viewcode-block" id="Client.get_my_user"><a class="viewcode-back" href="../../client.html#modio.client.Client.get_my_user">[docs]</a>    <span class="k">def</span> <span class="nf">get_my_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the authenticated user&#39;s details (aka the user who created the API key/access token)</span>
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        Forbidden</span>
+<span class="sd">            The access token is invalid/missing</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        User</span>
+<span class="sd">            The authenticated user</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">me_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="s2">&quot;/me&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">User</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">me_json</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Client.get_my_subs"><a class="viewcode-back" href="../../client.html#modio.client.Client.get_my_subs">[docs]</a>    <span class="k">def</span> <span class="nf">get_my_subs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets all the mods the authenticated user is subscribed to.  Takes</span>
+<span class="sd">        filtering arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        Forbidden</span>
+<span class="sd">            The access token is invalid/missing</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mod_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="s2">&quot;/me/subscribed&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">Mod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">mod</span><span class="p">)</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">mod_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">mod_json</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Client.get_my_events"><a class="viewcode-back" href="../../client.html#modio.client.Client.get_my_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_my_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get events that have been fired specifically for the authenticated user. Takes</span>
+<span class="sd">        filtering argmuments</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">events_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="s2">&quot;/me/events&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">Event</span><span class="p">(</span><span class="o">**</span><span class="n">event</span><span class="p">)</span> <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">events_json</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Client.get_my_games"><a class="viewcode-back" href="../../client.html#modio.client.Client.get_my_games">[docs]</a>    <span class="k">def</span> <span class="nf">get_my_games</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all the games the authenticated user added or is a team member of. Takes</span>
+<span class="sd">        filtering arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        Forbidden</span>
+<span class="sd">            The access token is invalid/missing</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">game_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="s2">&quot;/me/games&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">Game</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">game</span><span class="p">)</span> <span class="k">for</span> <span class="n">game</span> <span class="ow">in</span> <span class="n">game_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">game_json</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Client.get_my_mods"><a class="viewcode-back" href="../../client.html#modio.client.Client.get_my_mods">[docs]</a>    <span class="k">def</span> <span class="nf">get_my_mods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all the mods the authenticated user added or is a team member of. Takes</span>
+<span class="sd">        filtering arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        Forbidden</span>
+<span class="sd">            The access token is invalid/missing</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mod_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="s2">&quot;/me/mods&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">Mod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">mod</span><span class="p">)</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">mod_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">mod_json</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Client.get_my_modfiles"><a class="viewcode-back" href="../../client.html#modio.client.Client.get_my_modfiles">[docs]</a>    <span class="k">def</span> <span class="nf">get_my_modfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all the mods the authenticated user uploaded. The returned modfile objects cannot be</span>
+<span class="sd">        edited or deleted and do not have a `game_id` attribute. Takes filtering arguments. Returns </span>
+<span class="sd">        a named tuple with parameters results and pagination.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        Forbidden</span>
+<span class="sd">            The access token is invalid/missing</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">files_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="s2">&quot;/me/files&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">ModFile</span><span class="p">(</span><span class="o">**</span><span class="n">file</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">files_json</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Client.get_my_ratings"><a class="viewcode-back" href="../../client.html#modio.client.Client.get_my_ratings">[docs]</a>    <span class="k">def</span> <span class="nf">get_my_ratings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all the ratings the authentitated user has submitted. Takes filtering arguments. Returns a named</span>
+<span class="sd">        with parameter results and pagination.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        filter : Optional[Filter]</span>
+<span class="sd">            A instance of Filter to be used for filtering, paginating and sorting </span>
+<span class="sd">            results</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        Forbidden</span>
+<span class="sd">            The access token is invalid/missing</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Returned</span>
+<span class="sd">            The results and pagination tuple from this request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ratings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="s2">&quot;/me/ratings&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">Rating</span><span class="p">(</span><span class="o">**</span><span class="n">rating</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span> <span class="k">for</span> <span class="n">rating</span> <span class="ow">in</span> <span class="n">ratings</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">ratings</span><span class="p">))</span></div>
+        
+<div class="viewcode-block" id="Client.email_request"><a class="viewcode-back" href="../../client.html#modio.client.Client.email_request">[docs]</a>    <span class="k">def</span> <span class="nf">email_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span> <span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Posts an email request for an OAuth2 token. A code will be sent to the given email address</span>
+<span class="sd">        which can then be entered into :func:`email_exchange`.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        email : str</span>
+<span class="sd">            A valid email to which the 5-digit code will be sent</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_request</span><span class="p">(</span><span class="s2">&quot;/oauth/emailrequest&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;email&#39;</span> <span class="p">:</span> <span class="n">email</span><span class="p">,</span> <span class="s1">&#39;api_key&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">},</span> <span class="n">h_type</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Message</span><span class="p">(</span><span class="o">**</span><span class="n">r</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Client.email_exchange"><a class="viewcode-back" href="../../client.html#modio.client.Client.email_exchange">[docs]</a>    <span class="k">def</span> <span class="nf">email_exchange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span> <span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Exchanges the given 5-digit code for an OAuth2 token.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        code : int</span>
+<span class="sd">            A 5-digit code received by email less than 15 minutes ago</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        Unauthorized</span>
+<span class="sd">            Invalid security code</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            Security code was not 5 digits long</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        str</span>
+<span class="sd">            The access code. The access code will also be added directly to the Client&#39;s `access_token` </span>
+<span class="sd">            attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Security code must be 5 digits&quot;</span><span class="p">)</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_request</span><span class="p">(</span><span class="s2">&quot;/oauth/emailexchange&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;security_code&#39;</span> <span class="p">:</span> <span class="n">code</span><span class="p">,</span> <span class="s2">&quot;api_key&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">},</span> <span class="n">h_type</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span>   </div>
+
+<div class="viewcode-block" id="Client.steam_auth"><a class="viewcode-back" href="../../client.html#modio.client.Client.steam_auth">[docs]</a>    <span class="k">def</span> <span class="nf">steam_auth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Client.account_link"><a class="viewcode-back" href="../../client.html#modio.client.Client.account_link">[docs]</a>    <span class="k">def</span> <span class="nf">account_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+        <span class="k">pass</span>     </div></div>
+        
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">mod.io</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../client.html">Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../game.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mod.html">Mod</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../objects.html">Misc mod.io Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../filtering&amp;sorting.html">Filtering, Sorting and Pagination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../enums.html">Enumerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../errors.html">Errors and Exceptions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Clement Julia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

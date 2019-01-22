@@ -1,0 +1,155 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Filtering, Sorting and Pagination &#8212; mod.io 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="filtering-sorting-and-pagination">
+<h1>Filtering, Sorting and Pagination<a class="headerlink" href="#filtering-sorting-and-pagination" title="Permalink to this headline">¶</a></h1>
+<p>This library supports the filtering and sorting under the form of the Filter object which can be instantiated and
+edited in order to fine tune the returned results. First instantiate the filter with or without parameters and then
+call any of the various help methods attached to the object to add additional paramaters. In addition to filtering, the object supports three sorting methods: sort, offset and limit. All three are explained in depth in the Filter section of the docs.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">modio</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">modio</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;api key goes here&quot;</span><span class="p">)</span>
+<span class="n">filters</span> <span class="o">=</span> <span class="n">modio</span><span class="o">.</span><span class="n">Filter</span><span class="p">()</span>
+
+<span class="n">filters</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;The Lord of the Rings&quot;</span><span class="p">)</span>
+<span class="c1">#This will return every result where the name column contains any of</span>
+<span class="c1">#the following words: &#39;The&#39;, &#39;Lord&#39;, &#39;of&#39;, &#39;the&#39;, &#39;Rings&#39;</span>
+
+<span class="n">filters</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="c1"># Get all results where the id column value is 10.</span>
+
+<span class="n">filters</span><span class="o">.</span><span class="n">like</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;The Witcher*&quot;</span><span class="p">)</span>
+<span class="c1">#Get all results where &#39;The Witcher&#39; is succeeded by any value</span>
+
+<span class="n">filters</span><span class="o">.</span><span class="n">not_like</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;*Asset Pack&quot;</span><span class="p">)</span>
+<span class="c1">#Get all results where Asset Pack NOT is proceeded by any value.</span>
+
+<span class="n">filters</span><span class="o">.</span><span class="n">values_in</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">29</span><span class="p">])</span>
+<span class="c1">#Get all results where the id column value is 3, 11, 16 and 29.</span>
+
+<span class="n">filters</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+<span class="c1">#Sort name in ascending order</span>
+
+<span class="n">filters</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1">#Sort id in descending order</span>
+
+<span class="n">filters</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="c1">#limit to 20 results</span>
+
+<span class="n">filters</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="c1">#skip the first five results</span>
+
+<span class="n">games</span><span class="p">,</span> <span class="n">pagination_metadata</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_games</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+<span class="c1">#returns all the result that meet the above criteria</span>
+</pre></div>
+</div>
+<p>In addition, this library also supports and extends the pagination metadata provided by modio in the form of the Pagination object. The pagination object can be used both to gather additional data on the pagination, such as if you’ve reached the last page, or what page you are on. In addition, it can be passed to the Filter.offset() of the Filter instance you used to obtain the results to get the next page of results easily by simply passing the edited filter instance. For example if we want to get</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">modio</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">modio</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;api key goes here&quot;</span><span class="p">)</span>
+<span class="n">filters</span> <span class="o">=</span> <span class="n">modio</span><span class="o">.</span><span class="n">Filter</span><span class="p">()</span>
+<span class="n">filters</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;The Lord of the Rings&quot;</span><span class="p">)</span>
+<span class="n">games</span><span class="p">,</span> <span class="n">pagination</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_games</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+
+<span class="n">filters</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">pagination</span><span class="o">.</span><span class="n">next_page</span><span class="p">())</span>
+<span class="n">games</span><span class="p">,</span> <span class="n">pagination</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_games</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">mod.io</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="game.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mod.html">Mod</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objects.html">Misc mod.io Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="enums.html">Enumerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and Exceptions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Clement Julia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/filtering&amp;sorting.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
