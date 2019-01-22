@@ -66,6 +66,8 @@ class Client:
 
     @property
     def BASE_PATH(self):
+        """: str
+        The base url for the api with the version and test/prod settings injected."""
         if self._test:
             return f"https://api.test.mod.io/{self.version}"
         else:
@@ -208,7 +210,7 @@ class Client:
         game_json = self._get_request('/games', filter=filter)
         return Returned([Game(client=self, **game) for game in game_json["data"]], Pagination(**game_json))
 
-    def get_user(self, id : int):
+    def get_user(self, id):
         """Gets a user with the specified ID.
 
         Parameters
@@ -400,7 +402,7 @@ class Client:
         ratings = self._get_request("/me/ratings", filter=filter)
         return Returned([Rating(**rating, client=self) for rating in ratings["data"]], Pagination(**ratings))
         
-    def email_request(self, email : str):
+    def email_request(self, email):
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address
         which can then be entered into :func:`email_exchange`.
         
@@ -414,7 +416,7 @@ class Client:
         r = self._post_request("/oauth/emailrequest", params={'email' : email, 'api_key': self.api_key}, h_type = 2)
         return Message(**r)
 
-    def email_exchange(self, code : int):
+    def email_exchange(self, code):
         """Exchanges the given 5-digit code for an OAuth2 token.
 
         Parameters
@@ -445,8 +447,25 @@ class Client:
         return r["access_token"]   
 
     def steam_auth(self, code):
-        pass
+        """Request an access token on behalf of a Steam user. To use this functionality you must 
+        first have supplied your game's secret encrypted app ticket key from Steamworks via the API 
+        in the 'Options' tab of your game profile.
+
+        Parameters
+        ----------
+        code : str
+            The Steam users Encrypted User Authentication Ticket. 
+            https://partner.steamgames.com/doc/features/auth#encryptedapptickets
+
+        Returns
+        --------
+        str
+            The user's access code
+        """
+        r = self._post_request('/external/steamauth', data={'appdata': code})
+        return r["access_token"]
 
     def account_link(self, service, email):
-        pass     
+        """Link your mod.io account to one of the services. WIP"""
+        raise NotImplementedError("WIP")     
         
