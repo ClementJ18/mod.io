@@ -111,17 +111,21 @@ Is 0 until the rate_remain is 0 and becomes 0 again once the rate limit is reset
 <dl class="attribute">
 <dt id="modio.client.Client.BASE_PATH">
 <code class="descname">BASE_PATH</code><a class="headerlink" href="#modio.client.Client.BASE_PATH" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>str
+The base url for the api with the version and test/prod settings injected.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="modio.client.Client.account_link">
 <code class="descname">account_link</code><span class="sig-paren">(</span><em>service</em>, <em>email</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.account_link"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.account_link" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Link your mod.io account to one of the services. WIP</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="modio.client.Client.email_exchange">
-<code class="descname">email_exchange</code><span class="sig-paren">(</span><em>code: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.email_exchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.email_exchange" title="Permalink to this definition">¶</a></dt>
+<code class="descname">email_exchange</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.email_exchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.email_exchange" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exchanges the given 5-digit code for an OAuth2 token.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -148,9 +152,10 @@ attribute.</p>
 
 <dl class="method">
 <dt id="modio.client.Client.email_request">
-<code class="descname">email_request</code><span class="sig-paren">(</span><em>email: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.email_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.email_request" title="Permalink to this definition">¶</a></dt>
+<code class="descname">email_request</code><span class="sig-paren">(</span><em>email</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.email_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.email_request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Posts an email request for an OAuth2 token. A code will be sent to the given email address
 which can then be entered into <a class="reference internal" href="#modio.client.Client.email_exchange" title="modio.client.Client.email_exchange"><code class="xref py py-func docutils literal notranslate"><span class="pre">email_exchange()</span></code></a>.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -165,7 +170,8 @@ which can then be entered into <a class="reference internal" href="#modio.client
 <dt id="modio.client.Client.get_game">
 <code class="descname">get_game</code><span class="sig-paren">(</span><em>id: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_game"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_game" title="Permalink to this definition">¶</a></dt>
 <dd><p>Queries the mod.io API for the given game ID and if found returns it as a
-Game instance. If not found raises NotFound</p>
+Game instance. If not found raises NotFound.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -187,6 +193,7 @@ Game instance. If not found raises NotFound</p>
 <code class="descname">get_games</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_games"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_games" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets all the games available on mod.io. Takes filtering arguments. Returns a
 named tuple with parameters results and pagination.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -206,7 +213,8 @@ results</td>
 <dt id="modio.client.Client.get_my_events">
 <code class="descname">get_my_events</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_events" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get events that have been fired specifically for the authenticated user. Takes
-filtering argmuments</p>
+filtering argmuments.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -227,6 +235,7 @@ results</td>
 <code class="descname">get_my_games</code><span class="sig-paren">(</span><em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_games"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_games" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all the games the authenticated user added or is a team member of. Takes
 filtering arguments.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -250,6 +259,7 @@ results</td>
 <dd><p>Get all the mods the authenticated user uploaded. The returned modfile objects cannot be
 edited or deleted and do not have a <cite>game_id</cite> attribute. Takes filtering arguments. Returns
 a named tuple with parameters results and pagination.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -272,6 +282,7 @@ results</td>
 <code class="descname">get_my_mods</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_mods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_mods" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all the mods the authenticated user added or is a team member of. Takes
 filtering arguments.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -294,6 +305,7 @@ results</td>
 <code class="descname">get_my_ratings</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_ratings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_ratings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all the ratings the authentitated user has submitted. Takes filtering arguments. Returns a named
 with parameter results and pagination.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -316,6 +328,7 @@ results</td>
 <code class="descname">get_my_subs</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_subs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_subs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets all the mods the authenticated user is subscribed to.  Takes
 filtering arguments.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -336,15 +349,17 @@ results</td>
 <dl class="method">
 <dt id="modio.client.Client.get_my_user">
 <code class="descname">get_my_user</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_my_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_my_user" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the authenticated user’s details (aka the user who created the API key/access token)
-:raises: <code class="xref py py-exc docutils literal notranslate"><span class="pre">Forbidden</span></code> – The access token is invalid/missing</p>
+<dd><p>Gets the authenticated user’s details (aka the user who created the API key/access token)</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The authenticated user</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Forbidden</span></code> – The access token is invalid/missing</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.User" title="modio.objects.User">User</a></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The authenticated user</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="objects.html#modio.objects.User" title="modio.objects.User">User</a></td>
 </tr>
 </tbody>
 </table>
@@ -352,8 +367,9 @@ results</td>
 
 <dl class="method">
 <dt id="modio.client.Client.get_user">
-<code class="descname">get_user</code><span class="sig-paren">(</span><em>id: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_user" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_user</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets a user with the specified ID.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -375,6 +391,7 @@ results</td>
 <code class="descname">get_users</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.get_users"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.get_users" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets all the users availaible on mod.io. Takes filtering arguments. Returns
 a named tuple with parameters results and pagination.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -393,7 +410,24 @@ results</td>
 <dl class="method">
 <dt id="modio.client.Client.steam_auth">
 <code class="descname">steam_auth</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/client.html#Client.steam_auth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.client.Client.steam_auth" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Request an access token on behalf of a Steam user. To use this functionality you must
+first have supplied your game’s secret encrypted app ticket key from Steamworks via the API
+in the ‘Options’ tab of your game profile.</p>
+<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>code</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The Steam users Encrypted User Authentication Ticket.
+<a class="reference external" href="https://partner.steamgames.com/doc/features/auth#encryptedapptickets">https://partner.steamgames.com/doc/features/auth#encryptedapptickets</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The user’s access code</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -421,6 +455,7 @@ results</td>
 <li class="toctree-l1"><a class="reference internal" href="game.html">Games</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mod.html">Mod</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objects.html">Misc mod.io Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="filtering&amp;sorting.html">Filtering, Sorting and Pagination</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="enums.html">Enumerators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and Exceptions</a></li>

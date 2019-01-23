@@ -186,6 +186,12 @@ epub_exclude_files = ['search.html']
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
 
+rst_prolog = """
+.. |coro| replace:: In the async version of this wrapper, this function is a |corourl|_.
+.. |corourl| replace:: *coroutine*
+.. _corourl: https://docs.python.org/3/library/asyncio-task.html#coroutine
+"""
+
 napoleon_google_docstring = False
 napoleon_custom_sections = ["Filter-Only Attributes"]
 

@@ -32,7 +32,7 @@ class Curation(enum.Enum):
     """
     0 : No curation: Mods are immediately available to play
     1 : Paid curation: Mods are immediately available to play unless 
-        they choose to receive donations. These mods must be accepted to be listed
+    they choose to receive donations. These mods must be accepted to be listed
     2 : Full curation: All mods must be accepted by someone to be listed
     """
     no_curation   = 0
@@ -45,7 +45,7 @@ class Community(enum.IntFlag):
     1 : Discussion board enabled
     2 : Guides and news enabled
     ? : Above options can be added together to create custom settings (e.g 3 : 
-        discussion board, guides and news enabled)
+    discussion board, guides and news enabled)
     """
     disabled          = 0
     discussion_boards = 1
@@ -59,7 +59,7 @@ class Revenue(enum.IntFlag):
     4 : Allow mods to be traded
     8 : Allow mods to control supply and scarcity
     ? : Above options can be added together to create custom settings (e.g 3 :
-        allow mods to be sold and receive donations)
+    allow mods to be sold and receive donations)
     """
     disabled     = 0
     sold         = 1
@@ -71,11 +71,11 @@ class APIAccess(enum.IntFlag):
     """
     0 : All of the options below are disabled
     1 : Allow 3rd parties to access this games API endpoints
-    2 : Allow mods to be downloaded directly (if disabled all download URLs will 
-        contain a frequently changing verification hash to stop unauthorized use)
+    2 : Allow mods to be downloaded directly (if disabled all download URLs will contain a frequently 
+    changing verification hash to stop unauthorized use)
     ? : Above options can be added together to create custom settings (e.g 3 : 
-        allow 3rd parties to access this games API endpoints and allow mods to be
-        downloaded directly)
+    allow 3rd parties to access this games API endpoints and allow mods to be
+    downloaded directly)
     """
     disabled         = 0
     third_party      = 1

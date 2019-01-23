@@ -210,7 +210,9 @@
         <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;&lt;Comment id=</span><span class="si">{self.id}</span><span class="s2"> mod=</span><span class="si">{self.mod.id}</span><span class="s2">&gt;&quot;</span>
 
 <div class="viewcode-block" id="Comment.delete"><a class="viewcode-back" href="../../objects.html#modio.objects.Comment.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Remove the comment&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Remove the comment.</span>
+
+<span class="sd">        |coro|&quot;&quot;&quot;</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_delete_request</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;/games/</span><span class="si">{self.mod.game}</span><span class="s1">/mods/</span><span class="si">{self.mod.id}</span><span class="s1">/comments/</span><span class="si">{self.id}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span></div></div>
 
@@ -278,7 +280,9 @@
         <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;&lt;ModFile id=</span><span class="si">{self.id}</span><span class="s2"> name=</span><span class="si">{self.filename}</span><span class="s2"> version=</span><span class="si">{self.version}</span><span class="s2">&gt;&quot;</span>
 
 <div class="viewcode-block" id="ModFile.get_owner"><a class="viewcode-back" href="../../objects.html#modio.objects.ModFile.get_owner">[docs]</a>    <span class="k">def</span> <span class="nf">get_owner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the original submitter of the resource</span>
+        <span class="sd">&quot;&quot;&quot;Returns the original submitter of the resource.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
@@ -289,7 +293,9 @@
         <span class="k">return</span> <span class="n">User</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">,</span> <span class="o">**</span><span class="n">user_json</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ModFile.edit"><a class="viewcode-back" href="../../objects.html#modio.objects.ModFile.edit">[docs]</a>    <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">fields</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Edit the file&#39;s details</span>
+        <span class="sd">&quot;&quot;&quot;Edit the file&#39;s details.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -314,7 +320,9 @@
 
 <div class="viewcode-block" id="ModFile.delete"><a class="viewcode-back" href="../../objects.html#modio.objects.ModFile.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deletes the modfile, this will raise an error if the</span>
-<span class="sd">        file is the active release for the mod</span>
+<span class="sd">        file is the active release for the mod.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        -------</span>
@@ -328,7 +336,7 @@
         <span class="k">return</span> <span class="n">r</span></div>
 
 <div class="viewcode-block" id="ModFile.url_is_expired"><a class="viewcode-back" href="../../objects.html#modio.objects.ModFile.url_is_expired">[docs]</a>    <span class="k">def</span> <span class="nf">url_is_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check if the url is still valid for this modfile</span>
+        <span class="sd">&quot;&quot;&quot;Check if the url is still valid for this modfile.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -406,7 +414,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;client&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Rating.delete"><a class="viewcode-back" href="../../objects.html#modio.objects.Rating.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sets the rating to neutral.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Sets the rating to neutral.</span>
+
+<span class="sd">        |coro|&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;WIP&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_add_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rating</span> <span class="p">:</span> <span class="n">RatingType</span><span class="p">):</span>
@@ -420,13 +430,17 @@
 <div class="viewcode-block" id="Rating.add_positive_rating"><a class="viewcode-back" href="../../objects.html#modio.objects.Rating.add_positive_rating">[docs]</a>    <span class="k">def</span> <span class="nf">add_positive_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Changes the mod rating to positive, the author of the rating will be the authenticated user.</span>
 <span class="sd">        If the mod has already been positevely rated by the user it will return False. If the positive rating</span>
-<span class="sd">        is successful it will return True&quot;&quot;&quot;</span>
+<span class="sd">        is successful it will return True.</span>
+
+<span class="sd">        |coro|&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_rating</span><span class="p">(</span><span class="n">RatingType</span><span class="o">.</span><span class="n">good</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Rating.add_negative_rating"><a class="viewcode-back" href="../../objects.html#modio.objects.Rating.add_negative_rating">[docs]</a>    <span class="k">def</span> <span class="nf">add_negative_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Changes the mod rating to negative, the author of the rating will be the authenticated user.</span>
 <span class="sd">        If the mod has already been negatively rated by the user it will return False. If the negative rating</span>
-<span class="sd">        is successful it will return True.&quot;&quot;&quot;</span>
+<span class="sd">        is successful it will return True.</span>
+
+<span class="sd">        |coro|&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_rating</span><span class="p">(</span><span class="n">RatingType</span><span class="o">.</span><span class="n">bad</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Stats"><a class="viewcode-back" href="../../objects.html#modio.objects.Stats">[docs]</a><span class="k">class</span> <span class="nc">Stats</span><span class="p">:</span>
@@ -574,6 +588,8 @@
         <span class="sd">&quot;&quot;&quot;Report a this user, make sure to read mod.io&#39;s ToU to understand what is</span>
 <span class="sd">        and isnt allowed.</span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
 <span class="sd">        name : str</span>
@@ -645,6 +661,8 @@
 <div class="viewcode-block" id="TeamMember.edit"><a class="viewcode-back" href="../../objects.html#modio.objects.TeamMember.edit">[docs]</a>    <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Edit a team member&#39;s details.</span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
 <span class="sd">        level : Optional[Level]</span>
@@ -658,7 +676,9 @@
         <span class="k">return</span> <span class="n">Message</span><span class="p">(</span><span class="o">**</span><span class="n">msg</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TeamMember.delete"><a class="viewcode-back" href="../../objects.html#modio.objects.TeamMember.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Remove the user from the team. Fires a MOD_TEAM_CHANGED event&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Remove the user from the team. Fires a MOD_TEAM_CHANGED event.</span>
+
+<span class="sd">        |coro|&quot;&quot;&quot;</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_delete_request</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;/games/</span><span class="si">{self.mod.game}</span><span class="s1">/mods/</span><span class="si">{self.mod.id}</span><span class="s1">/team/</span><span class="si">{self.team_id}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span></div></div>
     

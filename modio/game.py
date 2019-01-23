@@ -106,7 +106,9 @@ class Game:
 
     def get_mod(self, id : int):
         """Queries the mod.io API for the given mod ID and if found returns it as a 
-        Mod instance. If not found raises NotFound
+        Mod instance. If not found raises NotFound.
+
+        |coro|
 
         Parameters
         -----------
@@ -131,6 +133,8 @@ class Game:
         """Gets all the mods available for the game. Takes filtering arguments. Returns a 
         named tuple with parameters results and pagination.
 
+        |coro|
+
         Parameters
         -----------
         filter : Optional[Filter]
@@ -150,6 +154,8 @@ class Game:
         """Gets all the mod events available for this game sorted by latest event first. Takes 
         filtering arguments.
 
+        |coro|
+
         Parameters
         -----------
         filter : Optional[Filter]
@@ -168,7 +174,9 @@ class Game:
 
     def get_tag_options(self, *, filter=None):
         """Gets all the game tags available for this game. Takes filtering
-        arguments. Updates the tag_option attribute
+        arguments. Updates the tag_option attribute.
+
+        |coro|
 
         Parameters
         -----------
@@ -188,7 +196,9 @@ class Game:
 
     def get_stats(self, *, filter=None):
         """Gets the stat objects for all the mods of this game. Takes 
-        filtering arguments
+        filtering arguments.
+
+        |coro|
 
         Parameters
         -----------
@@ -205,7 +215,9 @@ class Game:
         return Returned([Stats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
 
     def get_owner(self):
-        """Returns the original submitter of the resource
+        """Returns the original submitter of the resource.
+
+        |coro|
 
         Returns
         --------
@@ -218,6 +230,8 @@ class Game:
     def edit(self, **fields):
         """Used to edit the game details. For editing the icon, logo or header use :func:`add_media`.
         Sucessful editing will update the game instance.
+
+        |coro|
 
         Parameters
         -----------
@@ -256,6 +270,8 @@ class Game:
 
     def add_mod(self, mod):
         """Add a mod to this game.
+
+        |coro|
         
         Parameters
         -----------
@@ -289,7 +305,9 @@ class Game:
 
     def add_media(self, *, logo = None, icon = None, header = None):
         """Upload new media to to the game. This function can take between 1 to 3 arguments
-        depending on what media you desire to upload/update
+        depending on what media you desire to upload/update.
+
+        |coro|
         
         Parameters
         -----------
@@ -336,6 +354,8 @@ class Game:
         settings such as hidden or type will be overwritten to the values provided and all the 
         tags will be added to the group.
 
+        |coro|
+
         Parameters
         -----------
         name : str
@@ -364,7 +384,9 @@ class Game:
         return Message(**message)
 
     def delete_tag_options(self, name, *, tags = []):
-        """Delete one or more tags from a tag option
+        """Delete one or more tags from a tag option.
+
+        |coro|
         
         Parameters
         -----------
@@ -396,6 +418,8 @@ class Game:
     def report(self, name, summary, type = Report(0)):
         """Report a this game, make sure to read mod.io's ToU to understand what is
         and isnt allowed.
+
+        |coro|
 
         Parameters
         -----------

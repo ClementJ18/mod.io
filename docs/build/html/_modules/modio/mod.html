@@ -155,7 +155,9 @@
         <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;&lt;Mod id=</span><span class="si">{self.id}</span><span class="s2"> name=</span><span class="si">{self.name}</span><span class="s2"> game=</span><span class="si">{self.game}</span><span class="s2">&gt;&quot;</span>   
 
 <div class="viewcode-block" id="Mod.get_file"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.get_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span> <span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the Mod File with the following ID</span>
+        <span class="sd">&quot;&quot;&quot;Get the Mod File with the following ID.</span>
+
+<span class="sd">        |coro|</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -179,6 +181,8 @@
         <span class="sd">&quot;&quot;&quot;Get all mod files for this mod. Takes filtering arguments. Returns a named tuple</span>
 <span class="sd">        with parameters results and pagination.</span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
 <span class="sd">        filter : Optional[Filter]</span>
@@ -196,6 +200,8 @@
 <div class="viewcode-block" id="Mod.get_events"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get all events for that mod sorted by latest. Takes filtering arguments. Returns ,</span>
 <span class="sd">        a named tuple with parameters results and pagination.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -216,6 +222,8 @@
         <span class="sd">&quot;&quot;&quot;Gets all the tags for this mod. Takes filtering arguments. Updates the instance&#39;s</span>
 <span class="sd">        tag attribute. Returns a named tuple with parameters results and pagination.</span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
 <span class="sd">        filter : Optional[Filter]</span>
@@ -235,6 +243,8 @@
 <div class="viewcode-block" id="Mod.get_metadata"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a dict of metakey-metavalue pairs. This will also update the mod&#39;s kvp attribute.</span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
 <span class="sd">        Returned</span>
@@ -247,6 +257,8 @@
 <div class="viewcode-block" id="Mod.get_dependencies"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.get_dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">get_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a dict of dependency_id-date_added pairs. Takes filtering arguments. Returns </span>
 <span class="sd">        a named tuple with parameters results and pagination.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -265,7 +277,9 @@
 
 <div class="viewcode-block" id="Mod.get_team"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.get_team">[docs]</a>    <span class="k">def</span> <span class="nf">get_team</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a list of TeamMember object representing the Team in charge of the mod. Takes</span>
-<span class="sd">        filtering arguments</span>
+<span class="sd">        filtering arguments.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -285,7 +299,9 @@
 <div class="viewcode-block" id="Mod.get_comments"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.get_comments">[docs]</a>    <span class="k">def</span> <span class="nf">get_comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a list of all the top level comments for this mod wih comments replying</span>
 <span class="sd">        to top level comments stored in the children attribute. This can be flattened using</span>
-<span class="sd">        the utils.flatten function. Takes filtering arguments</span>
+<span class="sd">        the utils.flatten function. Takes filtering arguments.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -316,7 +332,9 @@
 
 
 <div class="viewcode-block" id="Mod.get_stats"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.get_stats">[docs]</a>    <span class="k">def</span> <span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a Stats object, representing a series of stats for the mod</span>
+        <span class="sd">&quot;&quot;&quot;Returns a Stats object, representing a series of stats for the mod.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -328,7 +346,9 @@
         <span class="k">return</span> <span class="n">stats</span></div>
 
 <div class="viewcode-block" id="Mod.get_owner"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.get_owner">[docs]</a>    <span class="k">def</span> <span class="nf">get_owner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the original submitter of the resource</span>
+        <span class="sd">&quot;&quot;&quot;Returns the original submitter of the resource.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
@@ -340,6 +360,8 @@
 
 <div class="viewcode-block" id="Mod.edit"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.edit">[docs]</a>    <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">fields</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Used to edit the mod details. Sucessful editing will update the mod instance.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -372,7 +394,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">,</span> <span class="o">**</span><span class="n">mod_json</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Mod.delete"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Delete a mod and set its status to deleted.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Delete a mod and set its status to deleted.</span>
+
+<span class="sd">        |coro|</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_delete_request</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;/games/</span><span class="si">{self.game}</span><span class="s1">/mods/</span><span class="si">{self.id}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="k">return</span> <span class="n">r</span></div>
@@ -380,6 +405,8 @@
 <div class="viewcode-block" id="Mod.add_file"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.add_file">[docs]</a>    <span class="k">def</span> <span class="nf">add_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span> <span class="p">:</span> <span class="n">NewModFile</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Adds a new file to the mod, to do so first construct an instance of NewModFile</span>
 <span class="sd">        and then pass it to the function.</span>
+
+<span class="sd">        |coro|</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -410,6 +437,8 @@
 
 <div class="viewcode-block" id="Mod.add_media"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.add_media">[docs]</a>    <span class="k">def</span> <span class="nf">add_media</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">logo</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">images</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">youtube</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">sketchfab</span> <span class="o">=</span> <span class="p">[]):</span>
         <span class="sd">&quot;&quot;&quot;Upload new media to the mod.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -465,6 +494,8 @@
 <div class="viewcode-block" id="Mod.delete_media"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.delete_media">[docs]</a>    <span class="k">def</span> <span class="nf">delete_media</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">images</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">youtube</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">sketchfab</span> <span class="o">=</span> <span class="p">[]):</span>
         <span class="sd">&quot;&quot;&quot;Delete media from the mod page. </span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
 <span class="sd">        images : Optional[List[str]]</span>
@@ -485,6 +516,8 @@
 <div class="viewcode-block" id="Mod.subscribe"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.subscribe">[docs]</a>    <span class="k">def</span> <span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Subscribe to the mod. Returns None if user is already subscribed. </span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
 <span class="sd">        Mod</span>
@@ -497,7 +530,9 @@
             <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="Mod.unsubscribe"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.unsubscribe">[docs]</a>    <span class="k">def</span> <span class="nf">unsubscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Unsubscribe from a mod. Returns None if the user is not subscribed.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Unsubscribe from a mod. Returns None if the user is not subscribed.</span>
+
+<span class="sd">        |coro|&quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_delete_request</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;/games/</span><span class="si">{self.game}</span><span class="s1">/mods/</span><span class="si">{self.id}</span><span class="s1">/subscribe&#39;</span><span class="p">)</span>
@@ -508,6 +543,8 @@
 <div class="viewcode-block" id="Mod.add_tags"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.add_tags">[docs]</a>    <span class="k">def</span> <span class="nf">add_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add tags to a mod, tags are case insensitive and duplicates will be removed. Tags</span>
 <span class="sd">        which are not in the game&#39;s tag_options will not be added.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -533,6 +570,8 @@
 <div class="viewcode-block" id="Mod.delete_tags"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.delete_tags">[docs]</a>    <span class="k">def</span> <span class="nf">delete_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Delete tags from the mod, tags are case insensitive and duplicates will be removed. Providing</span>
 <span class="sd">        no arguments will remove every tag from the mod.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -570,13 +609,17 @@
 <div class="viewcode-block" id="Mod.add_positive_rating"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.add_positive_rating">[docs]</a>    <span class="k">def</span> <span class="nf">add_positive_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Adds a good rating to the mod, the author of the rating will be the authenticated user.</span>
 <span class="sd">        If the mod has already been rated by the user it will return False. If the positive rating</span>
-<span class="sd">        is successful it will return True&quot;&quot;&quot;</span>
+<span class="sd">        is successful it will return True</span>
+
+<span class="sd">        |coro|&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_rating</span><span class="p">(</span><span class="n">RatingType</span><span class="o">.</span><span class="n">good</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Mod.add_negative_rating"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.add_negative_rating">[docs]</a>    <span class="k">def</span> <span class="nf">add_negative_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Adds a bad rating to the mod, the author of the rating will be the authenticated user.</span>
 <span class="sd">        If the mod has already been rated by the user it will return False. If the negative rating</span>
-<span class="sd">        is successful it will return True.&quot;&quot;&quot;</span>
+<span class="sd">        is successful it will return True.</span>
+
+<span class="sd">        |coro|&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_rating</span><span class="p">(</span><span class="n">RatingType</span><span class="o">.</span><span class="n">bad</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Mod.add_metadata"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.add_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">add_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">metadata</span><span class="p">):</span>
@@ -585,6 +628,8 @@
 <span class="sd">        Keys support alphanumeric, &#39;-&#39; and &#39;_&#39;. Total lengh of key and values cannot exceed 255</span>
 <span class="sd">        characters. To add meta-keys which contain a dash in their name they must be passed as an</span>
 <span class="sd">        upacked dictionnary.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Example</span>
 <span class="sd">        --------</span>
@@ -618,15 +663,17 @@
 <span class="sd">        meta-values for the meta-key will be deleted. To delete meta-keys which contain a dash in their </span>
 <span class="sd">        name they must be passed as an upacked dictionnary.</span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Example</span>
 <span class="sd">        --------</span>
-<span class="sd">        mod.delete_metadata(difficulty=[&quot;easy&quot;])</span>
+<span class="sd">        `mod.delete_metadata(difficulty=[&quot;easy&quot;])`</span>
 <span class="sd">            This will remove the value &quot;easy&quot; from the meta key &quot;difficulty&quot;</span>
-<span class="sd">        mod.delete_metadata(difficulty=[])</span>
+<span class="sd">        `mod.delete_metadata(difficulty=[])`</span>
 <span class="sd">            This will remove the meta key &quot;difficulty&quot;</span>
-<span class="sd">        mod.delete_metadata(**{&quot;test-var&quot;: [&quot;test1&quot;]})</span>
+<span class="sd">        `mod.delete_metadata(**{&quot;test-var&quot;: [&quot;test1&quot;]})`</span>
 <span class="sd">            This will remove the value &quot;test1&quot; from the meta key &quot;test-var&quot;</span>
-<span class="sd">        mod.delete_metadata(**{&quot;test-var&quot;:[]})</span>
+<span class="sd">        `mod.delete_metadata(**{&quot;test-var&quot;:[]})`</span>
 <span class="sd">            This will remove the meta key &quot;test-var&quot;</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -649,6 +696,9 @@
 <div class="viewcode-block" id="Mod.add_dependencies"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.add_dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">add_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dependencies</span> <span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add mod dependencies required by the corresponding mod. A dependency is a mod </span>
 <span class="sd">        that should be installed for this mod to run. </span>
+
+<span class="sd">        |coro|</span>
+<span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        dependencies : List[Union[int, Mod]]</span>
@@ -671,6 +721,8 @@
 <div class="viewcode-block" id="Mod.delete_dependencies"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.delete_dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">delete_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dependencies</span> <span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Delete mod dependecies required by this mod.</span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
 <span class="sd">        dependencies : List[Union[int, Mod]]</span>
@@ -692,6 +744,8 @@
 <div class="viewcode-block" id="Mod.add_team_member"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.add_team_member">[docs]</a>    <span class="k">def</span> <span class="nf">add_team_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add a user to the mod team. Will fire a MOD_TEAM_CHANGED event.</span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
 <span class="sd">        email : str</span>
@@ -709,6 +763,8 @@
 <div class="viewcode-block" id="Mod.report"><a class="viewcode-back" href="../../mod.html#modio.mod.Mod.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">summary</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">Report</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;Report a this mod, make sure to read mod.io&#39;s ToU to understand what is</span>
 <span class="sd">        and isnt allowed.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>

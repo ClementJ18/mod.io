@@ -171,7 +171,9 @@ class Client:
 
     def get_game(self, id : int):
         """Queries the mod.io API for the given game ID and if found returns it as a 
-        Game instance. If not found raises NotFound
+        Game instance. If not found raises NotFound.
+
+        |coro|
 
         Parameters
         -----------
@@ -196,6 +198,8 @@ class Client:
         """Gets all the games available on mod.io. Takes filtering arguments. Returns a 
         named tuple with parameters results and pagination.
 
+        |coro|
+
         Parameters
         -----------
         filter : Optional[Filter]
@@ -212,6 +216,8 @@ class Client:
 
     def get_user(self, id):
         """Gets a user with the specified ID.
+
+        |coro|
 
         Parameters
         -----------
@@ -236,6 +242,8 @@ class Client:
         """Gets all the users availaible on mod.io. Takes filtering arguments. Returns 
         a named tuple with parameters results and pagination.
 
+        |coro|
+
         Parameters
         -----------
         filter : Optional[Filter]
@@ -253,6 +261,9 @@ class Client:
     
     def get_my_user(self):
         """Gets the authenticated user's details (aka the user who created the API key/access token)
+
+        |coro|
+
         Raises
         -------
         Forbidden
@@ -270,6 +281,8 @@ class Client:
     def get_my_subs(self, *, filter=None):
         """Gets all the mods the authenticated user is subscribed to.  Takes
         filtering arguments.
+
+        |coro|
 
         Parameters
         -----------
@@ -292,7 +305,9 @@ class Client:
 
     def get_my_events(self, *, filter=None):
         """Get events that have been fired specifically for the authenticated user. Takes
-        filtering argmuments
+        filtering argmuments.
+
+        |coro|
 
         Parameters
         -----------
@@ -311,6 +326,8 @@ class Client:
     def get_my_games(self, filter=None):
         """Get all the games the authenticated user added or is a team member of. Takes
         filtering arguments.
+
+        |coro|
 
         Parameters
         -----------
@@ -334,6 +351,8 @@ class Client:
     def get_my_mods(self, *, filter=None):
         """Get all the mods the authenticated user added or is a team member of. Takes
         filtering arguments.
+
+        |coro|
 
         Parameters
         -----------
@@ -359,6 +378,8 @@ class Client:
         edited or deleted and do not have a `game_id` attribute. Takes filtering arguments. Returns 
         a named tuple with parameters results and pagination.
 
+        |coro|
+
         Parameters
         -----------
         filter : Optional[Filter]
@@ -381,6 +402,8 @@ class Client:
     def get_my_ratings(self, *, filter=None):
         """Get all the ratings the authentitated user has submitted. Takes filtering arguments. Returns a named
         with parameter results and pagination.
+
+        |coro|
 
         Parameters
         -----------
@@ -405,6 +428,8 @@ class Client:
     def email_request(self, email):
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address
         which can then be entered into :func:`email_exchange`.
+
+        |coro|
         
         Parameters
         ----------
@@ -418,6 +443,8 @@ class Client:
 
     def email_exchange(self, code):
         """Exchanges the given 5-digit code for an OAuth2 token.
+
+        |coro|
 
         Parameters
         ----------
@@ -450,6 +477,8 @@ class Client:
         """Request an access token on behalf of a Steam user. To use this functionality you must 
         first have supplied your game's secret encrypted app ticket key from Steamworks via the API 
         in the 'Options' tab of your game profile.
+
+        |coro|
 
         Parameters
         ----------

@@ -177,7 +177,9 @@ class Comment:
         return f"<Comment id={self.id} mod={self.mod.id}>"
 
     def delete(self):
-        """Remove the comment"""
+        """Remove the comment.
+
+        |coro|"""
         r = self._client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}')
         return r
 
@@ -245,7 +247,9 @@ class ModFile:
         return f"<ModFile id={self.id} name={self.filename} version={self.version}>"
 
     def get_owner(self):
-        """Returns the original submitter of the resource
+        """Returns the original submitter of the resource.
+
+        |coro|
 
         Returns
         --------
@@ -256,7 +260,9 @@ class ModFile:
         return User(client=self._client, **user_json)
 
     def edit(self, **fields):
-        """Edit the file's details
+        """Edit the file's details.
+
+        |coro|
 
         Parameters
         -----------
@@ -281,7 +287,9 @@ class ModFile:
 
     def delete(self):
         """Deletes the modfile, this will raise an error if the
-        file is the active release for the mod
+        file is the active release for the mod.
+
+        |coro|
 
         Raises
         -------
@@ -295,7 +303,7 @@ class ModFile:
         return r
 
     def url_is_expired(self):
-        """Check if the url is still valid for this modfile
+        """Check if the url is still valid for this modfile.
 
         Returns
         -------
@@ -373,7 +381,9 @@ class Rating:
         self._client = attrs.pop("client")
 
     def delete(self):
-        """Sets the rating to neutral."""
+        """Sets the rating to neutral.
+
+        |coro|"""
         raise NotImplementedError("WIP")
 
     def _add_rating(self, rating : RatingType):
@@ -387,13 +397,17 @@ class Rating:
     def add_positive_rating(self):
         """Changes the mod rating to positive, the author of the rating will be the authenticated user.
         If the mod has already been positevely rated by the user it will return False. If the positive rating
-        is successful it will return True"""
+        is successful it will return True.
+
+        |coro|"""
         return self._add_rating(RatingType.good)
 
     def add_negative_rating(self):
         """Changes the mod rating to negative, the author of the rating will be the authenticated user.
         If the mod has already been negatively rated by the user it will return False. If the negative rating
-        is successful it will return True."""
+        is successful it will return True.
+
+        |coro|"""
         return self._add_rating(RatingType.bad)
 
 class Stats:
@@ -541,6 +555,8 @@ class User:
         """Report a this user, make sure to read mod.io's ToU to understand what is
         and isnt allowed.
 
+        |coro|
+
         Parameters
         -----------
         name : str
@@ -612,6 +628,8 @@ class TeamMember(User):
     def edit(self, *, level=None, position=None):
         """Edit a team member's details.
 
+        |coro|
+
         Parameters
         -----------
         level : Optional[Level]
@@ -625,7 +643,9 @@ class TeamMember(User):
         return Message(**msg)
 
     def delete(self):
-        """Remove the user from the team. Fires a MOD_TEAM_CHANGED event"""
+        """Remove the user from the team. Fires a MOD_TEAM_CHANGED event.
+
+        |coro|"""
         r = self._client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}')
         return r
     

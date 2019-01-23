@@ -122,7 +122,9 @@ class Mod:
         return f"<Mod id={self.id} name={self.name} game={self.game}>"   
 
     def get_file(self, id : int):
-        """Get the Mod File with the following ID
+        """Get the Mod File with the following ID.
+
+        |coro|
         
         Parameters
         -----------
@@ -146,6 +148,8 @@ class Mod:
         """Get all mod files for this mod. Takes filtering arguments. Returns a named tuple
         with parameters results and pagination.
 
+        |coro|
+
         Parameters
         -----------
         filter : Optional[Filter]
@@ -163,6 +167,8 @@ class Mod:
     def get_events(self, *, filter=None):
         """Get all events for that mod sorted by latest. Takes filtering arguments. Returns ,
         a named tuple with parameters results and pagination.
+
+        |coro|
 
         Parameters
         -----------
@@ -183,6 +189,8 @@ class Mod:
         """Gets all the tags for this mod. Takes filtering arguments. Updates the instance's
         tag attribute. Returns a named tuple with parameters results and pagination.
 
+        |coro|
+
         Parameters
         -----------
         filter : Optional[Filter]
@@ -202,6 +210,8 @@ class Mod:
     def get_metadata(self):
         """Returns a dict of metakey-metavalue pairs. This will also update the mod's kvp attribute.
 
+        |coro|
+
         Returns
         --------
         Returned
@@ -214,6 +224,8 @@ class Mod:
     def get_dependencies(self, *, filter=None):
         """Returns a dict of dependency_id-date_added pairs. Takes filtering arguments. Returns 
         a named tuple with parameters results and pagination.
+
+        |coro|
 
         Parameters
         -----------
@@ -232,7 +244,9 @@ class Mod:
 
     def get_team(self, *, filter=filter):
         """Returns a list of TeamMember object representing the Team in charge of the mod. Takes
-        filtering arguments
+        filtering arguments.
+
+        |coro|
 
         Parameters
         -----------
@@ -252,7 +266,9 @@ class Mod:
     def get_comments(self, *, filter=None):
         """Returns a list of all the top level comments for this mod wih comments replying
         to top level comments stored in the children attribute. This can be flattened using
-        the utils.flatten function. Takes filtering arguments
+        the utils.flatten function. Takes filtering arguments.
+
+        |coro|
 
         Parameters
         -----------
@@ -283,7 +299,9 @@ class Mod:
 
 
     def get_stats(self):
-        """Returns a Stats object, representing a series of stats for the mod
+        """Returns a Stats object, representing a series of stats for the mod.
+
+        |coro|
 
         Returns
         -------
@@ -295,7 +313,9 @@ class Mod:
         return stats
 
     def get_owner(self):
-        """Returns the original submitter of the resource
+        """Returns the original submitter of the resource.
+
+        |coro|
 
         Returns
         --------
@@ -307,6 +327,8 @@ class Mod:
 
     def edit(self, **fields):
         """Used to edit the mod details. Sucessful editing will update the mod instance.
+
+        |coro|
 
         Parameters
         -----------
@@ -339,7 +361,10 @@ class Mod:
         return self.__init__(client=self._client, **mod_json)
 
     def delete(self):
-        """Delete a mod and set its status to deleted."""
+        """Delete a mod and set its status to deleted.
+
+        |coro|
+        """
         r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}')
         self.status = 3
         return r
@@ -347,6 +372,8 @@ class Mod:
     def add_file(self, file : NewModFile):
         """Adds a new file to the mod, to do so first construct an instance of NewModFile
         and then pass it to the function.
+
+        |coro|
         
         Parameters
         -----------
@@ -377,6 +404,8 @@ class Mod:
 
     def add_media(self, *, logo = None, images = [], youtube = [], sketchfab = []):
         """Upload new media to the mod.
+
+        |coro|
 
         Parameters
         -----------
@@ -432,6 +461,8 @@ class Mod:
     def delete_media(self, *, images = [], youtube = [], sketchfab = []):
         """Delete media from the mod page. 
 
+        |coro|
+
         Parameters
         -----------
         images : Optional[List[str]]
@@ -452,6 +483,8 @@ class Mod:
     def subscribe(self):
         """Subscribe to the mod. Returns None if user is already subscribed. 
 
+        |coro|
+
         Returns
         --------
         Mod
@@ -464,7 +497,9 @@ class Mod:
             pass
 
     def unsubscribe(self):
-        """Unsubscribe from a mod. Returns None if the user is not subscribed."""
+        """Unsubscribe from a mod. Returns None if the user is not subscribed.
+
+        |coro|"""
 
         try:
             r = self._client._delete_request(f'/games/{self.game}/mods/{self.id}/subscribe')
@@ -475,6 +510,8 @@ class Mod:
     def add_tags(self, *tags):
         """Add tags to a mod, tags are case insensitive and duplicates will be removed. Tags
         which are not in the game's tag_options will not be added.
+
+        |coro|
 
         Parameters
         -----------
@@ -500,6 +537,8 @@ class Mod:
     def delete_tags(self, *tags):
         """Delete tags from the mod, tags are case insensitive and duplicates will be removed. Providing
         no arguments will remove every tag from the mod.
+
+        |coro|
 
         Parameters
         -----------
@@ -537,13 +576,17 @@ class Mod:
     def add_positive_rating(self):
         """Adds a good rating to the mod, the author of the rating will be the authenticated user.
         If the mod has already been rated by the user it will return False. If the positive rating
-        is successful it will return True"""
+        is successful it will return True
+
+        |coro|"""
         return self._add_rating(RatingType.good)
 
     def add_negative_rating(self):
         """Adds a bad rating to the mod, the author of the rating will be the authenticated user.
         If the mod has already been rated by the user it will return False. If the negative rating
-        is successful it will return True."""
+        is successful it will return True.
+
+        |coro|"""
         return self._add_rating(RatingType.bad)
 
     def add_metadata(self, **metadata):
@@ -552,6 +595,8 @@ class Mod:
         Keys support alphanumeric, '-' and '_'. Total lengh of key and values cannot exceed 255
         characters. To add meta-keys which contain a dash in their name they must be passed as an
         upacked dictionnary.
+
+        |coro|
 
         Example
         --------
@@ -585,15 +630,17 @@ class Mod:
         meta-values for the meta-key will be deleted. To delete meta-keys which contain a dash in their 
         name they must be passed as an upacked dictionnary.
 
+        |coro|
+
         Example
         --------
-        mod.delete_metadata(difficulty=["easy"])
+        `mod.delete_metadata(difficulty=["easy"])`
             This will remove the value "easy" from the meta key "difficulty"
-        mod.delete_metadata(difficulty=[])
+        `mod.delete_metadata(difficulty=[])`
             This will remove the meta key "difficulty"
-        mod.delete_metadata(**{"test-var": ["test1"]})
+        `mod.delete_metadata(**{"test-var": ["test1"]})`
             This will remove the value "test1" from the meta key "test-var"
-        mod.delete_metadata(**{"test-var":[]})
+        `mod.delete_metadata(**{"test-var":[]})`
             This will remove the meta key "test-var"
 
         """
@@ -616,6 +663,9 @@ class Mod:
     def add_dependencies(self, dependencies : list):
         """Add mod dependencies required by the corresponding mod. A dependency is a mod 
         that should be installed for this mod to run. 
+
+        |coro|
+        
         Parameters
         ----------
         dependencies : List[Union[int, Mod]]
@@ -638,6 +688,8 @@ class Mod:
     def delete_dependencies(self, dependencies : list):
         """Delete mod dependecies required by this mod.
 
+        |coro|
+
         Parameters
         -----------
         dependencies : List[Union[int, Mod]]
@@ -659,6 +711,8 @@ class Mod:
     def add_team_member(self, email, level, *, position=None):
         """Add a user to the mod team. Will fire a MOD_TEAM_CHANGED event.
 
+        |coro|
+
         Parameters
         -----------
         email : str
@@ -676,6 +730,8 @@ class Mod:
     def report(self, name, summary, type = Report(0)):
         """Report a this mod, make sure to read mod.io's ToU to understand what is
         and isnt allowed.
+
+        |coro|
 
         Parameters
         -----------

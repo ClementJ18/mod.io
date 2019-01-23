@@ -139,7 +139,9 @@
 
 <div class="viewcode-block" id="Game.get_mod"><a class="viewcode-back" href="../../game.html#modio.game.Game.get_mod">[docs]</a>    <span class="k">def</span> <span class="nf">get_mod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span> <span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Queries the mod.io API for the given mod ID and if found returns it as a </span>
-<span class="sd">        Mod instance. If not found raises NotFound</span>
+<span class="sd">        Mod instance. If not found raises NotFound.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -164,6 +166,8 @@
         <span class="sd">&quot;&quot;&quot;Gets all the mods available for the game. Takes filtering arguments. Returns a </span>
 <span class="sd">        named tuple with parameters results and pagination.</span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
 <span class="sd">        filter : Optional[Filter]</span>
@@ -183,6 +187,8 @@
         <span class="sd">&quot;&quot;&quot;Gets all the mod events available for this game sorted by latest event first. Takes </span>
 <span class="sd">        filtering arguments.</span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
 <span class="sd">        filter : Optional[Filter]</span>
@@ -201,7 +207,9 @@
 
 <div class="viewcode-block" id="Game.get_tag_options"><a class="viewcode-back" href="../../game.html#modio.game.Game.get_tag_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_tag_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Gets all the game tags available for this game. Takes filtering</span>
-<span class="sd">        arguments. Updates the tag_option attribute</span>
+<span class="sd">        arguments. Updates the tag_option attribute.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -221,7 +229,9 @@
 
 <div class="viewcode-block" id="Game.get_stats"><a class="viewcode-back" href="../../game.html#modio.game.Game.get_stats">[docs]</a>    <span class="k">def</span> <span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Gets the stat objects for all the mods of this game. Takes </span>
-<span class="sd">        filtering arguments</span>
+<span class="sd">        filtering arguments.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -238,7 +248,9 @@
         <span class="k">return</span> <span class="n">Returned</span><span class="p">([</span><span class="n">Stats</span><span class="p">(</span><span class="o">**</span><span class="n">stats</span><span class="p">)</span> <span class="k">for</span> <span class="n">stats</span> <span class="ow">in</span> <span class="n">stats_json</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]],</span> <span class="n">Pagination</span><span class="p">(</span><span class="o">**</span><span class="n">stats_json</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Game.get_owner"><a class="viewcode-back" href="../../game.html#modio.game.Game.get_owner">[docs]</a>    <span class="k">def</span> <span class="nf">get_owner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the original submitter of the resource</span>
+        <span class="sd">&quot;&quot;&quot;Returns the original submitter of the resource.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
@@ -251,6 +263,8 @@
 <div class="viewcode-block" id="Game.edit"><a class="viewcode-back" href="../../game.html#modio.game.Game.edit">[docs]</a>    <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">fields</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Used to edit the game details. For editing the icon, logo or header use :func:`add_media`.</span>
 <span class="sd">        Sucessful editing will update the game instance.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -289,6 +303,8 @@
 
 <div class="viewcode-block" id="Game.add_mod"><a class="viewcode-back" href="../../game.html#modio.game.Game.add_mod">[docs]</a>    <span class="k">def</span> <span class="nf">add_mod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mod</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add a mod to this game.</span>
+
+<span class="sd">        |coro|</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -322,7 +338,9 @@
 
 <div class="viewcode-block" id="Game.add_media"><a class="viewcode-back" href="../../game.html#modio.game.Game.add_media">[docs]</a>    <span class="k">def</span> <span class="nf">add_media</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">logo</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">icon</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Upload new media to to the game. This function can take between 1 to 3 arguments</span>
-<span class="sd">        depending on what media you desire to upload/update</span>
+<span class="sd">        depending on what media you desire to upload/update.</span>
+
+<span class="sd">        |coro|</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -369,6 +387,8 @@
 <span class="sd">        settings such as hidden or type will be overwritten to the values provided and all the </span>
 <span class="sd">        tags will be added to the group.</span>
 
+<span class="sd">        |coro|</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
 <span class="sd">        name : str</span>
@@ -397,7 +417,9 @@
         <span class="k">return</span> <span class="n">Message</span><span class="p">(</span><span class="o">**</span><span class="n">message</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Game.delete_tag_options"><a class="viewcode-back" href="../../game.html#modio.game.Game.delete_tag_options">[docs]</a>    <span class="k">def</span> <span class="nf">delete_tag_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tags</span> <span class="o">=</span> <span class="p">[]):</span>
-        <span class="sd">&quot;&quot;&quot;Delete one or more tags from a tag option</span>
+        <span class="sd">&quot;&quot;&quot;Delete one or more tags from a tag option.</span>
+
+<span class="sd">        |coro|</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -429,6 +451,8 @@
 <div class="viewcode-block" id="Game.report"><a class="viewcode-back" href="../../game.html#modio.game.Game.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">summary</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">Report</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;Report a this game, make sure to read mod.io&#39;s ToU to understand what is</span>
 <span class="sd">        and isnt allowed.</span>
+
+<span class="sd">        |coro|</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
