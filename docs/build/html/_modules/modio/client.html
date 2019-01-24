@@ -64,6 +64,9 @@
 <span class="sd">    version : Optional[str]</span>
 <span class="sd">        An optional keyword argument to allow you to pick a specific version of the API to query,</span>
 <span class="sd">        usually you shouldn&#39;t need to change this. Default is the latest supported version.</span>
+<span class="sd">    loop : Optional[asyncio.EventLoop]</span>
+<span class="sd">        |async| An optional keyword argument allowing you to pass a loop, if no loop is passed the Client</span>
+<span class="sd">        will get the current event loop. </span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    -----------</span>
@@ -96,6 +99,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1">#check api key if no o auth 2</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_games</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Client.close"><a class="viewcode-back" href="../../client.html#modio.client.Client.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;|async| This function is used to clean up the client in order to close the application that it uses gracefully.</span>
+<span class="sd">        At the moment it is only used to close the client&#39;s Session.</span>
+
+<span class="sd">        |coro|&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">BASE_PATH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -555,6 +565,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../mod.html">Mod</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../objects.html">Misc mod.io Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../filtering&amp;sorting.html">Filtering, Sorting and Pagination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../async.html">Asynchronous mod.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../utils.html">Utility Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../enums.html">Enumerators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../errors.html">Errors and Exceptions</a></li>

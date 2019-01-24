@@ -74,6 +74,7 @@ Installation
    mod
    objects
    filtering&sorting
+   async
    utils
    enums
    errors

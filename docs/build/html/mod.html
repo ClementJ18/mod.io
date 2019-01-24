@@ -386,7 +386,7 @@ subscribers</dd>
 <code class="descname">add_dependencies</code><span class="sig-paren">(</span><em>dependencies: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_dependencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add mod dependencies required by the corresponding mod. A dependency is a mod
 that should be installed for this mod to run.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -402,7 +402,7 @@ that should be installed for this mod to run.</p>
 <code class="descname">add_file</code><span class="sig-paren">(</span><em>file: modio.objects.NewModFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new file to the mod, to do so first construct an instance of NewModFile
 and then pass it to the function.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -423,7 +423,7 @@ and then pass it to the function.</p>
 <dt id="modio.mod.Mod.add_media">
 <code class="descname">add_media</code><span class="sig-paren">(</span><em>*</em>, <em>logo=None</em>, <em>images=[]</em>, <em>youtube=[]</em>, <em>sketchfab=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_media"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_media" title="Permalink to this definition">¶</a></dt>
 <dd><p>Upload new media to the mod.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -460,7 +460,7 @@ as keyword arguments and meta data value as a list of values. E.g pistol_dmg = [
 Keys support alphanumeric, ‘-‘ and ‘_’. Total lengh of key and values cannot exceed 255
 characters. To add meta-keys which contain a dash in their name they must be passed as an
 upacked dictionnary.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <p class="rubric">Example</p>
 <dl class="docutils">
 <dt><cite>mod.add_metadata(difficulty=[“hard”, “medium”, “easy”])</cite></dt>
@@ -486,7 +486,7 @@ upacked dictionnary.</p>
 <dd><p>Adds a bad rating to the mod, the author of the rating will be the authenticated user.
 If the mod has already been rated by the user it will return False. If the negative rating
 is successful it will return True.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -495,7 +495,7 @@ is successful it will return True.</p>
 <dd><p>Adds a good rating to the mod, the author of the rating will be the authenticated user.
 If the mod has already been rated by the user it will return False. If the positive rating
 is successful it will return True</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -503,7 +503,7 @@ is successful it will return True</p>
 <code class="descname">add_tags</code><span class="sig-paren">(</span><em>*tags</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_tags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add tags to a mod, tags are case insensitive and duplicates will be removed. Tags
 which are not in the game’s tag_options will not be added.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -518,7 +518,7 @@ which are not in the game’s tag_options will not be added.</p>
 <dt id="modio.mod.Mod.add_team_member">
 <code class="descname">add_team_member</code><span class="sig-paren">(</span><em>email</em>, <em>level</em>, <em>*</em>, <em>position=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.add_team_member"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.add_team_member" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a user to the mod team. Will fire a MOD_TEAM_CHANGED event.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -538,14 +538,14 @@ which are not in the game’s tag_options will not be added.</p>
 <dt id="modio.mod.Mod.delete">
 <code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a mod and set its status to deleted.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="modio.mod.Mod.delete_dependencies">
 <code class="descname">delete_dependencies</code><span class="sig-paren">(</span><em>dependencies: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.delete_dependencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.delete_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete mod dependecies required by this mod.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -560,7 +560,7 @@ which are not in the game’s tag_options will not be added.</p>
 <dt id="modio.mod.Mod.delete_media">
 <code class="descname">delete_media</code><span class="sig-paren">(</span><em>*</em>, <em>images=[]</em>, <em>youtube=[]</em>, <em>sketchfab=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.delete_media"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.delete_media" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete media from the mod page.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -583,7 +583,7 @@ which are not in the game’s tag_options will not be added.</p>
 meta-values you wish to delete as a list. You can pass an empty list in which case all
 meta-values for the meta-key will be deleted. To delete meta-keys which contain a dash in their
 name they must be passed as an upacked dictionnary.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <p class="rubric">Example</p>
 <dl class="docutils">
 <dt><cite>mod.delete_metadata(difficulty=[“easy”])</cite></dt>
@@ -602,7 +602,7 @@ name they must be passed as an upacked dictionnary.</p>
 <code class="descname">delete_tags</code><span class="sig-paren">(</span><em>*tags</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.delete_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.delete_tags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete tags from the mod, tags are case insensitive and duplicates will be removed. Providing
 no arguments will remove every tag from the mod.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -617,7 +617,7 @@ no arguments will remove every tag from the mod.</p>
 <dt id="modio.mod.Mod.edit">
 <code class="descname">edit</code><span class="sig-paren">(</span><em>**fields</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.edit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.edit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Used to edit the mod details. Sucessful editing will update the mod instance.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -649,7 +649,7 @@ the item works, or other information you need to display.</li>
 <dd><p>Returns a list of all the top level comments for this mod wih comments replying
 to top level comments stored in the children attribute. This can be flattened using
 the utils.flatten function. Takes filtering arguments.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -670,7 +670,7 @@ results</td>
 <code class="descname">get_dependencies</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_dependencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dict of dependency_id-date_added pairs. Takes filtering arguments. Returns
 a named tuple with parameters results and pagination.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -691,7 +691,7 @@ results</td>
 <code class="descname">get_events</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_events" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all events for that mod sorted by latest. Takes filtering arguments. Returns ,
 a named tuple with parameters results and pagination.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -711,7 +711,7 @@ results</td>
 <dt id="modio.mod.Mod.get_file">
 <code class="descname">get_file</code><span class="sig-paren">(</span><em>id: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the Mod File with the following ID.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -733,7 +733,7 @@ results</td>
 <code class="descname">get_files</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all mod files for this mod. Takes filtering arguments. Returns a named tuple
 with parameters results and pagination.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -753,7 +753,7 @@ results</td>
 <dt id="modio.mod.Mod.get_metadata">
 <code class="descname">get_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dict of metakey-metavalue pairs. This will also update the mod’s kvp attribute.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -770,7 +770,7 @@ results</td>
 <dt id="modio.mod.Mod.get_owner">
 <code class="descname">get_owner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_owner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_owner" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the original submitter of the resource.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -787,7 +787,7 @@ results</td>
 <dt id="modio.mod.Mod.get_stats">
 <code class="descname">get_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a Stats object, representing a series of stats for the mod.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -805,7 +805,7 @@ results</td>
 <code class="descname">get_tags</code><span class="sig-paren">(</span><em>*</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_tags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets all the tags for this mod. Takes filtering arguments. Updates the instance’s
 tag attribute. Returns a named tuple with parameters results and pagination.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -826,7 +826,7 @@ results</td>
 <code class="descname">get_team</code><span class="sig-paren">(</span><em>*</em>, <em>filter=&lt;class 'filter'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.get_team"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.get_team" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of TeamMember object representing the Team in charge of the mod. Takes
 filtering arguments.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -852,7 +852,7 @@ results</td>
 <code class="descname">report</code><span class="sig-paren">(</span><em>name</em>, <em>summary</em>, <em>type=&lt;Report.generic: 0&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.report" title="Permalink to this definition">¶</a></dt>
 <dd><p>Report a this mod, make sure to read mod.io’s ToU to understand what is
 and isnt allowed.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -879,7 +879,7 @@ links to help moderators investigate and respond appropiately.</li>
 <dt id="modio.mod.Mod.subscribe">
 <code class="descname">subscribe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.subscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.subscribe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subscribe to the mod. Returns None if user is already subscribed.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -896,7 +896,7 @@ links to help moderators investigate and respond appropiately.</li>
 <dt id="modio.mod.Mod.unsubscribe">
 <code class="descname">unsubscribe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/modio/mod.html#Mod.unsubscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modio.mod.Mod.unsubscribe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unsubscribe from a mod. Returns None if the user is not subscribed.</p>
-<p>In the async version of this wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
+<p>In the <a class="reference internal" href="async.html#async-version"><span class="std std-ref">async version</span></a> of the wrapper, this function is a <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#coroutine"><em>coroutine</em></a>.</p>
 </dd></dl>
 
 </dd></dl>
@@ -926,6 +926,7 @@ links to help moderators investigate and respond appropiately.</li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Mod</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objects.html">Misc mod.io Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filtering&amp;sorting.html">Filtering, Sorting and Pagination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="async.html">Asynchronous mod.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="enums.html">Enumerators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and Exceptions</a></li>

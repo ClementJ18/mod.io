@@ -187,9 +187,11 @@ epub_exclude_files = ['search.html']
 intersphinx_mapping = {'https://docs.python.org/': None}
 
 rst_prolog = """
-.. |coro| replace:: In the async version of this wrapper, this function is a |corourl|_.
+.. |coro| replace:: In the |async-version| of the wrapper, this function is a |corourl|_.
 .. |corourl| replace:: *coroutine*
 .. _corourl: https://docs.python.org/3/library/asyncio-task.html#coroutine
+.. |async| replace:: Exclusive to the |async-version| of the wrapper
+.. |async-version| replace:: :ref:`async version <async-version>`
 """
 
 napoleon_google_docstring = False
