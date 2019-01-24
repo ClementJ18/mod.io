@@ -176,11 +176,11 @@ class Comment:
     def __repr__(self):
         return f"<Comment id={self.id} mod={self.mod.id}>"
 
-    def delete(self):
+    async def delete(self):
         """Remove the comment.
 
         |coro|"""
-        r = self._client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}')
+        r = await self._client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}')
         return r
 
 class ModFile:
@@ -246,7 +246,7 @@ class ModFile:
     def __repr__(self):
         return f"<ModFile id={self.id} name={self.filename} version={self.version}>"
 
-    def get_owner(self):
+    async def get_owner(self):
         """Returns the original submitter of the resource.
 
         |coro|
@@ -256,10 +256,10 @@ class ModFile:
         User
             User that submitted the resource
         """
-        user_json = self._client._post_request(f"/general/ownership", data={"resource_type" : "files", "resource_id" : self.id})
+        user_json = await self._client._post_request(f"/general/ownership", data={"resource_type" : "files", "resource_id" : self.id})
         return User(client=self._client, **user_json)
 
-    def edit(self, **fields):
+    async def edit(self, **fields):
         """Edit the file's details.
 
         |coro|
@@ -279,13 +279,13 @@ class ModFile:
         if not self.game:
             raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
 
-        file_json = self._client._put_request(f'/games/{self.game}/mods/{self.mod}/files/{self.id}', data = fields)
+        file_json = await self._client._put_request(f'/games/{self.game}/mods/{self.mod}/files/{self.id}', data = fields)
         if "code" in file_json:
             return
 
         self.__init__(client=self._client, game_id=self.game, **file_json)
 
-    def delete(self):
+    async def delete(self):
         """Deletes the modfile, this will raise an error if the
         file is the active release for the mod.
 
@@ -299,7 +299,7 @@ class ModFile:
         if not self.game:
             raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
             
-        r = self._client._delete_request(f'/games/{self.game}/mods/{self.mod}/files/{self.id}')
+        r = await self._client._delete_request(f'/games/{self.game}/mods/{self.mod}/files/{self.id}')
         return r
 
     def url_is_expired(self):
@@ -380,35 +380,35 @@ class Rating:
         self.date = _convert_date(attrs.pop("date_added"))
         self._client = attrs.pop("client")
 
-    def delete(self):
+    async def delete(self):
         """Sets the rating to neutral.
 
         |coro|"""
         raise NotImplementedError("WIP")
 
-    def _add_rating(self, rating : RatingType):
+    async def _add_rating(self, rating : RatingType):
         try:
-            self._client._post_request(f'/games/{self.game}/mods/{self.mod}/ratings', data={"rating":rating.value})
+            await self._client._post_request(f'/games/{self.game}/mods/{self.mod}/ratings', data={"rating":rating.value})
         except BadRequest:
             return False
 
         return True
 
-    def add_positive_rating(self):
+    async def add_positive_rating(self):
         """Changes the mod rating to positive, the author of the rating will be the authenticated user.
         If the mod has already been positevely rated by the user it will return False. If the positive rating
         is successful it will return True.
 
         |coro|"""
-        return self._add_rating(RatingType.good)
+        return await self._add_rating(RatingType.good)
 
-    def add_negative_rating(self):
+    async def add_negative_rating(self):
         """Changes the mod rating to negative, the author of the rating will be the authenticated user.
         If the mod has already been negatively rated by the user it will return False. If the negative rating
         is successful it will return True.
 
         |coro|"""
-        return self._add_rating(RatingType.bad)
+        return await self._add_rating(RatingType.bad)
 
 class Stats:
     """Represents a summary of stats for a mod
@@ -551,7 +551,7 @@ class User:
     def __repr__(self):
         return f"<User id={self.id} username={self.username}>"
 
-    def report(self, name, summary, type = Report(0)):
+    async def report(self, name, summary, type = Report(0)):
         """Report a this user, make sure to read mod.io's ToU to understand what is
         and isnt allowed.
 
@@ -581,7 +581,7 @@ class User:
             "summary" : summary
         }
 
-        msg = self._client._post_request('/report', data = fields)
+        msg = await self._client._post_request('/report', data = fields)
         return Message(**msg)
 
 @concat_docs
@@ -625,7 +625,7 @@ class TeamMember(User):
     def __repr__(self):
         return f"<TeamMember team_id={self.team_id} id={self.id} level={self.level}>"
 
-    def edit(self, *, level=None, position=None):
+    async def edit(self, *, level=None, position=None):
         """Edit a team member's details.
 
         |coro|
@@ -639,14 +639,14 @@ class TeamMember(User):
 
         """
         data = {"level" : level.value, "position" : position}
-        msg = self._client._put_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}', data=data)
+        msg = await self._client._put_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}', data=data)
         return Message(**msg)
 
-    def delete(self):
+    async def delete(self):
         """Remove the user from the team. Fires a MOD_TEAM_CHANGED event.
 
         |coro|"""
-        r = self._client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}')
+        r = await self._client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}')
         return r
     
 

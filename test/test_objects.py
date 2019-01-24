@@ -22,10 +22,6 @@ class TestComment(unittest.TestCase):
         self.game = client.get_game(180)
         self.mod = self.game.get_mod(1251)
 
-    def test_flatten(self):
-        comments = self.mod.get_comments().results
-        modio.utils.flatten(comments)
-
     def test_delete(self):
         self.mod.get_comments().results[0].delete()
 
