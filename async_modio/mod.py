@@ -242,7 +242,7 @@ class Mod:
         depen_json = await self._client._get_request(f"/games/{self.game}/mods/{self.id}/dependencies", filter=filter)
         return Returned({dependecy["mod_id"] : _convert_date(dependecy["date_added"]) for dependecy in depen_json["data"]}, Pagination(**depen_json))
 
-    async def get_team(self, *, filter=filter):
+    async def get_team(self, *, filter=None):
         """Returns a list of TeamMember object representing the Team in charge of the mod. Takes
         filtering arguments.
 
@@ -519,7 +519,7 @@ class Mod:
             list of tags to be added. 
 
         """
-        self.get_tags()
+        await self.get_tags()
         tags = list(set([tag.lower() for tag in tags if tag.lower() not in self.tags.keys()]))
         
         if not tags:
@@ -546,7 +546,7 @@ class Mod:
             List of tags to remove, if no list is provided, will remove every tag from the mod.
 
         """
-        self.get_tags()
+        await self.get_tags()
         if tags:
             tags = list(set([tag.lower() for tag in tags if tag.lower() in self.tags.keys()]))
         else:
@@ -570,7 +570,7 @@ class Mod:
         except BadRequest:
             return False
 
-        self.get_stats()
+        await self.get_stats()
         return True
 
     async def add_positive_rating(self):

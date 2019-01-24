@@ -60,9 +60,18 @@ Example
 
 Installation
 -------------
+Installing modio will install both the sync and the async package. Due to this when uninstalling you must uninstall
+both.
 ::
 
    pip install -U git+git://github.com/ClementJ18/mod.io.git@0.2
+
+Uninstalling
+-------------
+::
+
+   pip uninstall modio
+   pip uninstall async_modio
 
 
 .. toctree::

@@ -241,7 +241,7 @@ class Mod:
         depen_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/dependencies", filter=filter)
         return Returned({dependecy["mod_id"] : _convert_date(dependecy["date_added"]) for dependecy in depen_json["data"]}, Pagination(**depen_json))
 
-    def get_team(self, *, filter=filter):
+    def get_team(self, *, filter=None):
         """Returns a list of TeamMember object representing the Team in charge of the mod. |filterable|
 
         |coro|

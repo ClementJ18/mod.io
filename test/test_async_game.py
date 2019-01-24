@@ -7,12 +7,12 @@ from .test_utils import run
 
 class TestGame(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(auth=access_token, test=True)
+        self.client = async_modio.Client(auth=access_token, test=True)
         self.game = run(self.client.get_game(180))
         self.frozen_copy = run(self.client.get_game(180)) 
 
     def tearDown(self):
-        self.client.close() 
+        run(self.client.close())
 
     def test_gets(self):
         mods = run(self.game.get_mods())
@@ -26,8 +26,8 @@ class TestGame(unittest.TestCase):
 
     def test_edit(self):
         name = f"PyWrapper TestGame {random.randint(1, 34534)}"
-        community = random.choice(list(modio.Community))
-        maturity = random.choice(list(modio.MaturityOptions))
+        community = random.choice(list(async_modio.Community))
+        maturity = random.choice(list(async_modio.MaturityOptions))
         name_id = name.lower().replace(" ", "-")[:80]
         fields = {"name": name, "community": community, "maturity_options": maturity, "name_id": name_id}
 
@@ -53,18 +53,18 @@ class TestGame(unittest.TestCase):
         ))
 
     def test_report(self):
-        run(self.game.report("pywrappertestreport", "pywrappertestreportsummary",  modio.Report.generic))
+        run(self.game.report("pywrappertestreport", "pywrappertestreportsummary",  async_modio.Report.generic))
 
     def test_add_mod(self):
-        newmod = modio.NewMod(
+        newmod = async_modio.NewMod(
             name=f"pywrappertestnewmod{random.randint(1, 700000)}",
             summary = "pywrappertestnewmodsummary",
             description=f"pywrappertestnewmoddescription{'ha' * 50}",
             homepage="http://edain.wikia.com/",
             metadata_blob="yes,yes,yes,yes",
             stock=random.randint(0, 700000),
-            visible=modio.Visibility.hidden,
-            maturity=modio.Maturity.drugs | modio.Maturity.explicit,
+            visible=async_modio.Visibility.hidden,
+            maturity=async_modio.Maturity.drugs | async_modio.Maturity.explicit,
             logo="test/media/logo.png"
         )
 

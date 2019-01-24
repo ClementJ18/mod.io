@@ -7,16 +7,16 @@ from .test_utils import run
 
 class TestMod(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(auth=access_token, test=True)
-        self.game = self.client.get_game(180)
-        self.mod = self.game.get_mod(1251)
+        self.client = async_modio.Client(auth=access_token, test=True)
+        self.game = run(self.client.get_game(180))
+        self.mod = run(self.game.get_mod(1251))
 
     def tearDown(self):
-        self.client.close()
+        run(self.client.close())
 
     def test_gets(self):
         files = run(self.mod.get_files()).results
-        self.mod.get_file(files[0].id)
+        run(self.mod.get_file(files[0].id))
 
         run(self.mod.get_events())
         run(self.mod.get_tags())
@@ -28,15 +28,15 @@ class TestMod(unittest.TestCase):
         run(self.mod.get_owner())
 
     def test_add_file(self):
-        new_file = modio.NewModFile(version="1.231", changelog="It works now", active=False)
+        new_file = async_modio.NewModFile(version="1.231", changelog="It works now", active=False)
         new_file.add_file('test/files/file.zip')
 
         run(self.mod.add_file(new_file))
 
     def test_edit(self):
         name = f"PyWrapper TestMod {random.randint(1, 34534)}"
-        maturity = random.choice(list(modio.Maturity))
-        visible = random.choice(list(modio.Visibility))
+        maturity = random.choice(list(async_modio.Maturity))
+        visible = random.choice(list(async_modio.Visibility))
         name_id = name.lower().replace(" ", "-")[:80]
         fields = {"name": name, "maturity": maturity, "name_id": name_id}
 
@@ -90,20 +90,20 @@ class TestMod(unittest.TestCase):
         run(self.mod.delete_metadata(test=["mega_damage", 'tork'], seven=['sortk']))
 
     def test_add_dependencies(self):
-        mods = self.game.get_mods().results
+        mods = run(self.game.get_mods()).results
         obj = mods[:7]
         ids = [x.id for x in mods[8:9]]
         run(self.mod.add_dependencies([*obj, *ids]))
 
     def test_delete_dependencies(self):
-        run(self.mod.delete_dependencies(list(self.mod.get_dependencies().results.keys())))
+        run(self.mod.delete_dependencies(list(run(self.mod.get_dependencies()).results.keys())))
 
     def test_add_team_member(self):
-        run(self.mod.add_team_member("juliacj@cardiff.ac.uk", modio.Level.creator, position="Lord of Tests"))
+        run(self.mod.add_team_member("juliacj@cardiff.ac.uk", async_modio.Level.creator, position="Lord of Tests"))
 
     def test_report(self):
-        run(self.mod.report("pywrappertestreport", "pywrappertestreportsummary",  modio.Report.generic))
+        run(self.mod.report("pywrappertestreport", "pywrappertestreportsummary",  async_modio.Report.generic))
 
     def test_delete(self):
-        mod = self.game.get_mods(filter=modio.Filter().text("ToDeleteMod")).results[0]
+        mod = run(self.game.get_mods(filter=async_modio.Filter().text("ToDeleteMod"))).results[0]
         run(mod.delete())

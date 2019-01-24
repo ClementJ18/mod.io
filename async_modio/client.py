@@ -82,7 +82,7 @@ class Client:
         self.rate_remain = r.headers.get("X-RateLimit-Remaining", self.rate_remain)
         self.rate_retry = r.headers.get("X-Ratelimit-RetryAfter", 0)
 
-        if r.status_code == 204:
+        if r.status == 204:
             return r
 
         request_json = await r.json()
@@ -157,7 +157,27 @@ class Client:
             return await self._error_check(r)
 
     async def _post_request(self, url, *, h_type=0, **fields):
-        async with self.session.post(self._base_path + url, headers=self._define_headers(h_type), **fields) as r:
+        files = fields.pop("files", {})
+        data = fields.pop("data", {})
+
+        form = aiohttp.FormData()
+        for key, value in data.items():
+            if value is None:
+                continue
+
+            form.add_field(key, str(value))
+
+        for key, value in files.items():
+            if value is None:
+                continue
+
+            if isinstance(value, tuple):
+                form.add_field(key, value[1], filename=value[0], content_type="multipart/form-data")
+            else:
+                form.add_field(key, value, content_type="multipart/form-data")
+
+
+        async with self.session.post(self._base_path + url, headers=self._define_headers(h_type), data=form) as r:
             return await self._error_check(r)
 
     async def _put_request(self, url, *, h_type=0, **fields):
