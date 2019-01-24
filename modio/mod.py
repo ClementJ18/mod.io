@@ -6,6 +6,25 @@ from .utils import _convert_date, _clean_and_convert
 
 class Mod:
     """Represent a modio mod object.
+    
+    Filter-Only Attributes
+    -----------------------
+    These attributes can only be used at endpoints which return instances
+    of this class and takes filter arguments. They are not attached to the
+    object itself and trying to access them will cause an AttributeError
+
+    sort_downloads : str
+        Sort argument, provide to sort function to sort by most/least
+        downloaded
+    sort_popular : str
+        Sort argument, provide to sort function to sort by most/least
+        popular
+    sort_rating : str
+        Sort argument, provide to sort function to sort by weighed
+        rating
+    sort_subscribers : str
+        Sort argument, provide to sort function to sort by most/least
+        subscribers 
 
     Attributes
     -----------
@@ -57,26 +76,6 @@ class Mod:
         Contains key-value metadata. Filter attribute.
     plaintext : str
         description field converted into plaintext.
-
-
-    Filter-Only Attributes
-    -----------------------
-    These attributes can only be used at endpoints which return instances
-    of this class and takes filter arguments. They are not attached to the
-    object itself and trying to access them will cause an AttributeError
-
-    sort_downloads : str
-        Sort argument, provide to sort function to sort by most/least
-        downloaded
-    sort_popular : str
-        Sort argument, provide to sort function to sort by most/least
-        popular
-    sort_rating : str
-        Sort argument, provide to sort function to sort by weighed
-        rating
-    sort_subscribers : str
-        Sort argument, provide to sort function to sort by most/least
-        subscribers 
 
     """
     def __init__(self, **attrs):
@@ -145,8 +144,8 @@ class Mod:
         return ModFile(**file_json, game_id=self.game, client=self._client)
 
     def get_files(self, *, filter=None):
-        """Get all mod files for this mod. Takes filtering arguments. Returns a named tuple
-        with parameters results and pagination.
+        """Get all mod files for this mod. Returns a named tuple
+        with parameters results and pagination. |filterable|
 
         |coro|
 
@@ -165,8 +164,8 @@ class Mod:
         return Returned([ModFile(**file, game_id=self.game, client=self._client) for file in files_json["data"]], Pagination(**files_json))
 
     def get_events(self, *, filter=None):
-        """Get all events for that mod sorted by latest. Takes filtering arguments. Returns ,
-        a named tuple with parameters results and pagination.
+        """Get all events for that mod sorted by latest. Returns,
+        a named tuple with parameters results and pagination. |filterable|
 
         |coro|
 
@@ -186,8 +185,8 @@ class Mod:
         return Returned([Event(**event) for event in event_json["data"]], Pagination(**event_json))
 
     def get_tags(self, *, filter=None): 
-        """Gets all the tags for this mod. Takes filtering arguments. Updates the instance's
-        tag attribute. Returns a named tuple with parameters results and pagination.
+        """Gets all the tags for this mod. Updates the instance's
+        tag attribute. Returns a named tuple with parameters results and pagination. |filterable|
 
         |coro|
 
@@ -222,8 +221,8 @@ class Mod:
         return Returned(self.kvp, Pagination(**meta_json))
 
     def get_dependencies(self, *, filter=None):
-        """Returns a dict of dependency_id-date_added pairs. Takes filtering arguments. Returns 
-        a named tuple with parameters results and pagination.
+        """Returns a dict of dependency_id-date_added pairs. Returns 
+        a named tuple with parameters results and pagination. |filterable|
 
         |coro|
 
@@ -243,8 +242,7 @@ class Mod:
         return Returned({dependecy["mod_id"] : _convert_date(dependecy["date_added"]) for dependecy in depen_json["data"]}, Pagination(**depen_json))
 
     def get_team(self, *, filter=filter):
-        """Returns a list of TeamMember object representing the Team in charge of the mod. Takes
-        filtering arguments.
+        """Returns a list of TeamMember object representing the Team in charge of the mod. |filterable|
 
         |coro|
 
@@ -266,7 +264,7 @@ class Mod:
     def get_comments(self, *, filter=None):
         """Returns a list of all the top level comments for this mod wih comments replying
         to top level comments stored in the children attribute. This can be flattened using
-        the utils.flatten function. Takes filtering arguments.
+        the utils.flatten function. |filterable|
 
         |coro|
 

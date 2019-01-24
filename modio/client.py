@@ -202,8 +202,8 @@ class Client:
         return Game(client=self, **game_json)
 
     def get_games(self, *, filter=None):
-        """Gets all the games available on mod.io. Takes filtering arguments. Returns a 
-        named tuple with parameters results and pagination.
+        """Gets all the games available on mod.io. Returns a 
+        named tuple with parameters results and pagination. |filterable|
 
         |coro|
 
@@ -246,8 +246,8 @@ class Client:
         return User(client=self, **user_json)
 
     def get_users(self, *, filter=None):
-        """Gets all the users availaible on mod.io. Takes filtering arguments. Returns 
-        a named tuple with parameters results and pagination.
+        """Gets all the users availaible on mod.io. Returns 
+        a named tuple with parameters results and pagination. |filterable|
 
         |coro|
 
@@ -286,8 +286,7 @@ class Client:
         return User(client=self, **me_json)
 
     def get_my_subs(self, *, filter=None):
-        """Gets all the mods the authenticated user is subscribed to.  Takes
-        filtering arguments.
+        """Gets all the mods the authenticated user is subscribed to. |filterable|
 
         |coro|
 
@@ -311,8 +310,7 @@ class Client:
         return Returned([Mod(client=self, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
 
     def get_my_events(self, *, filter=None):
-        """Get events that have been fired specifically for the authenticated user. Takes
-        filtering argmuments.
+        """Get events that have been fired specifically for the authenticated user. |filterable|
 
         |coro|
 
@@ -331,8 +329,7 @@ class Client:
         return Returned([Event(**event) for event in events_json["data"]], Pagination(**events_json))
 
     def get_my_games(self, filter=None):
-        """Get all the games the authenticated user added or is a team member of. Takes
-        filtering arguments.
+        """Get all the games the authenticated user added or is a team member of. |filterable|
 
         |coro|
 
@@ -356,8 +353,7 @@ class Client:
         return Returned([Game(client=self, **game) for game in game_json["data"]], Pagination(**game_json))
 
     def get_my_mods(self, *, filter=None):
-        """Get all the mods the authenticated user added or is a team member of. Takes
-        filtering arguments.
+        """Get all the mods the authenticated user added or is a team member of. |filterable|
 
         |coro|
 
@@ -382,8 +378,8 @@ class Client:
 
     def get_my_modfiles(self, *, filter=None):
         """Get all the mods the authenticated user uploaded. The returned modfile objects cannot be
-        edited or deleted and do not have a `game_id` attribute. Takes filtering arguments. Returns 
-        a named tuple with parameters results and pagination.
+        edited or deleted and do not have a `game_id` attribute. Returns 
+        a named tuple with parameters results and pagination. |filterable|
 
         |coro|
 
@@ -407,8 +403,8 @@ class Client:
         return Returned([ModFile(**file, client=self) for file in files_json["data"]], Pagination(**files_json))
 
     def get_my_ratings(self, *, filter=None):
-        """Get all the ratings the authentitated user has submitted. Takes filtering arguments. Returns a named
-        with parameter results and pagination.
+        """Get all the ratings the authentitated user has submitted. Returns a named
+        with parameter results and pagination. |filterable|
 
         |coro|
 
@@ -434,7 +430,7 @@ class Client:
         
     def email_request(self, email):
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address
-        which can then be entered into :func:`email_exchange`.
+        which can then be entered into :func:`email_exchange`. 
 
         |coro|
         

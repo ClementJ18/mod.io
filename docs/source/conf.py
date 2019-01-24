@@ -192,6 +192,7 @@ rst_prolog = """
 .. _corourl: https://docs.python.org/3/library/asyncio-task.html#coroutine
 .. |async| replace:: Exclusive to the |async-version| of the wrapper
 .. |async-version| replace:: :ref:`async version <async-version>`
+.. |filterable| replace:: This method takes :ref:`filtering arguments <filter>`
 """
 
 napoleon_google_docstring = False

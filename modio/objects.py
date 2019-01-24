@@ -80,19 +80,6 @@ class Image:
 class Event:
     """Represents a mod event. 
 
-    Attributes
-    -----------
-    id : int
-        Unique ID of the event. Filter attribute.
-    mod : int
-        ID of the mod this event is from. Filter attribute.
-    user : int
-        ID of the user that made the change. Filter attribute.
-    date : datetime.datetime
-        UNIX timestamp of the event occurrence. Filter attribute.
-    type : EventType
-        Type of the event. Filter attribute.
-
     Filter-Only Attributes
     -----------------------
     These attributes can only be used at endpoints which return instances
@@ -105,6 +92,19 @@ class Event:
     subscribed : bool
         Returns only events connected to mods the authenticated user is 
         subscribed to, which is useful for keeping the users mods up-to-date.
+
+    Attributes
+    -----------
+    id : int
+        Unique ID of the event. Filter attribute.
+    mod : int
+        ID of the mod this event is from. Filter attribute.
+    user : int
+        ID of the user that made the change. Filter attribute.
+    date : datetime.datetime
+        UNIX timestamp of the event occurrence. Filter attribute.
+    type : EventType
+        Type of the event. Filter attribute.
 
     """
     def __init__(self, **attrs):
@@ -759,7 +759,9 @@ class NewModFile:
         return self
 
 class Filter:
-    """This class is unique to the library and is an attempt to make filtering
+    """.. _filter:
+    
+    This class is unique to the library and is an attempt to make filtering
     modio data easier. Instead of passing filter keywords directly you can pass
     an instance of this class which you have previously fine tuned through the
     various methods. For advanced users it is also possible to pass filtering

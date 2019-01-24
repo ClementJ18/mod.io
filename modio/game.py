@@ -130,8 +130,8 @@ class Game:
         return Mod(client=self._client, **mod_json)
 
     def get_mods(self, *, filter=None):
-        """Gets all the mods available for the game. Takes filtering arguments. Returns a 
-        named tuple with parameters results and pagination.
+        """Gets all the mods available for the game. Returns a 
+        named tuple with parameters results and pagination. |filterable|
 
         |coro|
 
@@ -151,8 +151,7 @@ class Game:
         return Returned([Mod(client=self._client, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
 
     def get_mod_events(self, *, filter=None):
-        """Gets all the mod events available for this game sorted by latest event first. Takes 
-        filtering arguments.
+        """Gets all the mod events available for this game sorted by latest event first. |filterable|
 
         |coro|
 
@@ -173,8 +172,7 @@ class Game:
         return Returned([Event(**event) for event in event_json["data"]], Pagination(**event_json))
 
     def get_tag_options(self, *, filter=None):
-        """Gets all the game tags available for this game. Takes filtering
-        arguments. Updates the tag_option attribute.
+        """Gets all the game tags available for this game. Updates the tag_option attribute. |filterable|
 
         |coro|
 
@@ -195,8 +193,7 @@ class Game:
         return Returned(tags, Pagination(**tag_json))
 
     def get_stats(self, *, filter=None):
-        """Gets the stat objects for all the mods of this game. Takes 
-        filtering arguments.
+        """Gets the stat objects for all the mods of this game. |filterable|
 
         |coro|
 

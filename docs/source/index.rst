@@ -7,7 +7,7 @@
 Welcome to modio's documentation!
 =================================
 
-modio.py is a wrapper package for the mod.io API.
+modio.py is a wrapper package for the mod.io API. There is also an async wrapper available :ref:`here <async-version>`.
 
 Basic Usage
 -----------------
@@ -66,7 +66,7 @@ Installation
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    client
