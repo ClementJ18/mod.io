@@ -1,6 +1,9 @@
 # mod.io
 
 ![mod.io Logo](https://static.mod.io/v1/images/branding/modio-color-dark.png "https://mod.io")
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
 
 A wrapper for the mod.io API in Python. 
 * [Docs](https://modio.readthedocs.io/en/latest/) 

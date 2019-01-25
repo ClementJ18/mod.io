@@ -7,8 +7,26 @@
 Welcome to modio's documentation!
 =================================
 .. image:: https://readthedocs.org/projects/modio/badge/?version=latest
-:target: https://modio.readthedocs.io/en/latest/?badge=latest
-:alt: Documentation Status
+   :target: https://modio.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+
+.. image:: https://img.shields.io/badge/License-MIT-yellow.svg
+   :target: https://opensource.org/licenses/MIT
+   :alt: Licence: MIT
+
+.. image:: https://img.shields.io/github/issues/ClementJ18/mod.io.svg
+   :target: https://github.com/ClementJ18/mod.io/issues
+   :alt: Open Issues
+
+.. image:: https://img.shields.io/github/issues-pr/ClementJ18/mod.io.svg
+   :target: https://github.com/ClementJ18/mod.io/pulls
+   :alt: Open PRs
+
+..image:: https://img.shields.io/github/release/ClementJ18/mod.io.svg
+   :alt: Latest Release
+
+.. image:: https://img.shields.io/github/stars/badges/shields.svg?label=Stars&style=social 
+   :target: https://github.com/ClementJ18/mod.io
 
 modio.py is a wrapper package for the mod.io API. There is also an async wrapper available :ref:`here <async-version>`.
 
