@@ -92,6 +92,9 @@ class Event:
         UNIX timestamp of the event occurrence. Filter attribute.
     type : EventType
         Type of the event. Filter attribute.
+    game : int
+        ID of the game that the mod the user change came from. Can be None if it is
+        a mod event. Filter attribute.
 
     Filter-Only Attributes
     -----------------------
@@ -113,6 +116,7 @@ class Event:
         self._raw_type = attrs.pop("event_type")
         self.mod = attrs.pop("mod_id")
         self.user = attrs.pop("user_id")
+        self.game = attrs.pop("game_id", None)
 
     @property
     def type(self):

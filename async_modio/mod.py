@@ -672,17 +672,8 @@ class Mod:
             List of mod ids to submit as dependencies. 
 
         """
-        #for future
-        # dependency = {f"dependencies[{dependencies.index(data)}]" : getattr(data, "id", data) for data in dependencies}
-        # r = await self._client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependency)
-        # return Message(**r)
-
-        while dependencies:
-            dependency = {f"dependencies[{dependencies.index(data)}]" : getattr(data, "id", data) for data in dependencies[:5]}
-            dependencies = dependencies[5:]
-
-            r = await self._client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependency)
-
+        dependency = {f"dependencies[{dependencies.index(data)}]" : getattr(data, "id", data) for data in dependencies}
+        r = await self._client._post_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependency)
         return Message(**r)
 
     async def delete_dependencies(self, dependencies : list):
@@ -695,17 +686,8 @@ class Mod:
         dependencies : List[Union[int, Mod]]
             List of dependencies to remove
         """
-        #for future
-        # dependency = {f"dependencies[{dependencies.index(data)}]" : getattr(data, "id", data) for data in dependencies}
-        # r = await self._client._delete_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependency)
-        # return Message(**r)
-
-        r = None
-        while dependencies:
-            dependency = {f"dependencies[{dependencies.index(data)}]" : getattr(data, "id", data) for data in dependencies[:5]}
-            dependencies = dependencies[5:]
-            r = await self._client._delete_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependency)
-        
+        dependency = {f"dependencies[{dependencies.index(data)}]" : getattr(data, "id", data) for data in dependencies}
+        r = await self._client._delete_request(f'/games/{self.game}/mods/{self.id}/dependencies', data=dependency)
         return r
 
     async def add_team_member(self, email, level, *, position=None):
