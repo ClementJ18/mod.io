@@ -65,7 +65,7 @@ class Mod:
     profile : str
         URL of the mod's modio profile
     file : ModFile
-        Latest release instance. Can be None. Filter attribute.
+        Latest released instance. Can be None. Filter attribute.
     media : ModMedia
         Contains mod media data (links and images)
     rating : Stats

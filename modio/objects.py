@@ -973,7 +973,7 @@ class Pagination:
     offset : int
         Number of results skipped over
     total : int
-        Total number of results avalaible for that endpoint
+        Total number of results avalaible for that endpoint with those filters.
     """
 
     def __init__(self, **attrs):
@@ -986,8 +986,7 @@ class Pagination:
         return f"<Pagination count={self.count} limit={self.limit} offset={self.offset} total={self.total}>"
 
     def max(self):
-        """Returns True if there are no additional results after this set. Can fail if the returned count is coincidentally
-        exactly the same as the limit."""
+        """Returns True if there are no additional results after this set."""
         return (self.offset + self.count) == self.total
 
     def min(self):
@@ -1007,8 +1006,6 @@ class Pagination:
     def page(self):
         """Returns the current page number. Page numbers start at 0"""
         return self.offset // self.limit
-
-
 
 class Object:
     """A dud class that can be used to replace other classes, keyword arguments

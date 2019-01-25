@@ -14,9 +14,9 @@ class Game:
     id : int
         ID of the game. Filter attribute.
     status : Status
-        Status of the game. Filter attribute.
+        Status of the game. (see `status and visibility <https://docs.mod.io/#status-amp-visibility>`_ for details) Filter attribute.
     submitter : User
-        Instance of the modio user having submitted the game. Filter 
+        Instance of the modio user who submitted the game. Filter 
         attribute.
     date : datetime.datetime
         UNIX timestamp of the date the game was registered. Filter attribute.
@@ -25,19 +25,20 @@ class Game:
     live : datetime.datetime
         UNIX timestamp of the date the game went live. Filter attribute.
     presentation : Presentation
-        Filter attribute.
+        Presentation style used on the mod.io website. Filter attribute.
     submission : Submission
-        Filter attribute.
+        Submission process modders must follow. Filter attribute.
     curation : Curation
-        Filter attribute.
+        Curation process used to approve mods. Filter attribute.
     community : Community
-        Filter attribute.
+        Community features enabled on the mod.io website. Filter attribute.
     revenue : Revenue
-        Filter attribute.
+        Revenue capabilities mods can enable. Filter attribute.
     api : APIAccess
-        Filter attribute.
+        Level of API access allowed by this game. Filter attribute.
     maturity_options : MaturityOptions
-        Filter attribute.
+        Switch to allow developers to select if they flag their mods as containing mature 
+        content. Filter attribute.
     ugc : str
         Word used to describe user-generated content (mods, items, addons etc).
         Filter attribute.
