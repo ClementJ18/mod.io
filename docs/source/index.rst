@@ -22,7 +22,7 @@ Welcome to modio's documentation!
    :target: https://github.com/ClementJ18/mod.io/pulls
    :alt: Open PRs
 
-..image:: https://img.shields.io/github/release/ClementJ18/mod.io.svg
+.. image:: https://img.shields.io/github/release/ClementJ18/mod.io.svg
    :alt: Latest Release
 
 .. image:: https://img.shields.io/github/stars/badges/shields.svg?label=Stars&style=social 
