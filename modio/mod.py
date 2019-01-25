@@ -157,7 +157,7 @@ class Mod:
         
         Returns
         --------
-        Returned
+        Returned[List[ModFile], Pagination]
             The results and pagination tuple from this request
         """
         files_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/files", filter=filter)
@@ -177,7 +177,7 @@ class Mod:
 
         Returns
         --------
-        Returned
+        Returned[List[Event], Pagination]
             The results and pagination tuple from this request
 
         """
@@ -198,7 +198,7 @@ class Mod:
 
         Returns
         --------
-        Returned
+        Returned[List[Tag], Pagination]
             The results and pagination tuple from this request
 
         """
@@ -213,7 +213,7 @@ class Mod:
 
         Returns
         --------
-        Returned
+        Returned[List[MetaData], Pagination]
             The results and pagination tuple from this request
         """
         meta_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/metadatakvp")
@@ -234,7 +234,7 @@ class Mod:
 
         Returns
         --------
-        Returned
+        Returned[List[Dependency], Pagination]
             The results and pagination tuple from this request
 
         """
@@ -254,7 +254,7 @@ class Mod:
 
         Returns
         --------
-        Returned
+        Returned[List[TeamMember], Pagination]
             The results and pagination tuple from this request
 
         """
@@ -276,7 +276,7 @@ class Mod:
 
         Returns
         --------
-        Returned
+        Returned[List[Comment], Pagination]
             The results and pagination tuple from this request
         """
         comment_json = self._client._get_request(f"/games/{self.game}/mods/{self.id}/comments", filter=filter)

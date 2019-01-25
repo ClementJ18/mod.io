@@ -8,7 +8,6 @@ import time
 
 
 _Returned = namedtuple("Returned", "results pagination")
-
 class Returned(_Returned):
     """A named tuple returned by certain methods which return multiple results 
     and need to return pagination data along with it. 

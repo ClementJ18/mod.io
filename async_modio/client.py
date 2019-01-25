@@ -188,7 +188,7 @@ class Client:
         async with self.session.delete(self._base_path + url, headers=self._define_headers(h_type), **fields) as r:
             return await self._error_check(r)
 
-    async def get_game(self, id : int):
+    async def get_game(self, id):
         """Queries the mod.io API for the given game ID and if found returns it as a 
         Game instance. If not found raises NotFound.
 
@@ -514,6 +514,8 @@ class Client:
         return r["access_token"]
 
     async def account_link(self, service, email):
-        """Link your mod.io account to one of the services. WIP"""
+        """Link your mod.io account to one of the services. WIP
+
+        |coro|"""
         raise NotImplementedError("WIP")     
         

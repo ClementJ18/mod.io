@@ -143,7 +143,7 @@ class Game:
 
         Returns
         --------
-        Returned
+        Returned[List[Mod], Pagination]
             The results and pagination tuple from this request
                
         """
@@ -163,7 +163,7 @@ class Game:
 
         Returns
         --------
-        Returned
+        Returned[List[Event], Pagination]
             The results and pagination tuple from this request
                
         """
@@ -184,7 +184,7 @@ class Game:
 
         Returns
         --------
-        Returned
+        Returned[List[TagOption], Pagination]
             The results and pagination tuple from this request
                
         """
@@ -205,7 +205,7 @@ class Game:
 
         Returns
         --------
-        Returned
+        Returned[List[Stats], Pagination]
             The results and pagination tuple from this request
         """
         stats_json = self._client._get_request(f"/games/{self.id}/mods/stats", filter=filter)

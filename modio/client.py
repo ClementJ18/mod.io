@@ -176,7 +176,7 @@ class Client:
         r = requests.delete(self._base_path + url, headers=self._define_headers(h_type), **fields)
         return self._error_check(r)
 
-    def get_game(self, id : int):
+    def get_game(self, id):
         """Queries the mod.io API for the given game ID and if found returns it as a 
         Game instance. If not found raises NotFound.
 
@@ -215,7 +215,7 @@ class Client:
 
         Returns
         --------
-        Returned
+        Returned[List[Game], Pagination]
             The results and pagination tuple from this request    
         """
         game_json = self._get_request('/games', filter=filter)
@@ -259,7 +259,7 @@ class Client:
 
         Returns
         --------
-        Returned
+        Returned[List[User], Pagination]
             The results and pagination tuple from this request
                
         """
@@ -303,7 +303,7 @@ class Client:
 
         Returns
         --------
-        Returned
+        Returned[List[Mod], Pagination]
             The results and pagination tuple from this request
         """
         mod_json = self._get_request("/me/subscribed", filter=filter)
@@ -322,7 +322,7 @@ class Client:
 
         Returns
         --------
-        Returned
+        Returned[List[Event], Pagination]
             The results and pagination tuple from this request
         """
         events_json = self._get_request("/me/events", filter=filter)
@@ -346,7 +346,7 @@ class Client:
 
         Returns
         --------
-        Returned
+        Returned[List[Game], Pagination]
             The results and pagination tuple from this request
         """
         game_json = self._get_request("/me/games", filter=filter)
@@ -370,7 +370,7 @@ class Client:
 
         Returns
         --------
-        Returned
+        Returned[List[Mod], Pagination]
             The results and pagination tuple from this request
         """
         mod_json = self._get_request("/me/mods", filter=filter)
@@ -396,7 +396,7 @@ class Client:
 
         Returns
         --------
-        Returned
+        Returned[List[ModFile], Pagination]
             The results and pagination tuple from this request
         """
         files_json = self._get_request("/me/files", filter=filter)
@@ -421,7 +421,7 @@ class Client:
 
         Returns
         --------
-        Returned
+        Returned[List[Rating], Pagination]
             The results and pagination tuple from this request
         """
 
@@ -498,6 +498,8 @@ class Client:
         return r["access_token"]
 
     def account_link(self, service, email):
-        """Link your mod.io account to one of the services. WIP"""
+        """Link your mod.io account to one of the services. WIP
+
+        |coro|"""
         raise NotImplementedError("WIP")     
         
