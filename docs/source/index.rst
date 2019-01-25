@@ -25,7 +25,7 @@ Welcome to modio's documentation!
 .. image:: https://img.shields.io/github/release/ClementJ18/mod.io.svg
    :alt: Latest Release
 
-.. image:: https://img.shields.io/github/stars/badges/shields.svg?label=Stars&style=social 
+.. image:: https://img.shields.io/github/stars/ClementJ18/mod.io.svg?label=Stars&style=social 
    :target: https://github.com/ClementJ18/mod.io
 
 modio.py is a wrapper package for the mod.io API. There is also an async wrapper available :ref:`here <async-version>`.
