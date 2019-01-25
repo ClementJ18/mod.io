@@ -6,6 +6,9 @@
 
 Welcome to modio's documentation!
 =================================
+.. image:: https://readthedocs.org/projects/modio/badge/?version=latest
+:target: https://modio.readthedocs.io/en/latest/?badge=latest
+:alt: Documentation Status
 
 modio.py is a wrapper package for the mod.io API. There is also an async wrapper available :ref:`here <async-version>`.
 
