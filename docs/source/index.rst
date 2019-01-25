@@ -64,7 +64,7 @@ Installing modio will install both the sync and the async package. Due to this w
 both.
 ::
 
-   pip install -U git+git://github.com/ClementJ18/mod.io.git@0.2
+   pip install -U git+git://github.com/ClementJ18/mod.io.git@0.3
 
 Uninstalling
 -------------
