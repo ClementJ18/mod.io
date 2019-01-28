@@ -2,8 +2,8 @@ import unittest
 import async_modio
 import random
 
-from .test_config import access_token
-from .test_utils import run
+from .config import access_token
+from .utils import run
 
 class TestMod(unittest.TestCase):
     def setUp(self):

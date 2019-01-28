@@ -2,7 +2,7 @@ import unittest
 import modio
 import random
 
-from .test_config import access_token
+from .config import access_token
 
 class TestEvent(unittest.TestCase):
     def test_type(self):

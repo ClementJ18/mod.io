@@ -2,7 +2,7 @@ import unittest
 import modio
 import random
 
-from .test_config import access_token
+from .config import access_token
 
 class TestGame(unittest.TestCase):
     def setUp(self):

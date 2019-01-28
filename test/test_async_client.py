@@ -1,8 +1,8 @@
 import unittest
 import async_modio
 
-from .test_config import user_api_key, game_api_key, access_token
-from .test_utils import run
+from .config import user_api_key, game_api_key, access_token
+from .utils import run
 
 class TestAsyncClient(unittest.TestCase):
     def test_oauth_access(self):

@@ -1,7 +1,7 @@
 import unittest
 import modio
 
-from .test_config import user_api_key, game_api_key, access_token
+from .config import user_api_key, game_api_key, access_token
 
 class TestClient(unittest.TestCase):
     def setUp(self):
