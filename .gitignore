@@ -1,5 +1,4 @@
 *.pyc
 test.py
-old_async_modio
 docs/build
 test/config.py
