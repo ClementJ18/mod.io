@@ -47,6 +47,15 @@ class Community(enum.IntFlag):
     ? : Above options can be added together to create custom settings (e.g 3 : 
     discussion board, guides and news enabled)
     """
+    def __repr__(self):
+        cls = self.__class__
+        if self._name_ is not None:
+            return self._name_
+        members, uncovered = enum._decompose(cls, self._value_)
+        return '|'.join([str(m._name_ or m._value_) for m in members])
+
+    __str__ = __repr__
+    
     disabled          = 0
     discussion_boards = 1
     guides_news       = 2
@@ -61,6 +70,15 @@ class Revenue(enum.IntFlag):
     ? : Above options can be added together to create custom settings (e.g 3 :
     allow mods to be sold and receive donations)
     """
+    def __repr__(self):
+        cls = self.__class__
+        if self._name_ is not None:
+            return self._name_
+        members, uncovered = enum._decompose(cls, self._value_)
+        return '|'.join([str(m._name_ or m._value_) for m in members])
+
+    __str__ = __repr__
+
     disabled     = 0
     sold         = 1
     donations    = 2
@@ -77,6 +95,15 @@ class APIAccess(enum.IntFlag):
     allow 3rd parties to access this games API endpoints and allow mods to be
     downloaded directly)
     """
+    def __repr__(self):
+        cls = self.__class__
+        if self._name_ is not None:
+            return self._name_
+        members, uncovered = enum._decompose(cls, self._value_)
+        return '|'.join([str(m._name_ or m._value_) for m in members])
+
+    __str__ = __repr__
+
     disabled         = 0
     third_party      = 1
     direct_downloads = 2
@@ -101,6 +128,15 @@ class Maturity(enum.IntFlag):
     ? : Above options can be added together to create custom settings (e.g 3 : 
     alcohol and drugs present)
     """
+    def __repr__(self):
+        cls = self.__class__
+        if self._name_ is not None:
+            return self._name_
+        members, uncovered = enum._decompose(cls, self._value_)
+        return '|'.join([str(m._name_ or m._value_) for m in members])
+
+    __str__ = __repr__
+
     none     = 0
     alcohol  = 1
     drugs    = 2

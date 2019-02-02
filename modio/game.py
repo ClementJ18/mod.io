@@ -90,7 +90,7 @@ class Game:
         self.instructions_url = attrs.pop("instructions_url", None)
         self.profile = attrs.pop("profile_url")
         self.tag_options = [TagOption(**tag) for tag in attrs.pop("tag_options", [])]
-        self.maturity_options = attrs.pop("maturity_options")
+        self.maturity_options = MaturityOptions(attrs.pop("maturity_options"))
         self._client = attrs.pop("client")
         self.submitter = User(client=self._client, **attrs.pop("submitted_by"))
         

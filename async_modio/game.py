@@ -76,7 +76,7 @@ class Game:
         self.curation = Curation(attrs.pop("curation_option"))
         self.community = Community(attrs.pop("community_options"))
         self.revenue = Revenue(attrs.pop("revenue_options"))
-        self.api = APIAccess(attrs.pop("api_access_options", ))
+        self.api = APIAccess(attrs.pop("api_access_options"))
         self.ugc = attrs.pop("ugc_name")
         self.icon = Image(**attrs.pop("icon", None))
         self.logo = Image(**attrs.pop("logo", None))
@@ -89,7 +89,7 @@ class Game:
         self.instructions_url = attrs.pop("instructions_url", None)
         self.profile = attrs.pop("profile_url")
         self.tag_options = [TagOption(**tag) for tag in attrs.pop("tag_options", [])]
-        self.maturity_options = attrs.pop("maturity_options")
+        self.maturity_options = MaturityOptions(attrs.pop("maturity_options"))
         self._client = attrs.pop("client")
         self.submitter = User(client=self._client, **attrs.pop("submitted_by"))
         
