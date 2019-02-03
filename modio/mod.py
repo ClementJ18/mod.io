@@ -68,8 +68,8 @@ class Mod:
         Latest released instance. Can be None. Filter attribute.
     media : ModMedia
         Contains mod media data (links and images)
-    rating : Stats
-        Summary of all rating for this mod
+    stats : Stats
+        Summary of all stats for this mod
     tags : dict
         Tags for this mod. Filter attribute.
     kvp : dict
