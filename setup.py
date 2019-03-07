@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='modio',
-      version='0.4.0',
+      version='0.2.0',
       description='mod.io python wrapper',
       author='Clement Julia',
       author_email='clement.julia13@gmail.com',
@@ -10,7 +10,7 @@ setup(name='modio',
      )
 
 setup(name='async_modio',
-      version='0.4.0',
+      version='0.2.0',
       description='async mod.io python wrapper',
       author='Clement Julia',
       author_email='clement.julia13@gmail.com',

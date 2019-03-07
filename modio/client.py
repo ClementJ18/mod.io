@@ -464,13 +464,16 @@ class Client:
         Returns
         --------
         str
-            The access code.
+            The access code. The access code will also be added directly to the Client's `access_token` 
+            attribute.
         """
 
         if len(code) != 5:
             raise ValueError("Security code must be 5 digits")
 
         r = self._post_request("/oauth/emailexchange", params={'security_code' : code, "api_key":self.api_key}, h_type=2)
+        self.access_token = r["access_token"]
+
         return r["access_token"]   
 
     def steam_auth(self, code):
@@ -489,52 +492,14 @@ class Client:
         Returns
         --------
         str
-            The access code
+            The user's access code
         """
         r = self._post_request('/external/steamauth', data={'appdata': code})
         return r["access_token"]
 
-    def gog_auth(self, code):
-        """Request an access token on behalf of a GOG Galaxy user. To use this functionality you 
-        must supply your games encrypted app ticket key supplied by GOG Galaxy, in the Edit > Options 
-        page of your games profile on mod.io.
+    def account_link(self, service, email):
+        """Link your mod.io account to one of the services. WIP
 
-        |coro|
-
-        Parameters
-        ----------
-        code : str
-            The Steam users Encrypted User Authentication Ticket. 
-            https://cdn.gog.com/open/galaxy/sdk/1.133.3/Documentation/classgalaxy_1_1api_1_1IUser.html#a352802aab7a6e71b1cd1b9b1adfd53d8
-
-        Returns
-        --------
-        str
-            The access code
-        """
-        r = self._post_request('/external/galaxyauth', data={"appdata": code})
-        return r["access_token"]
-
-    def external_account(self, service, service_id, email):
-        """Link an external account to your mod.io account.
-
-        Parameters
-        -----------
-        service : ServiceType
-            The external service where the user's account originates.
-        service_id : str
-            The id used to represent the user on the external service you are trying to 
-            link. Service ID formats:
-            - steam (int, 17 characters, Community ID format)
-            - gog (int, 12 characters)
-        email : str
-            The e-mail address to link to the authenticated user's account.
-        """
-        data = {
-            "service": service.name,
-            "service_id": service_id,
-            "email": email
-        }
-
-        r = self._post_request('/external/link', data=data)
-        return r["code"] == 200        
+        |coro|"""
+        raise NotImplementedError("WIP")     
+        
