@@ -199,3 +199,8 @@ class RatingType(enum.Enum):
     good    = 1
     neutral = 0
     bad     = -1
+
+class ServiceType(enum.Enum):
+    """The type of external services you can authenticate with"""
+    gog = 0
+    steam = 1
