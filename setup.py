@@ -7,6 +7,9 @@ setup(name='modio',
       author_email='clement.julia13@gmail.com',
       url='https://github.com/ClementJ18/mod.io',
       packages=['modio'],
+      install_requires=[
+        'requests>=2.20.0'
+      ]
      )
 
 setup(name='async_modio',
@@ -16,4 +19,7 @@ setup(name='async_modio',
       author_email='clement.julia13@gmail.com',
       url='https://github.com/ClementJ18/mod.io',
       packages=['async_modio'],
+      install_requires=[
+        'aiohttp==3.4.4'
+      ]
      )
