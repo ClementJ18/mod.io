@@ -1,4 +1,5 @@
 """Client used to interact with the API at a base level."""
+import asyncio
 import requests
 import aiohttp
 
@@ -34,11 +35,19 @@ class Connection:
         return f"https://api.mod.io/{self.version}"
 
     def __repr__(self):
-        return f"<Client rate_limit={self.rate_limit} rate_retry={self.rate_retry} rate_remain={self.rate_remain}>"
+        return f"<Connection rate_limit={self.rate_limit} rate_retry={self.rate_retry} rate_remain={self.rate_remain}>"
 
     async def close(self):
         """Close sessions"""
         await self.async_session.close()
+
+    def enforce_ratelimit(self):
+        if self.rate_retry > 0:
+            time.sleep(self.rate_retry)
+
+    async def async_enforce_ratelimit(self):
+        if self.rate_retry > 0:
+            await asyncio.sleep(self.rate_retry)
 
     def _error_check(self, resp, request_json):
         """Updates the rate-limit attributes and check validity of the request."""
@@ -95,19 +104,31 @@ class Connection:
             h_type = 2
 
         resp = self.session.get(self._base_path + url, headers=self._define_headers(h_type), params=extra)
-        return self._error_check(resp, resp.json())
+        data = self._error_check(resp, resp.json())
+        self.enforce_ratelimit()
+        
+        return data
 
     def post_request(self, url, *, h_type=0, **fields):
         resp = self.session.post(self._base_path + url, headers=self._define_headers(h_type), **fields)
-        return self._error_check(resp, resp.json())
+        data = self._error_check(resp, resp.json())
+        self.enforce_ratelimit()
+        
+        return data
 
     def put_request(self, url, *, h_type=0, **fields):
         resp = self.session.put(self._base_path + url, headers=self._define_headers(h_type), **fields)
-        return self._error_check(resp, resp.json())
+        data = self._error_check(resp, resp.json())
+        self.enforce_ratelimit()
+        
+        return data
 
     def delete_request(self, url, *, h_type=0, **fields):
         resp = self.session.delete(self._base_path + url, headers=self._define_headers(h_type), **fields)
-        return self._error_check(resp, resp.json())
+        data = self._error_check(resp, resp.json())
+        self.enforce_ratelimit()
+        
+        return data
 
     async def async_get_request(self, url, *, h_type=0, **fields):
         filters = fields.pop("filters", None)
@@ -122,7 +143,10 @@ class Connection:
         async with self.async_session.get(
             self._base_path + url, headers=self._define_headers(h_type), params=extra
         ) as resp:
-            return await self._error_check(resp, await resp.json())
+            data = await self._error_check(resp, await resp.json())
+            await self.async_enforce_ratelimit()
+
+            return data
 
     async def async_post_request(self, url, *, h_type=0, **fields):
         files = fields.pop("files", {})
@@ -147,19 +171,28 @@ class Connection:
         async with self.async_session.post(
             self._base_path + url, headers=self._define_headers(h_type), data=form
         ) as resp:
-            return await self._error_check(resp, await resp.json())
+            data = await self._error_check(resp, await resp.json())
+            await self.async_enforce_ratelimit()
+
+            return data
 
     async def async_put_request(self, url, *, h_type=0, **fields):
         async with self.async_session.put(
             self._base_path + url, headers=self._define_headers(h_type), **fields
         ) as resp:
-            return await self._error_check(resp, await resp.json())
+            data = await self._error_check(resp, await resp.json())
+            await self.async_enforce_ratelimit()
+
+            return data
 
     async def async_delete_request(self, url, *, h_type=0, **fields):
         async with self.async_session.delete(
             self._base_path + url, headers=self._define_headers(h_type), **fields
         ) as resp:
-            return await self._error_check(resp, await resp.json())
+            data = await self._error_check(resp, await resp.json())
+            await self.async_enforce_ratelimit()
+
+            return data
 
 
 class Client:
@@ -207,7 +240,11 @@ class Client:
         self.access_token = auth
         self.lang = lang
         self.version = version
+        self.test = test
         self.connection = Connection(test=test, api_key=api_key, auth=auth, version=version, lang=lang)
+
+    def __repr__(self):
+        return f"< Client version={self.version} test={self.test} >"
 
     async def close(self):
         """|async| This function is used to clean up the client in order to close the application that it uses gracefully.
