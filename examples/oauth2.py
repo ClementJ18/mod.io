@@ -14,8 +14,8 @@ oauth2 = client.email_exchange(code)
 #your oauth2 token is now stored in the variable
 
 #to save simply
-with open("oauth2.txt", "w") as f:
-    f.write(oauth2)
+with open("oauth2.txt", "w") as file:
+    file.write(oauth2)
 
 #and now the token is stored in oauth2.txt
 

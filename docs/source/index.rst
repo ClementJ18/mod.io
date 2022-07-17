@@ -34,7 +34,8 @@ Welcome to modio's documentation!
 .. image:: https://img.shields.io/github/commits-since/ClementJ18/mod.io/latest.svg
     :target: https://github.com/ClementJ18/mod.io/releases/latest
 
-modio.py is a wrapper package for the mod.io API. There is also an async wrapper available :ref:`here <async-version>`.
+modio.py is a wrapper package for the mod.io API. Most blocking methods have both a synchronous version and async method
+for use within async applications.
 
 Basic Usage
 -----------------
@@ -87,18 +88,15 @@ Example
 
 Installation
 -------------
-Installing modio will install both the sync and the async package. Due to this when uninstalling you must uninstall
-both.
 ::
 
-   pip install -U git+git://github.com/ClementJ18/mod.io.git@0.3
+   pip install mod.io
 
 Uninstalling
 -------------
 ::
 
    pip uninstall modio
-   pip uninstall async_modio
 
 
 .. toctree::

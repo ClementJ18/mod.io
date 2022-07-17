@@ -1,5 +1,9 @@
-# async_modio\client.py: 1
-aiohttp == 3.4.4
+aiohttp==3.8.1 
+requests==2.28.1
 
-# modio\client.py: 1
-requests>=2.20.0
+pytest==7.1.2
+pytest_html==3.1.1
+pytest-rerunfailures==10.2
+pytest-test-groups==1.0.3
+flakeheaven==1.0.1
+black==22.3.0

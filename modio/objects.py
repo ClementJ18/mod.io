@@ -1,16 +1,20 @@
-from .errors import modioException, BadRequest
+from modio.mixins import RatingMixin, ReportMixin
+from .errors import modioException
 from .utils import concat_docs, _lib_to_api, _convert_date
-from .enums import *
+from .enums import EventType, Maturity, RatingType, VirusStatus, Visibility
 
+import enum
 import hashlib
 from collections import namedtuple
 import time
 
 
 _Returned = namedtuple("Returned", "results pagination")
+
+
 class Returned(_Returned):
-    """A named tuple returned by certain methods which return multiple results 
-    and need to return pagination data along with it. 
+    """A named tuple returned by certain methods which return multiple results
+    and need to return pagination data along with it.
 
     Attributes
     ----------
@@ -19,7 +23,7 @@ class Returned(_Returned):
     pagination : Pagination
         Pagination metadata attached to the results
     """
-    pass
+
 
 class Message:
     """A simple representation of a modio Message, used when modio returns
@@ -33,6 +37,7 @@ class Message:
         The server response to the request
 
     """
+
     def __init__(self, **attrs):
         self.code = attrs.pop("code")
         self.message = attrs.pop("message")
@@ -42,6 +47,7 @@ class Message:
 
     def __repr__(self):
         return f"<Message code={self.code}>"
+
 
 class Image:
     """A representation of a modio image, which stand for the Logo, Icon
@@ -65,6 +71,7 @@ class Image:
         on the object being processed. Can be None.
 
     """
+
     def __init__(self, **attrs):
         self.filename = attrs.pop("filename")
         self.original = attrs.pop("original")
@@ -74,10 +81,11 @@ class Image:
         self.large = list(attrs.values())[4] if len(attrs) > 4 else None
 
     def __repr__(self):
-        return f"<Image filename={self.filename} original={self.original}>"     
+        return f"<Image filename={self.filename} original={self.original}>"
+
 
 class Event:
-    """Represents a mod event. 
+    """Represents a mod event.
 
     Filter-Only Attributes
     -----------------------
@@ -86,10 +94,10 @@ class Event:
     object itself and trying to access them will cause an AttributeError
 
     latest : bool
-        Returns only the latest unique events, which is useful for checking 
+        Returns only the latest unique events, which is useful for checking
         if the primary modfile has changed.
     subscribed : bool
-        Returns only events connected to mods the authenticated user is 
+        Returns only events connected to mods the authenticated user is
         subscribed to, which is useful for keeping the users mods up-to-date.
 
     Attributes
@@ -109,6 +117,7 @@ class Event:
         a mod event. Filter attribute.
 
     """
+
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.date = _convert_date(attrs.pop("date_added"))
@@ -126,6 +135,7 @@ class Event:
 
     def __repr__(self):
         return f"<Event id={self.id} type={self.type.name} mod={self.mod}>"
+
 
 class Comment:
     """Represents a comment on a mod page.
@@ -161,6 +171,7 @@ class Comment:
         The level of nesting from 1 to 3 where one is top level and three is
         the deepest level
     """
+
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.mod = attrs.pop("mod_id")
@@ -171,9 +182,9 @@ class Comment:
         self.karma = attrs.pop("karma")
         self.karma_guest = attrs.pop("karma_guest")
         self.content = attrs.pop("content")
-        self._client = attrs.pop("client")
+        self.connection = attrs.pop("connection")
         self.mod = attrs.pop("mod")
-        self.submitter = User(client=self._client, **attrs.pop("user"))
+        self.submitter = User(connection=self.connection, **attrs.pop("user"))
         self.children = []
 
     def __repr__(self):
@@ -183,8 +194,18 @@ class Comment:
         """Remove the comment.
 
         |coro|"""
-        r = self._client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}')
-        return r
+        resp = self.connection.delete_request(f"/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}")
+        return resp
+
+    async def async_delete(self):
+        """Remove the comment.
+
+        |coro|"""
+        resp = await self.connection.async_delete_request(
+            f"/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}"
+        )
+        return resp
+
 
 class ModFile:
     """A object to represents modfiles. If the modfile has been returned for the me/modfile endpoint
@@ -226,7 +247,8 @@ class ModFile:
         ID of the game of the mod this file belongs to. Can be None if this file
         was returned from the me/modfiles endpoint.
     """
-    def __init__(self,**attrs):
+
+    def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.mod = attrs.pop("mod_id")
         self.date = attrs.pop("date_added")
@@ -244,7 +266,7 @@ class ModFile:
         self.url = download["binary_url"]
         self.expires = _convert_date(download["date_expires"])
         self.game = attrs.pop("game_id", None)
-        self._client = attrs.pop("client")
+        self.connection = attrs.pop("connection")
 
     def __repr__(self):
         return f"<ModFile id={self.id} name={self.filename} version={self.version}>"
@@ -259,8 +281,16 @@ class ModFile:
         User
             User that submitted the resource
         """
-        user_json = self._client._post_request(f"/general/ownership", data={"resource_type" : "files", "resource_id" : self.id})
-        return User(client=self._client, **user_json)
+        user_json = self.connection.post_request(
+            "/general/ownership", data={"resource_type": "files", "resource_id": self.id}
+        )
+        return User(connection=self.connection, **user_json)
+
+    async def async_get_owner(self):
+        user_json = await self.connection.async_post_request(
+            "/general/ownership", data={"resource_type": "files", "resource_id": self.id}
+        )
+        return User(connection=self.connection, **user_json)
 
     def edit(self, **fields):
         """Edit the file's details.
@@ -276,17 +306,35 @@ class ModFile:
         active : bool
             Change whether or not this is the active version.
         metadata_blob : str
-            Metadata stored by the game developer which may include 
+            Metadata stored by the game developer which may include
             properties such as what version of the game this file is compatible with.
         """
         if not self.game:
-            raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
+            raise modioException(
+                "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
+            )
 
-        file_json = self._client._put_request(f'/games/{self.game}/mods/{self.mod}/files/{self.id}', data = fields)
+        file_json = self.connection.put_request(
+            f"/games/{self.game}/mods/{self.mod}/files/{self.id}", data=fields
+        )
         if "code" in file_json:
             return
 
-        self.__init__(client=self._client, game_id=self.game, **file_json)
+        self.__init__(connection=self.connection, game_id=self.game, **file_json)
+
+    async def async_edit(self, **fields):
+        if not self.game:
+            raise modioException(
+                "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
+            )
+
+        file_json = await self.connection.async_put_request(
+            f"/games/{self.game}/mods/{self.mod}/files/{self.id}", data=fields
+        )
+        if "code" in file_json:
+            return
+
+        self.__init__(connection=self.connection, game_id=self.game, **file_json)
 
     def delete(self):
         """Deletes the modfile, this will raise an error if the
@@ -300,10 +348,31 @@ class ModFile:
             You cannot delete the active release of a mod
         """
         if not self.game:
-            raise modioException("This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint")
-            
-        r = self._client._delete_request(f'/games/{self.game}/mods/{self.mod}/files/{self.id}')
-        return r
+            raise modioException(
+                "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
+            )
+
+        resp = self.connection.delete_request(f"/games/{self.game}/mods/{self.mod}/files/{self.id}")
+        return resp
+
+    async def async_delete(self):
+        """Deletes the modfile, this will raise an error if the
+        file is the active release for the mod.
+
+        |coro|
+
+        Raises
+        -------
+        Forbidden
+            You cannot delete the active release of a mod
+        """
+        if not self.game:
+            raise modioException(
+                "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
+            )
+
+        resp = await self.connection.async_delete_request(f"/games/{self.game}/mods/{self.mod}/files/{self.id}")
+        return resp
 
     def url_is_expired(self):
         """Check if the url is still valid for this modfile.
@@ -314,6 +383,7 @@ class ModFile:
             True if it's still valid, else False
         """
         return self.expires.timestamp() < time.time()
+
 
 class ModMedia:
     """Represents all the media for a mod.
@@ -328,13 +398,15 @@ class ModMedia:
         A list of image objects (gallery)
 
     """
+
     def __init__(self, **attrs):
         self.youtube = attrs.pop("youtube")
         self.sketchfab = attrs.pop("sketchfab")
-        self.images = [Image(**image) for image in attrs.pop("images", [])] 
+        self.images = [Image(**image) for image in attrs.pop("images", [])]
+
 
 class TagOption:
-    """Represents a game tag gropup, a category of tags from which a 
+    """Represents a game tag gropup, a category of tags from which a
     mod may pick one or more.
 
     Attributes
@@ -352,6 +424,7 @@ class TagOption:
         Array of tags for this group
 
     """
+
     def __init__(self, **attrs):
         self.name = attrs.pop("name")
         self.type = attrs.pop("type", "dropdown")
@@ -361,7 +434,8 @@ class TagOption:
     def __repr__(self):
         return f"<TagOption name={self.name} hidden={self.hidden}>"
 
-class Rating:
+
+class Rating(RatingMixin):
     """Represents a rating, objects obtained from the get_my_ratings endpoint
 
     Attributes
@@ -376,12 +450,15 @@ class Rating:
         UNIX timestamp of whe the rating was added
 
     """
+
+    mod_key = "mod"
+
     def __init__(self, **attrs):
         self.game = attrs.pop("game_id")
         self.mod = attrs.pop("mod_id")
         self.rating = RatingType(attrs.pop("rating"))
         self.date = _convert_date(attrs.pop("date_added"))
-        self._client = attrs.pop("client")
+        self.connection = attrs.pop("connection")
 
     def delete(self):
         """Sets the rating to neutral.
@@ -389,29 +466,9 @@ class Rating:
         |coro|"""
         raise NotImplementedError("WIP")
 
-    def _add_rating(self, rating : RatingType):
-        try:
-            self._client._post_request(f'/games/{self.game}/mods/{self.mod}/ratings', data={"rating":rating.value})
-        except BadRequest:
-            return False
+    async def async_delete(self):
+        raise NotImplementedError("WIP")
 
-        return True
-
-    def add_positive_rating(self):
-        """Changes the mod rating to positive, the author of the rating will be the authenticated user.
-        If the mod has already been positevely rated by the user it will return False. If the positive rating
-        is successful it will return True.
-
-        |coro|"""
-        return self._add_rating(RatingType.good)
-
-    def add_negative_rating(self):
-        """Changes the mod rating to negative, the author of the rating will be the authenticated user.
-        If the mod has already been negatively rated by the user it will return False. If the negative rating
-        is successful it will return True.
-
-        |coro|"""
-        return self._add_rating(RatingType.bad)
 
 class Stats:
     """Represents a summary of stats for a mod
@@ -429,7 +486,7 @@ class Stats:
     subscribers : int
         Amount of subscribers. Filter attribute
     total : int
-        Number of times this item has been rated. 
+        Number of times this item has been rated.
     positive : int
         Number of positive ratings. Filter attribute
     negative : int
@@ -437,9 +494,9 @@ class Stats:
     percentage : int
         Percentage of positive rating (positive/total)
     weighted : int
-        Overall rating of this item calculated using the Wilson score confidence 
-        interval. This column is good to sort on, as it will order items based 
-        on number of ratings and will place items with many positive ratings above 
+        Overall rating of this item calculated using the Wilson score confidence
+        interval. This column is good to sort on, as it will order items based
+        on number of ratings and will place items with many positive ratings above
         those with a higher score but fewer ratings.
     text : str
         Textual representation of the rating in format. This is currently not updated
@@ -448,6 +505,7 @@ class Stats:
         Unix timestamp until this mods's statistics are considered stale. Endpoint
         should be polled again when this expires.
     """
+
     def __init__(self, **attrs):
         self.id = attrs.pop("mod_id")
         self.rank = attrs.pop("popularity_rank_position")
@@ -475,6 +533,7 @@ class Stats:
         """
         return self.expires.timestamp() < time.time()
 
+
 class Tag:
     """mod.io Tag objects are represented as dictionnaries and are returned
     as such by the function of this library, each entry of in the dictionnary
@@ -492,14 +551,14 @@ class Tag:
     tag : str
         String representation of the tag.
     """
-    pass
+
 
 class MetaData:
     """mod.io MetaData objects are represented as dictionnaries and are returned
     as such by the function of this library, each entry of in the dictionnary
     is composed of the metakey as the key and the metavalue as the value.
     """
-    pass
+
 
 class Dependencies:
     """mod.io Depedencies objects are represented as dictionnaries and are returned
@@ -508,9 +567,9 @@ class Dependencies:
     dict.keys() to access dependencies as a list.
 
     """
-    pass
 
-class User:
+
+class User(ReportMixin):
     """Represents a modio user.
 
     Attributes
@@ -533,6 +592,9 @@ class User:
         URL to the user's mod.io profile.
 
     """
+
+    resource_type = "users"
+
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
         self.name_id = attrs.pop("name_id")
@@ -549,43 +611,11 @@ class User:
         self.tz = attrs.pop("timezone")
         self.lang = attrs.pop("language")
         self.profile = attrs.pop("profile_url")
-        self._client = attrs.pop("client")
+        self.connection = attrs.pop("connection")
 
     def __repr__(self):
-        return f"<User id={self.id} username={self.username}>"
+        return f"<User id={self.id} username={self.username}>" 
 
-    def report(self, name, summary, type = Report(0)):
-        """Report a this user, make sure to read mod.io's ToU to understand what is
-        and isnt allowed.
-
-        |coro|
-
-        Parameters
-        -----------
-        name : str
-            Name of the report
-        summary : str
-            Detailed description of your report. Make sure you include all relevant information and 
-            links to help moderators investigate and respond appropiately.
-        type : Report
-            Type of the report
-
-        Returns
-        --------
-        Message
-            The returned message on the success of the query.
-
-        """
-        fields = {
-            "id" : self.id,
-            "resource" :  "users",
-            "name" : name,
-            "type" : type.value,
-            "summary" : summary
-        }
-
-        msg = self._client._post_request('/report', data = fields)
-        return Message(**msg)
 
 @concat_docs
 class TeamMember(User):
@@ -597,10 +627,10 @@ class TeamMember(User):
     object itself and trying to access them will cause an AttributeError
 
     user_id : int
-        Unique id of the user.  
+        Unique id of the user.
     username : str
-        Username of the user. 
-    
+        Username of the user.
+
     Attributes
     -----------
     team_id : int
@@ -616,9 +646,10 @@ class TeamMember(User):
         The mod object the team is attached to.
 
     """
+
     def __init__(self, **attrs):
-        self._client = attrs.pop("client")
-        super().__init__(**attrs.pop("user"), client=self._client)
+        self.connection = attrs.pop("connection")
+        super().__init__(**attrs.pop("user"), connection=self.connection)
         self.team_id = attrs.pop("id")
         self.level = attrs.pop("level")
         self.date = attrs.pop("date_added")
@@ -641,17 +672,32 @@ class TeamMember(User):
             Custom title given to the user in this team.
 
         """
-        data = {"level" : level.value, "position" : position}
-        msg = self._client._put_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}', data=data)
+        data = {"level": level.value, "position": position}
+        msg = self.connection.put_request(
+            f"/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}", data=data
+        )
+        return Message(**msg)
+
+    async def async_edit(self, *, level=None, position=None):
+        data = {"level": level.value, "position": position}
+        msg = await self.connection.async_put_request(
+            f"/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}", data=data
+        )
         return Message(**msg)
 
     def delete(self):
         """Remove the user from the team. Fires a MOD_TEAM_CHANGED event.
 
         |coro|"""
-        r = self._client._delete_request(f'/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}')
-        return r
-    
+        resp = self.connection.delete_request(f"/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}")
+        return resp
+
+    async def async_delete(self):
+        resp = await self.connection.async_delete_request(
+            f"/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}"
+        )
+        return resp
+
 
 class NewMod:
     """This class is unique to the library, it represents a mod to be submitted. The class
@@ -673,15 +719,16 @@ class NewMod:
     stock : Optional[int]
         Maximium number of subscribers for this mod. Optional, if not included disables
     metadata : Optional[str]
-        Metadata stored by developers which may include properties on how information 
+        Metadata stored by developers which may include properties on how information
         required. Optional. E.g. `"rogue,hd,high-res,4k,hd textures"`
     maturity : Optional[Maturity]
         Choose if the mod contains mature content.
     visible : Optional[Visibility]
-        Visibility status of the mod 
+        Visibility status of the mod
     logo : str
         Path to the file. If on windows, must have \\ escaped.
     """
+
     def __init__(self, **attrs):
         self.name = attrs.pop("name")
         self.name_id = attrs.pop("name_id", None)
@@ -707,6 +754,7 @@ class NewMod:
 
         return self
 
+
 class NewModFile:
     """This class is unique to the library and represents a file to be submitted. The class
     must be instantiated and then passed to mod.add_file().
@@ -720,15 +768,19 @@ class NewModFile:
     active : Optional[bool]
         Label this upload as the current release. Optional, if not included defaults to True.
     metadata : str
-        Metadata stored by the game developer which may include properties such as what version 
+        Metadata stored by the game developer which may include properties such as what version
         of the game this file is compatible with.
 
     """
+
     def __init__(self, **attrs):
         self.version = attrs.pop("version")
         self.changelog = attrs.pop("changelog")
         self.active = attrs.pop("active", True)
         self.metadata_blob = attrs.pop("metadata", None)
+
+        self.file = None
+        self.filehash = None
 
     def _file_hash(self, file):
         hash_md5 = hashlib.md5()
@@ -740,13 +792,13 @@ class NewModFile:
     def add_file(self, path):
         """Used to add a file.
 
-        The binary file for the release. For compatibility you should 
-        ZIP the base folder of your mod, or if it is a collection of files 
-        which live in a pre-existing game folder, you should ZIP those files. 
+        The binary file for the release. For compatibility you should
+        ZIP the base folder of your mod, or if it is a collection of files
+        which live in a pre-existing game folder, you should ZIP those files.
         Your file must meet the following conditions:
 
             - File must be zipped and cannot exceed 10GB in filesize
-            - Mods which span multiple game directories are not supported 
+            - Mods which span multiple game directories are not supported
                 unless the game manages this
             - Mods which overwrite files are not supported unless the game manages this
 
@@ -761,9 +813,10 @@ class NewModFile:
 
         return self
 
+
 class Filter:
     """.. _filter:
-    
+
     This class is unique to the library and is an attempt to make filtering
     modio data easier. Instead of passing filter keywords directly you can pass
     an instance of this class which you have previously fine tuned through the
@@ -772,8 +825,8 @@ class Filter:
     If you don't know the modio format simply use the methods, all method return
     self for fluid chaining. This is also used for sorting and pagination. These
     instances can be save and reused at will. Attributes which can be used as filters
-    will be marked as "Filter attributes" in the docs for the class the endpoint 
-    returns an array of. E.g. ID is marked as a filter argument for in the class Game 
+    will be marked as "Filter attributes" in the docs for the class the endpoint
+    returns an array of. E.g. ID is marked as a filter argument for in the class Game
     and therefore in get_games() it can be used a filter.
 
     Parameters
@@ -782,9 +835,18 @@ class Filter:
         A dict which contains modio filter keyword and the appropriate value.
 
     """
-    def __init__(self, filters={}):
+
+    def __init__(self, filters=None):
+        if filters is None:
+            filters = {}
+
         for key, value in filters.items():
             self._set(key, value)
+
+        self._q = None
+        self._sort = None
+        self._limit = None
+        self._offset = None
 
     def _set(self, key, value, text="{}"):
         try:
@@ -810,8 +872,8 @@ class Filter:
         Parameters
         -----------
         query : str
-            The words to identify. filter.text("The Lord of the Rings") - This will return every 
-            result where the name column contains any of the following words: 'The', 
+            The words to identify. filter.text("The Lord of the Rings") - This will return every
+            result where the name column contains any of the following words: 'The',
             'Lord', 'of', 'the', 'Rings'.
 
         """
@@ -819,7 +881,7 @@ class Filter:
         return self
 
     def equals(self, **kwargs):
-        """The simpliest filter you can apply is columnname equals. This will return all rows which 
+        """The simpliest filter you can apply is columnname equals. This will return all rows which
         contain a column matching the value provided. There are not set parameters, this methods takes
         any named keywords and transforms them into arguments that will be passed to the request. E.g.
         'id=10' or 'name="Best Mod"'
@@ -829,8 +891,8 @@ class Filter:
         return self
 
     def not_equals(self, **kwargs):
-        """Where the preceding column value does not equal the value specified. There are not set parameters, 
-        this methods takes any named keywords and transforms them into arguments that will be passed to 
+        """Where the preceding column value does not equal the value specified. There are not set parameters,
+        this methods takes any named keywords and transforms them into arguments that will be passed to
         the request. E.g. 'id=10' or 'name="Best Mod"'
         """
         for key, value in kwargs.items():
@@ -838,9 +900,9 @@ class Filter:
         return self
 
     def like(self, **kwargs):
-        """Where the string supplied matches the preceding column value. This is equivalent to SQL's LIKE. 
-        Consider using wildcard's * for the best chance of results as described below. There are not set parameters, 
-        this methods takes any named keywords and transforms them into arguments that will be passed to 
+        """Where the string supplied matches the preceding column value. This is equivalent to SQL's LIKE.
+        Consider using wildcard's * for the best chance of results as described below. There are not set parameters,
+        this methods takes any named keywords and transforms them into arguments that will be passed to
         the request. E.g. 'id=10' or 'name="Best Mod"'
         """
         for key, value in kwargs.items():
@@ -848,9 +910,9 @@ class Filter:
         return self
 
     def not_like(self, **kwargs):
-        """Where the string supplied does not match the preceding column value. This is equivalent to SQL's 
-        NOT LIKE. This is equivalent to SQL's LIKE. Consider using wildcard's * for the best chance of results 
-        as described below. There are not set parameters, this methods takes any named keywords and transforms 
+        """Where the string supplied does not match the preceding column value. This is equivalent to SQL's
+        NOT LIKE. This is equivalent to SQL's LIKE. Consider using wildcard's * for the best chance of results
+        as described below. There are not set parameters, this methods takes any named keywords and transforms
         them into arguments that will be passed to the request. E.g. 'id=10' or 'name="Best Mod"'
         """
         for key, value in kwargs.items():
@@ -858,9 +920,9 @@ class Filter:
         return self
 
     def values_in(self, **kwargs):
-        """Where the supplied list of values appears in the preceding column value. This is equivalent 
+        """Where the supplied list of values appears in the preceding column value. This is equivalent
         to SQL's IN. There are not set parameters, this methods takes any named keywords and values as lists
-        and transforms them into arguments that will be passed to the request. 
+        and transforms them into arguments that will be passed to the request.
         E.g. 'id=[10, 3, 4]' or 'name=["Best","Mod"]'
         """
         for key, value in kwargs.items():
@@ -868,9 +930,9 @@ class Filter:
         return self
 
     def values_not_in(self, **kwargs):
-        """Where the supplied list of values does NOT appears in the preceding column value. This is equivalent 
+        """Where the supplied list of values does NOT appears in the preceding column value. This is equivalent
         to SQL's NOT IN. There are not set parameters, this methods takes any named keywords and values as lists
-        and transforms them into arguments that will be passed to the request. 
+        and transforms them into arguments that will be passed to the request.
         E.g. 'id=[10, 3, 4]' or 'name=["Best","Mod"]'
         """
         for key, value in kwargs.items():
@@ -878,8 +940,8 @@ class Filter:
         return self
 
     def max(self, **kwargs):
-        """Where the preceding column value is smaller than or equal to the value specified. There are not set 
-        parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
+        """Where the preceding column value is smaller than or equal to the value specified. There are not set
+        parameters, this methods takes any named keywords and transforms them into arguments that will be passed
         to the request. E.g. 'game=40'
         """
         for key, value in kwargs.items():
@@ -887,8 +949,8 @@ class Filter:
         return self
 
     def min(self, **kwargs):
-        """Where the preceding column value is greater than or equal to the value specified. There are not set 
-        parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
+        """Where the preceding column value is greater than or equal to the value specified. There are not set
+        parameters, this methods takes any named keywords and transforms them into arguments that will be passed
         to the request. E.g. 'game=40'
         """
         for key, value in kwargs.items():
@@ -896,8 +958,8 @@ class Filter:
         return self
 
     def smaller_than(self, **kwargs):
-        """Where the preceding column value is smaller than the value specified. There are not set 
-        parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
+        """Where the preceding column value is smaller than the value specified. There are not set
+        parameters, this methods takes any named keywords and transforms them into arguments that will be passed
         to the request. E.g. 'game=40'
         """
         for key, value in kwargs.items():
@@ -905,8 +967,8 @@ class Filter:
         return self
 
     def greater_than(self, **kwargs):
-        """Where the preceding column value is greater than the value specified. There are not set 
-        parameters, this methods takes any named keywords and transforms them into arguments that will be passed 
+        """Where the preceding column value is greater than the value specified. There are not set
+        parameters, this methods takes any named keywords and transforms them into arguments that will be passed
         to the request. E.g. 'game=40'
         """
         for key, value in kwargs.items():
@@ -960,6 +1022,7 @@ class Filter:
         self._offset = offset
         return self
 
+
 class Pagination:
     """This class is unique to the library and represents the pagination
     data that some of the endpoints return.
@@ -1001,17 +1064,19 @@ class Pagination:
     def previous(self):
         """Returns the offset required for the previous set of results. If the min results have been reached the returns the
         current offset."""
-        return self.offset - self.limit  if not self.min() else self.offset
+        return self.offset - self.limit if not self.min() else self.offset
 
     def page(self):
         """Returns the current page number. Page numbers start at 0"""
         return self.offset // self.limit
+
 
 class Object:
     """A dud class that can be used to replace other classes, keyword arguments
     passed will become attributes.
 
     """
+
     def __init__(self, **attrs):
         self.__dict__.update(attrs)
 
