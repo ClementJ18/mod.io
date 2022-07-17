@@ -1,16 +1,16 @@
 """Games are the umbrella entities under which all mods are stored."""
+import json
 
 from .mod import Mod
-from .objects import Event, Image, Message, NewMod, Pagination, Returned, Stats, TagOption, User
+from .entities import Event, Image, Message, Stats, TagOption, User
+from .objects import NewMod, Pagination, Returned
 from .errors import modioException
 from .utils import _convert_date, _clean_and_convert, find
 from .enums import APIAccess, Community, Curation, MaturityOptions, Presentation, Revenue, Status, Submission
-from .mixins import ReportMixin
-
-import json
+from .mixins import OwnerMixin, ReportMixin
 
 
-class Game(ReportMixin):
+class Game(ReportMixin, OwnerMixin):
     """Represents an instance of a Game. Do not create manually.
 
     Attributes
@@ -162,11 +162,15 @@ class Game(ReportMixin):
 
         """
         mod_json = self.connection.get_request(f"/games/{self.id}/mods", filters=filters)
-        return Returned([Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
+        return Returned(
+            [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
+        )
 
     async def async_get_mods(self, *, filters=None):
         mod_json = await self.connection.async_get_request(f"/games/{self.id}/mods", filters=filters)
-        return Returned([Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
+        return Returned(
+            [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
+        )
 
     def get_mod_events(self, *, filters=None):
         """Gets all the mod events available for this game sorted by latest event first. |filterable|
@@ -242,30 +246,9 @@ class Game(ReportMixin):
         stats_json = await self.connection.async_get_request(f"/games/{self.id}/mods/stats", filters=filters)
         return Returned([Stats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
 
-    def get_owner(self):
-        """Returns the original submitter of the resource.
-
-        |coro|
-
-        Returns
-        --------
-        User
-            User that submitted the resource
-        """
-        user_json = self.connection.post_request(
-            "/general/ownership", data={"resource_type": "games", "resource_id": self.id}
-        )
-        return User(connection=self.connection, **user_json)
-
-    async def async_get_owner(self):
-        user_json = await self.connection.async_post_request(
-            "/general/ownership", data={"resource_type": "games", "resource_id": self.id}
-        )
-        return User(connection=self.connection, **user_json)
-
     def edit(self, **fields):
         """Used to edit the game details. For editing the icon, logo or header use :func:`add_media`.
-        Sucessful editing will update the game instance.
+        Sucessful editing will return the updated game.
 
         |coro|
 
@@ -298,16 +281,22 @@ class Game(ReportMixin):
         api : APIAccess
             Change the api access of the mods
         maturity_options : MaturityOptions
-            Chose whether or not to allow mature content"""
+            Chose whether or not to allow mature content
+
+        Returns
+        --------
+        Game
+            The updated gamed
+        """
 
         fields = _clean_and_convert(fields)
         game_json = self.connection.put_request(f"/games/{self.id}", data=fields)
-        self.__init__(connection=self.connection, **game_json)
+        return self.__class__(connection=self.connection, **game_json)
 
     async def async_edit(self, **fields):
         fields = _clean_and_convert(fields)
         game_json = await self.connection.async_put_request(f"/games/{self.id}", data=fields)
-        self.__init__(connection=self.connection, **game_json)
+        return self.__class__(connection=self.connection, **game_json)
 
     def add_mod(self, mod):
         """Add a mod to this game.
@@ -420,7 +409,9 @@ class Game(ReportMixin):
             media["header"] = open(header, "rb")
 
         try:
-            message = await self.connection.async_post_request(f"/games/{self.id}/media", h_type=1, files=media)
+            message = await self.connection.async_post_request(
+                f"/games/{self.id}/media", h_type=1, files=media
+            )
         finally:
             for image in media.values():
                 image.close()

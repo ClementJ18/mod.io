@@ -2,7 +2,7 @@
 
 from .errors import modioException
 from .enums import RatingType, Report
-from . import objects
+from . import entities
 
 
 class ReportMixin:
@@ -43,13 +43,13 @@ class ReportMixin:
         """
 
         msg = self.connection.post_request("/report", data=self._make_report_dict(name, summary, report_type))
-        return objects.Message(**msg)
+        return entities.Message(**msg)
 
     async def async_report(self, name, summary, report_type=Report(0)):
         msg = await self.connection.async_post_request(
             "/report", data=self._make_report_dict(name, summary, report_type)
         )
-        return objects.Message(**msg)
+        return entities.Message(**msg)
 
 
 class RatingMixin:
@@ -88,7 +88,7 @@ class RatingMixin:
         return self._add_rating(RatingType.good)
 
     async def async_add_positive_rating(self):
-        return await self.connection.async_add_rating(RatingType.good)
+        return await self._async_add_rating(RatingType.good)
 
     def add_negative_rating(self):
         """Changes the mod rating to negative, the author of the rating will be the authenticated user.
@@ -99,4 +99,39 @@ class RatingMixin:
         return self._add_rating(RatingType.bad)
 
     async def async_add_negative_rating(self):
-        return await self.connection.async_add_rating(RatingType.bad)
+        return await self._async_add_rating(RatingType.bad)
+
+    def delete(self):
+        """Removes a rating. Returns true if the rating was succefully removed.
+
+        |coro|
+        """
+        return self._add_rating(RatingType.neutral)
+
+    async def async_delete(self):
+        return await self._async_add_rating(RatingType.neutral)
+
+
+class OwnerMixin:
+    """Mixin containing get owner methods."""
+
+    def get_owner(self):
+        """Get the original submitter of the resource.
+
+        |coro|
+
+        Returns
+        -------
+        User
+            The original submitter
+        """
+        resp = self.connection.post_request(
+            "/general/ownership", data={"resource_type": self.resource_type, "resource_id": self.id}
+        )
+        return entities.User(**resp.json())
+
+    async def async_get_owner(self):
+        resp = await self.connection.async_post_request(
+            "/general/ownership", data={"resource_type": self.resource_type, "resource_id": self.id}
+        )
+        return entities.User(**resp.json())

@@ -234,11 +234,7 @@ class TestMod(unittest.TestCase):
         run(self.mod.delete_dependencies(list(run(self.mod.async_get_dependencies()).results.keys())))
 
     def test_async_add_team_member(self):
-        run(
-            self.mod.add_team_member(
-                "juliacj@cardiff.ac.uk", modio.Level.creator, position="Lord of Tests"
-            )
-        )
+        run(self.mod.add_team_member("juliacj@cardiff.ac.uk", modio.Level.creator, position="Lord of Tests"))
 
     def test_async_report(self):
         run(self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))

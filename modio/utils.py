@@ -1,3 +1,4 @@
+"""Utility functions for the library"""
 import inspect
 import enum
 import datetime
@@ -54,8 +55,8 @@ def find(iterable, **fields):
     """
 
     for e in iterable:
-        if all(key in e.__dict__ for key in fields.keys()):
-            if all(e.__dict__[key] == fields[key] for key in fields.keys()):
+        if all(key in e.__dict__ for key in fields):
+            if all(e.__dict__[key] == fields[key] for key in fields):
                 return e
 
     return None
@@ -76,10 +77,10 @@ def get(iterable, **fields):
     is returned
     """
 
-    e_list = list()
+    e_list = []
     for e in iterable:
-        if all(key in e.__dict__ for key in fields.keys()):
-            if all(e.__dict__[key] == fields[key] for key in fields.keys()):
+        if all(key in e.__dict__ for key in fields):
+            if all(e.__dict__[key] == fields[key] for key in fields):
                 e_list.append(e)
 
     return e_list

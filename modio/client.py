@@ -3,13 +3,15 @@ import requests
 import aiohttp
 
 from .errors import modioException
-from .objects import Event, Filter, Message, ModFile, Pagination, Rating, Returned, User
+from .entities import Event, Message, ModFile, Rating, User
+from .objects import Pagination, Returned, Filter
 from .game import Game
 from .mod import Mod
 
 
 class Connection:
     """Class handling under the hood requests and ratelimits."""
+
     def __init__(self, api_key, auth, lang, version, test):
         self.test = test
         self.version = version
@@ -200,9 +202,7 @@ class Client:
         Is 0 until the rate_remain is 0 and becomes 0 again once the rate limit is reset.
     """
 
-    def __init__(
-        self, *, api_key=None, auth=None, lang="en", version="v1", test=False
-    ):
+    def __init__(self, *, api_key=None, auth=None, lang="en", version="v1", test=False):
         self.api_key = api_key
         self.access_token = auth
         self.lang = lang
@@ -263,11 +263,15 @@ class Client:
             The results and pagination tuple from this request
         """
         game_json = self.connection.get_request("/games", filters=filters)
-        return Returned([Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json))
+        return Returned(
+            [Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json)
+        )
 
     async def async_get_games(self, *, filters=None):
         game_json = await self.connection.async_get_request("/games", filters=filters)
-        return Returned([Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json))
+        return Returned(
+            [Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json)
+        )
 
     def get_user(self, user_id):
         """Gets a user with the specified ID.
@@ -316,11 +320,15 @@ class Client:
 
         """
         user_json = self.connection.get_request("/users", filters=filters)
-        return Returned([User(connection=self.connection, **user) for user in user_json["data"]], Pagination(**user_json))
+        return Returned(
+            [User(connection=self.connection, **user) for user in user_json["data"]], Pagination(**user_json)
+        )
 
     async def async_get_users(self, *, filters=None):
         user_json = await self.connection.async_get_request("/users", filters=filters)
-        return Returned([User(connection=self.connection, **user) for user in user_json["data"]], Pagination(**user_json))
+        return Returned(
+            [User(connection=self.connection, **user) for user in user_json["data"]], Pagination(**user_json)
+        )
 
     def get_my_user(self):
         """Gets the authenticated user's details (aka the user who created the API key/access token)
@@ -367,11 +375,15 @@ class Client:
             The results and pagination tuple from this request
         """
         mod_json = self.connection.get_request("/me/subscribed", filters=filters)
-        return Returned([Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
+        return Returned(
+            [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
+        )
 
     async def async_get_my_subs(self, *, filters=None):
         mod_json = await self.connection.async_get_request("/me/subscribed", filters=filters)
-        return Returned([Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
+        return Returned(
+            [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
+        )
 
     def get_my_events(self, *, filters=None):
         """Get events that have been fired specifically for the authenticated user. |filterable|
@@ -418,11 +430,15 @@ class Client:
             The results and pagination tuple from this request
         """
         game_json = self.connection.get_request("/me/games", filters=filters)
-        return Returned([Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json))
+        return Returned(
+            [Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json)
+        )
 
     async def async_get_my_games(self, filters=None):
         game_json = await self.connection.async_get_request("/me/games", filters=filters)
-        return Returned([Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json))
+        return Returned(
+            [Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json)
+        )
 
     def get_my_mods(self, *, filters=None):
         """Get all the mods the authenticated user added or is a team member of. |filterable|
@@ -446,11 +462,15 @@ class Client:
             The results and pagination tuple from this request
         """
         mod_json = self.connection.get_request("/me/mods", filters=filters)
-        return Returned([Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
+        return Returned(
+            [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
+        )
 
     async def async_get_my_mods(self, *, filters=None):
         mod_json = await self.connection.async_get_request("/me/mods", filters=filters)
-        return Returned([Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json))
+        return Returned(
+            [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
+        )
 
     def get_my_modfiles(self, *, filters=None):
         """Get all the mods the authenticated user uploaded. The returned modfile objects cannot be
@@ -477,13 +497,15 @@ class Client:
         """
         files_json = self.connection.get_request("/me/files", filters=filters)
         return Returned(
-            [ModFile(**file, connection=self.connection) for file in files_json["data"]], Pagination(**files_json)
+            [ModFile(**file, connection=self.connection) for file in files_json["data"]],
+            Pagination(**files_json),
         )
 
     async def async_get_my_modfiles(self, *, filters=None):
         files_json = await self.connection.async_get_request("/me/files", filters=filters)
         return Returned(
-            [ModFile(**file, connection=self.connection) for file in files_json["data"]], Pagination(**files_json)
+            [ModFile(**file, connection=self.connection) for file in files_json["data"]],
+            Pagination(**files_json),
         )
 
     def get_my_ratings(self, *, filters=None):
@@ -510,11 +532,17 @@ class Client:
         """
 
         ratings = self.connection.get_request("/me/ratings", filters=filters)
-        return Returned([Rating(**rating, connection=self.connection) for rating in ratings["data"]], Pagination(**ratings))
+        return Returned(
+            [Rating(**rating, connection=self.connection) for rating in ratings["data"]],
+            Pagination(**ratings),
+        )
 
     async def async_get_my_ratings(self, *, filters=None):
         ratings = await self.connection.async_get_request("/me/ratings", filters=filters)
-        return Returned([Rating(**rating, connection=self.connection) for rating in ratings["data"]], Pagination(**ratings))
+        return Returned(
+            [Rating(**rating, connection=self.connection) for rating in ratings["data"]],
+            Pagination(**ratings),
+        )
 
     def get_my_mutes(self, *, filters=None):
         """Get all users muted by this user
@@ -539,11 +567,15 @@ class Client:
         """
 
         users = self.connection.get_request("/me/users/muted", filters=filters)
-        return Returned([User(**user, connection=self.connection) for user in users["data"]], Pagination(**users))
+        return Returned(
+            [User(**user, connection=self.connection) for user in users["data"]], Pagination(**users)
+        )
 
     async def async_get_my_mutes(self, *, filters=None):
         users = await self.connection.async_get_request("/me/users/muted", filters=filters)
-        return Returned([User(**user, connection=self.connection) for user in users["data"]], Pagination(**users))
+        return Returned(
+            [User(**user, connection=self.connection) for user in users["data"]], Pagination(**users)
+        )
 
     def email_request(self, email):
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address
@@ -613,37 +645,3 @@ class Client:
         self.access_token = resp["access_token"]
 
         return resp["access_token"]
-
-    def steam_auth(self, code):
-        """Request an access token on behalf of a Steam user. To use this functionality you must
-        first have supplied your game's secret encrypted app ticket key from Steamworks via the API
-        in the 'Options' tab of your game profile.
-
-        |coro|
-
-        Parameters
-        ----------
-        code : str
-            The Steam users Encrypted User Authentication Ticket.
-            https://partner.steamgames.com/doc/features/auth#encryptedapptickets
-
-        Returns
-        --------
-        str
-            The user's access code
-        """
-        resp = self.connection.post_request("/external/steamauth", data={"appdata": code})
-        return resp["access_token"]
-
-    async def async_steam_auth(self, code):
-        resp = await self.connection.async_post_request("/external/steamauth", data={"appdata": code})
-        return resp["access_token"]
-
-    def account_link(self, service, email):
-        """Link your mod.io account to one of the services. WIP
-
-        |coro|"""
-        raise NotImplementedError("WIP")
-
-    async def async_account_link(self, service, email):
-        raise NotImplementedError("WIP")

@@ -14,7 +14,7 @@ from .utils import run
 
 class TestEvent(unittest.TestCase):
     def test_type(self):
-        event = modio.objects.Event(
+        event = modio.entities.Event(
             **{
                 "id": 13,
                 "mod_id": 13,

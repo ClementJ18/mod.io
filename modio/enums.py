@@ -4,6 +4,7 @@ import enum
 
 class IntFlag(enum.IntFlag):
     """Base class for IntFlags containing formatting methods."""
+
     def __repr__(self):
         cls = self.__class__
         if self._name_ is not None:
@@ -173,6 +174,7 @@ class Level(enum.Enum):
     4 : Manager (moderator access, including uploading builds and editing settings except supply and team members)
     8 : Administrator (full access, including editing the supply and team)
     """
+
     moderator = 1
     creator = 4
     admin = 8

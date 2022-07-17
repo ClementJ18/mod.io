@@ -3,25 +3,23 @@ import time
 
 from .enums import Maturity, Status, Visibility
 from .errors import modioException
-from .mixins import RatingMixin, ReportMixin
-from .objects import (
+from .mixins import OwnerMixin, RatingMixin, ReportMixin
+from .entities import (
     Comment,
     Event,
     Image,
     Message,
     ModFile,
     ModMedia,
-    NewModFile,
-    Pagination,
-    Returned,
     Stats,
     TeamMember,
     User,
 )
+from .objects import NewModFile, Pagination, Returned
 from .utils import _convert_date, _clean_and_convert
 
 
-class Mod(ReportMixin, RatingMixin):
+class Mod(ReportMixin, RatingMixin, OwnerMixin):
     """Represent a modio mod object.
 
     Filter-Only Attributes
@@ -121,7 +119,9 @@ class Mod(ReportMixin, RatingMixin):
         self.connection = attrs.pop("connection")
         self._file = attrs.pop("modfile", None)
         self._kvp_raw = attrs.pop("metadata_kvp")
-        self.file = ModFile(**self._file, game_id=self.game, connection=self.connection) if self._file else None
+        self.file = (
+            ModFile(**self._file, game_id=self.game, connection=self.connection) if self._file else None
+        )
         self.submitter = User(connection=self.connection, **attrs.pop("submitted_by"))
         self.plaintext = attrs.pop("description_plaintext")
 
@@ -163,7 +163,9 @@ class Mod(ReportMixin, RatingMixin):
         return ModFile(**file_json, game_id=self.game, connection=self.connection)
 
     async def async_get_file(self, file_id: int):
-        file_json = await self.connection.async_get_request(f"/games/{self.game}/mods/{self.id}/files/{file_id}")
+        file_json = await self.connection.async_get_request(
+            f"/games/{self.game}/mods/{self.id}/files/{file_id}"
+        )
         return ModFile(**file_json, game_id=self.game, connection=self.connection)
 
     def get_files(self, *, filters=None):
@@ -394,29 +396,8 @@ class Mod(ReportMixin, RatingMixin):
         self.stats = stats = Stats(**stats_json)
         return stats
 
-    def get_owner(self):
-        """Returns the original submitter of the resource.
-
-        |coro|
-
-        Returns
-        --------
-        User
-            User that submitted the resource
-        """
-        user_json = self.connection.post_request(
-            "/general/ownership", data={"resource_type": "mods", "resource_id": self.id}
-        )
-        return User(connection=self.connection, **user_json)
-
-    async def async_get_owner(self):
-        user_json = await self.connection.async_post_request(
-            "/general/ownership", data={"resource_type": "mods", "resource_id": self.id}
-        )
-        return User(connection=self.connection, **user_json)
-
     def edit(self, **fields):
-        """Used to edit the mod details. Sucessful editing will update the mod instance.
+        """Used to edit the mod details. Sucessful editing will return the updated mod.
 
         |coro|
 
@@ -445,15 +426,20 @@ class Mod(ReportMixin, RatingMixin):
         metadata : str
                 Metadata stored by the mod developer which may include properties as to how
                 the item works, or other information you need to display.
+
+        Returns
+        --------
+        Mod
+            The updated version of the mod
         """
         fields = _clean_and_convert(fields)
         mod_json = self.connection.put_request(f"/games/{self.game}/mods/{self.id}", data=fields)
-        return self.__init__(connection=self.connection, **mod_json)
+        return self.__class__(connection=self.connection, **mod_json)
 
     async def async_edit(self, **fields):
         fields = _clean_and_convert(fields)
         mod_json = await self.connection.async_put_request(f"/games/{self.game}/mods/{self.id}", data=fields)
-        return self.__init__(connection=self.connection, **mod_json)
+        return self.__class__(connection=self.connection, **mod_json)
 
     def delete(self):
         """Delete a mod and set its status to deleted.
@@ -683,7 +669,7 @@ class Mod(ReportMixin, RatingMixin):
 
         """
         self.get_tags()
-        tags = list(set([tag.lower() for tag in tags if tag.lower() not in self.tags.keys()]))
+        tags = list({tag.lower() for tag in tags if tag.lower() not in self.tags.keys()})
 
         if not tags:
             raise modioException("No unique tags were submitted")
@@ -699,7 +685,7 @@ class Mod(ReportMixin, RatingMixin):
 
     async def async_add_tags(self, *tags):
         await self.get_tags()
-        tags = list(set([tag.lower() for tag in tags if tag.lower() not in self.tags.keys()]))
+        tags = list({tag.lower() for tag in tags if tag.lower() not in self.tags.keys()})
 
         if not tags:
             raise modioException("No unique tags were submitted")
@@ -729,7 +715,7 @@ class Mod(ReportMixin, RatingMixin):
         """
         self.get_tags()
         if tags:
-            tags = list(set([tag.lower() for tag in tags if tag.lower() in self.tags.keys()]))
+            tags = list({tag.lower() for tag in tags if tag.lower() in self.tags.keys()})
         else:
             tags = list(self.tags.keys())
 
@@ -748,7 +734,7 @@ class Mod(ReportMixin, RatingMixin):
     async def async_delete_tags(self, *tags):
         await self.get_tags()
         if tags:
-            tags = list(set([tag.lower() for tag in tags if tag.lower() in self.tags.keys()]))
+            tags = list({tag.lower() for tag in tags if tag.lower() in self.tags.keys()})
         else:
             tags = list(self.tags.keys())
 
@@ -843,12 +829,12 @@ class Mod(ReportMixin, RatingMixin):
         metadata_d = {}
         index = 0
         for key, values in metadata.items():
-            metadata_d[
-                f"metadata[{index}]"
-            ] = f"{key}{':' if len(values) > 0 else ''}{':'.join(values)}"
+            metadata_d[f"metadata[{index}]"] = f"{key}{':' if len(values) > 0 else ''}{':'.join(values)}"
             index += 1
 
-        resp = self.connection.delete_request(f"/games/{self.game}/mods/{self.id}/metadatakvp", data=metadata_d)
+        resp = self.connection.delete_request(
+            f"/games/{self.game}/mods/{self.id}/metadatakvp", data=metadata_d
+        )
 
         for key, values in metadata.items():
             if not values:
@@ -864,9 +850,7 @@ class Mod(ReportMixin, RatingMixin):
         metadata_d = {}
         index = 0
         for key, values in metadata.items():
-            metadata_d[
-                f"metadata[{index}]"
-            ] = f"{key}{':' if len(values) > 0 else ''}{':'.join(values)}"
+            metadata_d[f"metadata[{index}]"] = f"{key}{':' if len(values) > 0 else ''}{':'.join(values)}"
             index += 1
 
         resp = await self.connection.async_delete_request(
@@ -898,7 +882,9 @@ class Mod(ReportMixin, RatingMixin):
         dependency = {
             f"dependencies[{dependencies.index(data)}]": getattr(data, "id", data) for data in dependencies
         }
-        resp = self.connection.post_request(f"/games/{self.game}/mods/{self.id}/dependencies", data=dependency)
+        resp = self.connection.post_request(
+            f"/games/{self.game}/mods/{self.id}/dependencies", data=dependency
+        )
         return Message(**resp)
 
     async def async_add_dependencies(self, dependencies: list):
