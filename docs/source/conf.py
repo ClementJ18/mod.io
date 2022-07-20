@@ -187,10 +187,10 @@ epub_exclude_files = ["search.html"]
 intersphinx_mapping = {"https://docs.python.org/": None}
 
 rst_prolog = """
-.. |coro| replace:: This method has an async equivalent, it is a method of the same name prefixed with `async_`.
+.. |coro| replace:: This method has an async equivalent, it is a method of the same name prefixed with `async_`.  You must use :ref:`Client.start` before using this method
 .. |corourl| replace:: *coroutine*
 .. _corourl: https://docs.python.org/3/library/asyncio-task.html#coroutine
-.. |async| replace:: Exclusive to the |async-version| of the wrapper
+.. |async| replace:: Exclusive to the |async-version| of the wrapper. You must use :ref:`Client.start` before using this method
 .. |async-version| replace:: :ref:`async version <async-version>`
 .. |filterable| replace:: This method takes :ref:`filtering arguments <filter>`
 """

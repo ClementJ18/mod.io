@@ -45,7 +45,7 @@ Basic Usage
 
    client = modio.Client(
       api_key="your api key here", 
-      auth="your o auth 2 token here"
+      access_token="your o auth 2 token here"
    )
 
    game = client.get_game(345)

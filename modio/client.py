@@ -1,7 +1,9 @@
 """Client used to interact with the API at a base level."""
 import asyncio
+import logging
 import requests
 import aiohttp
+import time
 
 from .errors import modioException
 from .entities import Event, Message, ModFile, Rating, User
@@ -13,10 +15,10 @@ from .mod import Mod
 class Connection:
     """Class handling under the hood requests and ratelimits."""
 
-    def __init__(self, api_key, auth, lang, version, test):
+    def __init__(self, api_key, access_token, lang, version, test):
         self.test = test
         self.version = version
-        self.access_token = auth
+        self.access_token = access_token
         self.api_key = api_key
         self.lang = lang
 
@@ -25,7 +27,18 @@ class Connection:
         self.rate_retry = 0
 
         self.session = requests.Session()
-        self.async_session = aiohttp.ClientSession()
+        self._async_session = None
+
+    @property
+    def async_session(self):
+        if self._async_session is None:
+            raise ValueError("No async session found, did you forget to class Client.start?")
+
+        return self._async_session
+
+    @async_session.setter
+    def async_session(self, session):
+        self._async_session = session
 
     @property
     def _base_path(self):
@@ -38,15 +51,21 @@ class Connection:
         return f"<Connection rate_limit={self.rate_limit} rate_retry={self.rate_retry} rate_remain={self.rate_remain}>"
 
     async def close(self):
-        """Close sessions"""
+        """Close session"""
         await self.async_session.close()
+
+    async def start(self):
+        """Start session"""
+        self.async_session = aiohttp.ClientSession()
 
     def enforce_ratelimit(self):
         if self.rate_retry > 0:
+            logging.info("Ratelimited, sleeping for %s seconds", self.rate_retry)
             time.sleep(self.rate_retry)
 
     async def async_enforce_ratelimit(self):
         if self.rate_retry > 0:
+            logging.info("Ratelimited, sleeping for %s seconds", self.rate_retry)
             await asyncio.sleep(self.rate_retry)
 
     def _error_check(self, resp, request_json):
@@ -54,14 +73,18 @@ class Connection:
         self.rate_limit = resp.headers.get("X-RateLimit-Limit", self.rate_limit)
         self.rate_remain = resp.headers.get("X-RateLimit-Remaining", self.rate_remain)
         self.rate_retry = resp.headers.get("X-Ratelimit-RetryAfter", 0)
+        code = getattr(resp, "status_code", getattr(resp, "status", None))
 
-        if resp.status_code == 204:
+        if code == 204:
             return resp
 
         if "error" in request_json:
-            code = request_json["error"]["code"]
+            error_code = request_json["error"]["code"]
             msg = request_json["error"]["message"]
-            raise modioException(msg, code)
+            ref = request_json["error"]["error_ref"]
+            errors = request_json["error"].get("errors", {})
+
+            raise modioException(msg, error_code, ref, errors)
 
         return request_json
 
@@ -95,7 +118,7 @@ class Connection:
 
     def get_request(self, url, *, h_type=0, **fields):
         filters = fields.pop("filters", None)
-        filters = (filters or Filter()).__dict__.copy()
+        filters = (filters or Filter()).get_dict()
 
         extra = {**fields, **filters}
 
@@ -106,33 +129,33 @@ class Connection:
         resp = self.session.get(self._base_path + url, headers=self._define_headers(h_type), params=extra)
         data = self._error_check(resp, resp.json())
         self.enforce_ratelimit()
-        
+
         return data
 
     def post_request(self, url, *, h_type=0, **fields):
         resp = self.session.post(self._base_path + url, headers=self._define_headers(h_type), **fields)
         data = self._error_check(resp, resp.json())
         self.enforce_ratelimit()
-        
+
         return data
 
     def put_request(self, url, *, h_type=0, **fields):
         resp = self.session.put(self._base_path + url, headers=self._define_headers(h_type), **fields)
         data = self._error_check(resp, resp.json())
         self.enforce_ratelimit()
-        
+
         return data
 
     def delete_request(self, url, *, h_type=0, **fields):
         resp = self.session.delete(self._base_path + url, headers=self._define_headers(h_type), **fields)
         data = self._error_check(resp, resp.json())
         self.enforce_ratelimit()
-        
+
         return data
 
     async def async_get_request(self, url, *, h_type=0, **fields):
         filters = fields.pop("filters", None)
-        filters = (filters or Filter()).__dict__.copy()
+        filters = (filters or Filter()).get_dict()
 
         extra = {**fields, **filters}
 
@@ -143,7 +166,7 @@ class Connection:
         async with self.async_session.get(
             self._base_path + url, headers=self._define_headers(h_type), params=extra
         ) as resp:
-            data = await self._error_check(resp, await resp.json())
+            data = self._error_check(resp, await resp.json())
             await self.async_enforce_ratelimit()
 
             return data
@@ -171,7 +194,7 @@ class Connection:
         async with self.async_session.post(
             self._base_path + url, headers=self._define_headers(h_type), data=form
         ) as resp:
-            data = await self._error_check(resp, await resp.json())
+            data = self._error_check(resp, await resp.json())
             await self.async_enforce_ratelimit()
 
             return data
@@ -180,7 +203,7 @@ class Connection:
         async with self.async_session.put(
             self._base_path + url, headers=self._define_headers(h_type), **fields
         ) as resp:
-            data = await self._error_check(resp, await resp.json())
+            data = self._error_check(resp, await resp.json())
             await self.async_enforce_ratelimit()
 
             return data
@@ -189,7 +212,7 @@ class Connection:
         async with self.async_session.delete(
             self._base_path + url, headers=self._define_headers(h_type), **fields
         ) as resp:
-            data = await self._error_check(resp, await resp.json())
+            data = self._error_check(resp, await resp.json())
             await self.async_enforce_ratelimit()
 
             return data
@@ -205,7 +228,7 @@ class Client:
         The api key that will be used to authenticate the bot while it makes most of
         its GET requests. This can be generated on the mod.io website. Optional if an access
         token is supplied.
-    auth : Optional[str]
+    access_token : Optional[str]
         The OAuth 2 token that will be used to make more complex GET requests and to make
         POST requests. This can either be generated using the library's oauth2 functions
         or through the mod.io website. This is referred as an access token in the rest of
@@ -235,13 +258,11 @@ class Client:
         Is 0 until the rate_remain is 0 and becomes 0 again once the rate limit is reset.
     """
 
-    def __init__(self, *, api_key=None, auth=None, lang="en", version="v1", test=False):
-        self.api_key = api_key
-        self.access_token = auth
+    def __init__(self, *, api_key=None, access_token=None, lang="en", version="v1", test=False):
         self.lang = lang
         self.version = version
         self.test = test
-        self.connection = Connection(test=test, api_key=api_key, auth=auth, version=version, lang=lang)
+        self.connection = Connection(test=test, api_key=api_key, access_token=access_token, version=version, lang=lang)
 
     def __repr__(self):
         return f"< Client version={self.version} test={self.test} >"
@@ -250,8 +271,17 @@ class Client:
         """|async| This function is used to clean up the client in order to close the application that it uses gracefully.
         At the moment it is only used to close the client's Session.
 
-        |coro|"""
+        |coro|
+        """
         await self.connection.close()
+
+    async def start(self):
+        """|async| This function is used to start up the async part of the client. This is required to avoid sync users
+        from having to clean up stuff.
+
+        |coro|
+        """
+        await self.connection.start()
 
     def get_game(self, game_id):
         """Queries the mod.io API for the given game ID and if found returns it as a
@@ -308,63 +338,6 @@ class Client:
         game_json = await self.connection.async_get_request("/games", filters=filters)
         return Returned(
             [Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json)
-        )
-
-    def get_user(self, user_id):
-        """Gets a user with the specified ID.
-
-        |coro|
-
-        Parameters
-        -----------
-        user_id : int
-            The ID of the user to query the API for
-
-        Raises
-        -------
-        NotFound
-            A user with the supplied id was not found.
-
-        Returns
-        --------
-        User
-            The user with the given ID
-
-        """
-        user_json = self.connection.get_request(f"/users/{user_id}")
-        return User(connection=self.connection, **user_json)
-
-    async def async_get_user(self, user_id):
-        user_json = await self.connection.async_get_request(f"/users/{user_id}")
-        return User(connection=self.connection, **user_json)
-
-    def get_users(self, *, filters=None):
-        """Gets all the users availaible on mod.io. Returns
-        a named tuple with parameters results and pagination. |filterable|
-
-        |coro|
-
-        Parameters
-        -----------
-        filters : Optional[Filter]
-            A instance of Filter to be used for filtering, paginating and sorting
-            results
-
-        Returns
-        --------
-        Returned[List[User], Pagination]
-            The results and pagination tuple from this request
-
-        """
-        user_json = self.connection.get_request("/users", filters=filters)
-        return Returned(
-            [User(connection=self.connection, **user) for user in user_json["data"]], Pagination(**user_json)
-        )
-
-    async def async_get_users(self, *, filters=None):
-        user_json = await self.connection.async_get_request("/users", filters=filters)
-        return Returned(
-            [User(connection=self.connection, **user) for user in user_json["data"]], Pagination(**user_json)
         )
 
     def get_my_user(self):
@@ -628,13 +601,13 @@ class Client:
         """
 
         resp = self.connection.post_request(
-            "/oauth/emailrequest", params={"email": email, "api_key": self.api_key}, h_type=2
+            "/oauth/emailrequest", params={"email": email, "api_key": self.connection.api_key}, h_type=2
         )
         return Message(**resp)
 
     async def async_email_request(self, email):
         resp = await self.connection.async_post_request(
-            "/oauth/emailrequest", params={"email": email, "api_key": self.api_key}, h_type=2
+            "/oauth/emailrequest", params={"email": email, "api_key": self.connection.api_key}, h_type=2
         )
         return Message(**resp)
 
@@ -658,17 +631,15 @@ class Client:
         Returns
         --------
         str
-            The access code. The access code will also be added directly to the Client's `access_token`
-            attribute.
+            The access code.
         """
 
         if len(code) != 5:
             raise ValueError("Security code must be 5 digits")
 
         resp = self.connection.post_request(
-            "/oauth/emailexchange", params={"security_code": code, "api_key": self.api_key}, h_type=2
+            "/oauth/emailexchange", params={"security_code": code, "api_key": self.connection.api_key}, h_type=2
         )
-        self.access_token = resp["access_token"]
 
         return resp["access_token"]
 
@@ -677,8 +648,7 @@ class Client:
             raise ValueError("Security code must be 5 digits")
 
         resp = await self.connection.async_post_request(
-            "/oauth/emailexchange", params={"security_code": code, "api_key": self.api_key}, h_type=2
+            "/oauth/emailexchange", params={"security_code": code, "api_key": self.connection.api_key}, h_type=2
         )
-        self.access_token = resp["access_token"]
 
         return resp["access_token"]

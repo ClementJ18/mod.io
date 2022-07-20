@@ -429,7 +429,7 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
 }
 </script>
     <h1>report.html</h1>
-    <p>Report generated on 17-Jul-2022 at 15:29:02 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.1.1</p>
+    <p>Report generated on 20-Jul-2022 at 10:09:24 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.1.1</p>
     <h2>Environment</h2>
     <table id="environment">
       <tr>
@@ -445,8 +445,8 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
         <td>Python</td>
         <td>3.8.13</td></tr></table>
     <h2>Summary</h2>
-    <p>4 tests ran in 2.02 seconds. </p>
-    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">1 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">3 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>, <input checked="true" class="filter" data-test-result="rerun" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="rerun">0 rerun</span>
+    <p>8 tests ran in 35.66 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">6 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">2 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>, <input checked="true" class="filter" data-test-result="rerun" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="rerun">0 rerun</span>
     <h2>Results</h2>
     <table id="results-table">
       <thead id="results-table-head">
@@ -460,36 +460,87 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
       <tbody class="failed results-table-row">
         <tr>
           <td class="col-result">Failed</td>
-          <td class="col-name">tests/test_client.py::TestClient::test_api_token</td>
-          <td class="col-duration">0.74</td>
+          <td class="col-name">tests/test_game.py::TestGame::test_async_tag_options</td>
+          <td class="col-duration">1.83</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log">self = &lt;tests.test_client.TestClient testMethod=test_api_token&gt;<br/><br/>    def test_api_token(self):<br/>        client = modio.Client(api_key=game_api_key, test=True)<br/>        games = client.get_games()<br/>&gt;       client.get_game(games.results[0].id)<br/><span class="error">E       IndexError: list index out of range</span><br/><br/>tests/test_client.py:31: IndexError<br/></div></td></tr></tbody>
+            <div class="log">self = &lt;tests.test_game.TestGame testMethod=test_async_tag_options&gt;<br/><br/>    def test_async_tag_options(self):<br/>&gt;       run(<br/>            self.game.async_add_tag_options(<br/>                &quot;pywrappertest&quot;,<br/>                tags=[&quot;this&quot;, &quot;is&quot;, &quot;a&quot;, &quot;test&quot;],<br/>                tag_type=random.choice((&quot;dropdown&quot;, &quot;checkboxes&quot;)),<br/>                hidden=random.choice((False, True)),<br/>            )<br/>        )<br/><br/>tests/test_game.py:93: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>tests/utils.py:5: in run<br/>    return asyncio.get_event_loop().run_until_complete(coro)<br/>/usr/lib/python3.8/asyncio/base_events.py:616: in run_until_complete<br/>    return future.result()<br/>modio/game.py:415: in async_add_tag_options<br/>    message = await self.connection.async_post_request(f&quot;/games/{self.id}/tags&quot;, data=tags)<br/>modio/client.py:197: in async_post_request<br/>    data = self._error_check(resp, await resp.json())<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;Connection rate_limit=120 rate_retry=0 rate_remain=95&gt;<br/>resp = &lt;ClientResponse(https://api.test.mod.io/v1/games/947/tags) [422 Unprocessable Entity]&gt;<br/>&lt;CIMultiDictProxy(&#x27;Date&#x27;: &#x27;Wed,..., &#x27;Server&#x27;: &#x27;cloudflare&#x27;, &#x27;CF-RAY&#x27;: &#x27;72da36c1a9bb101a-MRS&#x27;, &#x27;alt-svc&#x27;: &#x27;h3=&quot;:443&quot;; ma=86400, h3-29=&quot;:443&quot;; ma=86400&#x27;)&gt;<br/><br/>request_json = {&#x27;error&#x27;: {&#x27;code&#x27;: 422, &#x27;error_ref&#x27;: 13009, &#x27;errors&#x27;: {&#x27;a&#x27;: &#x27;Duplicate tags are not allowed, even if they are in diffe..., even if they are in different tag groups.&#x27;}, &#x27;message&#x27;: &#x27;Validation Failed. Please see below to fix invalid input:&#x27;}}<br/><br/>    def _error_check(self, resp, request_json):<br/>        &quot;&quot;&quot;Updates the rate-limit attributes and check validity of the request.&quot;&quot;&quot;<br/>        self.rate_limit = resp.headers.get(&quot;X-RateLimit-Limit&quot;, self.rate_limit)<br/>        self.rate_remain = resp.headers.get(&quot;X-RateLimit-Remaining&quot;, self.rate_remain)<br/>        self.rate_retry = resp.headers.get(&quot;X-Ratelimit-RetryAfter&quot;, 0)<br/>        code = getattr(resp, &quot;status_code&quot;, getattr(resp, &quot;status&quot;, None))<br/>    <br/>        if code == 204:<br/>            return resp<br/>    <br/>        if &quot;error&quot; in request_json:<br/>            error_code = request_json[&quot;error&quot;][&quot;code&quot;]<br/>            msg = request_json[&quot;error&quot;][&quot;message&quot;]<br/>            ref = request_json[&quot;error&quot;][&quot;error_ref&quot;]<br/>            errors = request_json[&quot;error&quot;].get(&quot;errors&quot;, {})<br/>    <br/>&gt;           raise modioException(msg, error_code, ref, errors)<br/><span class="error">E           modio.errors.modioException: 422 (13009) - Validation Failed. Please see below to fix invalid input: </span><br/><span class="error">E           is - Duplicate tags are not allowed, even if they are in different tag groups.</span><br/><span class="error">E           a - Duplicate tags are not allowed, even if they are in different tag groups.</span><br/><br/>modio/client.py:87: modioException<br/></div></td></tr></tbody>
       <tbody class="failed results-table-row">
         <tr>
           <td class="col-result">Failed</td>
-          <td class="col-name">tests/test_client.py::TestClient::test_async_api_token</td>
-          <td class="col-duration">0.00</td>
+          <td class="col-name">tests/test_game.py::TestGame::test_tag_options</td>
+          <td class="col-duration">1.50</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log">self = &lt;tests.test_client.TestClient testMethod=test_async_api_token&gt;<br/><br/>    def test_async_api_token(self):<br/>        client = modio.Client(api_key=game_api_key, test=True)<br/>&gt;       games = run(client.async_get_games())<br/><br/>tests/test_client.py:51: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>tests/utils.py:5: in run<br/>    return asyncio.get_event_loop().run_until_complete(coro)<br/>/usr/lib/python3.8/asyncio/base_events.py:616: in run_until_complete<br/>    return future.result()<br/>modio/client.py:269: in async_get_games<br/>    game_json = await self.connection.async_get_request(&quot;/games&quot;, filters=filters)<br/>modio/client.py:120: in async_get_request<br/>    async with self.async_session.get(<br/>.env/lib/python3.8/site-packages/aiohttp/client.py:1138: in __aenter__<br/>    self._resp = await self._coro<br/>.env/lib/python3.8/site-packages/aiohttp/client.py:507: in _request<br/>    req = self._request_class(<br/>.env/lib/python3.8/site-packages/aiohttp/client_reqrep.py:283: in __init__<br/>    url2 = url.with_query(params)<br/>.env/lib/python3.8/site-packages/yarl/_url.py:984: in with_query<br/>    new_query = self._get_str_query(*args, **kwargs)<br/>.env/lib/python3.8/site-packages/yarl/_url.py:945: in _get_str_query<br/>    query = &quot;&amp;&quot;.join(self._query_seq_pairs(quoter, query.items()))<br/>.env/lib/python3.8/site-packages/yarl/_url.py:908: in _query_seq_pairs<br/>    yield quoter(key) + &quot;=&quot; + quoter(cls._query_var(val))<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>v = None<br/><br/>    @staticmethod<br/>    def _query_var(v):<br/>        cls = type(v)<br/>        if issubclass(cls, str):<br/>            return v<br/>        if issubclass(cls, float):<br/>            if math.isinf(v):<br/>                raise ValueError(&quot;float(&#x27;inf&#x27;) is not supported&quot;)<br/>            if math.isnan(v):<br/>                raise ValueError(&quot;float(&#x27;nan&#x27;) is not supported&quot;)<br/>            return str(float(v))<br/>        if issubclass(cls, int) and cls is not bool:<br/>            return str(int(v))<br/>&gt;       raise TypeError(<br/>            &quot;Invalid variable type: value &quot;<br/>            &quot;should be str, int or float, got {!r} &quot;<br/>            &quot;of type {}&quot;.format(v, cls)<br/>        )<br/><span class="error">E       TypeError: Invalid variable type: value should be str, int or float, got None of type &lt;class &#x27;NoneType&#x27;&gt;</span><br/><br/>.env/lib/python3.8/site-packages/yarl/_url.py:923: TypeError<br/></div></td></tr></tbody>
-      <tbody class="failed results-table-row">
-        <tr>
-          <td class="col-result">Failed</td>
-          <td class="col-name">tests/test_client.py::TestClient::test_async_oauth_access</td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="4">
-            <div class="log">self = &lt;tests.test_client.TestClient testMethod=test_async_oauth_access&gt;<br/><br/>    def test_async_oauth_access(self):<br/>        client = modio.Client(auth=access_token, test=True)<br/>    <br/>&gt;       run(client.async_get_my_user())<br/><br/>tests/test_client.py:39: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>tests/utils.py:5: in run<br/>    return asyncio.get_event_loop().run_until_complete(coro)<br/>/usr/lib/python3.8/asyncio/base_events.py:616: in run_until_complete<br/>    return future.result()<br/>modio/client.py:345: in async_get_my_user<br/>    me_json = await self.connection.async_get_request(&quot;/me&quot;)<br/>modio/client.py:120: in async_get_request<br/>    async with self.async_session.get(<br/>.env/lib/python3.8/site-packages/aiohttp/client.py:1138: in __aenter__<br/>    self._resp = await self._coro<br/>.env/lib/python3.8/site-packages/aiohttp/client.py:507: in _request<br/>    req = self._request_class(<br/>.env/lib/python3.8/site-packages/aiohttp/client_reqrep.py:283: in __init__<br/>    url2 = url.with_query(params)<br/>.env/lib/python3.8/site-packages/yarl/_url.py:984: in with_query<br/>    new_query = self._get_str_query(*args, **kwargs)<br/>.env/lib/python3.8/site-packages/yarl/_url.py:945: in _get_str_query<br/>    query = &quot;&amp;&quot;.join(self._query_seq_pairs(quoter, query.items()))<br/>.env/lib/python3.8/site-packages/yarl/_url.py:908: in _query_seq_pairs<br/>    yield quoter(key) + &quot;=&quot; + quoter(cls._query_var(val))<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>v = None<br/><br/>    @staticmethod<br/>    def _query_var(v):<br/>        cls = type(v)<br/>        if issubclass(cls, str):<br/>            return v<br/>        if issubclass(cls, float):<br/>            if math.isinf(v):<br/>                raise ValueError(&quot;float(&#x27;inf&#x27;) is not supported&quot;)<br/>            if math.isnan(v):<br/>                raise ValueError(&quot;float(&#x27;nan&#x27;) is not supported&quot;)<br/>            return str(float(v))<br/>        if issubclass(cls, int) and cls is not bool:<br/>            return str(int(v))<br/>&gt;       raise TypeError(<br/>            &quot;Invalid variable type: value &quot;<br/>            &quot;should be str, int or float, got {!r} &quot;<br/>            &quot;of type {}&quot;.format(v, cls)<br/>        )<br/><span class="error">E       TypeError: Invalid variable type: value should be str, int or float, got None of type &lt;class &#x27;NoneType&#x27;&gt;</span><br/><br/>.env/lib/python3.8/site-packages/yarl/_url.py:923: TypeError<br/></div></td></tr></tbody>
+            <div class="log">self = &lt;tests.test_game.TestGame testMethod=test_tag_options&gt;<br/><br/>    def test_tag_options(self):<br/>&gt;       self.game.add_tag_options(<br/>            &quot;pywrappertest&quot;,<br/>            tags=[&quot;this&quot;, &quot;is&quot;, &quot;a&quot;, &quot;test&quot;],<br/>            tag_type=random.choice((&quot;dropdown&quot;, &quot;checkboxes&quot;)),<br/>            hidden=random.choice((False, True)),<br/>        )<br/><br/>tests/test_game.py:42: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>modio/game.py:397: in add_tag_options<br/>    message = self.connection.post_request(f&quot;/games/{self.id}/tags&quot;, data=tags)<br/>modio/client.py:137: in post_request<br/>    data = self._error_check(resp, resp.json())<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;Connection rate_limit=120 rate_retry=0 rate_remain=84&gt;, resp = &lt;Response [422]&gt;<br/>request_json = {&#x27;error&#x27;: {&#x27;code&#x27;: 422, &#x27;error_ref&#x27;: 13009, &#x27;errors&#x27;: {&#x27;a&#x27;: &#x27;Duplicate tags are not allowed, even if they are in diffe..., even if they are in different tag groups.&#x27;}, &#x27;message&#x27;: &#x27;Validation Failed. Please see below to fix invalid input:&#x27;}}<br/><br/>    def _error_check(self, resp, request_json):<br/>        &quot;&quot;&quot;Updates the rate-limit attributes and check validity of the request.&quot;&quot;&quot;<br/>        self.rate_limit = resp.headers.get(&quot;X-RateLimit-Limit&quot;, self.rate_limit)<br/>        self.rate_remain = resp.headers.get(&quot;X-RateLimit-Remaining&quot;, self.rate_remain)<br/>        self.rate_retry = resp.headers.get(&quot;X-Ratelimit-RetryAfter&quot;, 0)<br/>        code = getattr(resp, &quot;status_code&quot;, getattr(resp, &quot;status&quot;, None))<br/>    <br/>        if code == 204:<br/>            return resp<br/>    <br/>        if &quot;error&quot; in request_json:<br/>            error_code = request_json[&quot;error&quot;][&quot;code&quot;]<br/>            msg = request_json[&quot;error&quot;][&quot;message&quot;]<br/>            ref = request_json[&quot;error&quot;][&quot;error_ref&quot;]<br/>            errors = request_json[&quot;error&quot;].get(&quot;errors&quot;, {})<br/>    <br/>&gt;           raise modioException(msg, error_code, ref, errors)<br/><span class="error">E           modio.errors.modioException: 422 (13009) - Validation Failed. Please see below to fix invalid input: </span><br/><span class="error">E           is - Duplicate tags are not allowed, even if they are in different tag groups.</span><br/><span class="error">E           a - Duplicate tags are not allowed, even if they are in different tag groups.</span><br/><br/>modio/client.py:87: modioException<br/> -----------------------------Captured log teardown------------------------------ <br/>ERROR    asyncio:base_events.py:1707 Unclosed client session
+client_session: &lt;aiohttp.client.ClientSession object at 0x7f66ddbb8700&gt;<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">tests/test_client.py::TestClient::test_oauth_access</td>
-          <td class="col-duration">0.00</td>
+          <td class="col-name">tests/test_game.py::TestGame::test_add_media</td>
+          <td class="col-duration">6.06</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="empty log">No log output captured.</div></td></tr></tbody></table></body></html>
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">tests/test_game.py::TestGame::test_add_mod</td>
+          <td class="col-duration">5.42</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -----------------------------Captured log teardown------------------------------ <br/>ERROR    asyncio:base_events.py:1707 Unclosed client session
+client_session: &lt;aiohttp.client.ClientSession object at 0x7f66ddb60b80&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">tests/test_game.py::TestGame::test_async_add_media</td>
+          <td class="col-duration">5.96</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -----------------------------Captured log teardown------------------------------ <br/>ERROR    asyncio:base_events.py:1707 Unclosed client session
+client_session: &lt;aiohttp.client.ClientSession object at 0x7f66ddb60910&gt;
+ERROR    asyncio:base_events.py:1707 Unclosed connector
+connections: [&#x27;[(&lt;aiohttp.client_proto.ResponseHandler object at 0x7f66ddb52880&gt;, 23620.228573838)]&#x27;]
+connector: &lt;aiohttp.connector.TCPConnector object at 0x7f66ddb60fa0&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">tests/test_game.py::TestGame::test_async_add_mod</td>
+          <td class="col-duration">6.21</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -----------------------------Captured log teardown------------------------------ <br/>ERROR    asyncio:base_events.py:1707 Unclosed client session
+client_session: &lt;aiohttp.client.ClientSession object at 0x7f66ddb609d0&gt;
+ERROR    asyncio:base_events.py:1707 Unclosed connector
+connections: [&#x27;[(&lt;aiohttp.client_proto.ResponseHandler object at 0x7f66ddb52e80&gt;, 23626.444825477)]&#x27;]
+connector: &lt;aiohttp.connector.TCPConnector object at 0x7f66ddb60f70&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">tests/test_game.py::TestGame::test_async_gets</td>
+          <td class="col-duration">4.40</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -----------------------------Captured log teardown------------------------------ <br/>ERROR    asyncio:base_events.py:1707 Unclosed client session
+client_session: &lt;aiohttp.client.ClientSession object at 0x7f66ddb60940&gt;
+ERROR    asyncio:base_events.py:1707 Unclosed connector
+connections: [&#x27;[(&lt;aiohttp.client_proto.ResponseHandler object at 0x7f66ddb52520&gt;, 23630.850843285)]&#x27;]
+connector: &lt;aiohttp.connector.TCPConnector object at 0x7f66ddb7ecd0&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">tests/test_game.py::TestGame::test_gets</td>
+          <td class="col-duration">3.89</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -----------------------------Captured log teardown------------------------------ <br/>ERROR    asyncio:base_events.py:1707 Unclosed client session
+client_session: &lt;aiohttp.client.ClientSession object at 0x7f66dd3dde50&gt;<br/></div></td></tr></tbody></table></body></html>

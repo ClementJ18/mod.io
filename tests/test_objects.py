@@ -3,11 +3,13 @@ import modio
 import random
 
 try:
-    from .config import access_token
+    from .config import access_token, game_id, mod_id
 except ModuleNotFoundError:
     import os
 
     access_token = os.environ["ACCESS_TOKEN"]
+    game_id = os.environ["GAME_ID"]
+    mod_id = os.environ["MOD_ID"]
 
 from .utils import run
 
@@ -29,9 +31,11 @@ class TestEvent(unittest.TestCase):
 
 class TestComment(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(auth=access_token, test=True)
-        self.game = client.get_game(180)
-        self.mod = self.game.get_mod(1251)
+        client = modio.Client(access_token=access_token, test=True)
+        run(client.start())
+
+        self.game = client.get_game(game_id)
+        self.mod = self.game.get_mod(mod_id)
 
     def test_delete(self):
         self.mod.get_comments().results[0].delete()
@@ -39,9 +43,11 @@ class TestComment(unittest.TestCase):
 
 class TestModFile(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(auth=access_token, test=True)
-        self.game = client.get_game(180)
-        self.mod = self.game.get_mod(1251)
+        client = modio.Client(access_token=access_token, test=True)
+        run(client.start())
+
+        self.game = client.get_game(game_id)
+        self.mod = self.game.get_mod(mod_id)
         self.file = self.mod.get_files().results[0]
 
     def test_get_owner(self):
@@ -70,7 +76,9 @@ class TestModFile(unittest.TestCase):
 
 class TestRating(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(auth=access_token, test=True)
+        client = modio.Client(access_token=access_token, test=True)
+        run(client.start())
+
         self.rating = client.get_my_ratings().results[0]
 
     def test_add_positive_rating(self):
@@ -88,8 +96,10 @@ class TestRating(unittest.TestCase):
 
 class TestStats(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(auth=access_token, test=True)
-        self.game = client.get_game(180)
+        client = modio.Client(access_token=access_token, test=True)
+        run(client.start())
+
+        self.game = client.get_game(game_id)
         self.stat = self.game.get_stats().results[0]
 
     def test_is_stale(self):
@@ -98,21 +108,33 @@ class TestStats(unittest.TestCase):
 
 class TestUser(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(auth=access_token, test=True)
+        client = modio.Client(access_token=access_token, test=True)
+        run(client.start())
+
         self.user = client.get_my_user()
 
-    def test_report(self):
-        self.user.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic)
+    # def test_report(self):
+    #     self.user.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic)
 
-    def test_async_report(self):
-        run(self.user.async_report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))
+    # def test_async_report(self):
+        # run(self.user.async_report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))
+
+    def test_mute(self):
+        self.user.mute()
+        self.user.unmute()
+
+    def test_async_mute(self):
+        run(self.user.async_mute())
+        run(self.user.async_unmute())
 
 
 class TestTeamMember(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(auth=access_token, test=True)
-        self.game = client.get_game(180)
-        self.mod = self.game.get_mod(1251)
+        client = modio.Client(access_token=access_token, test=True)
+        run(client.start())
+
+        self.game = client.get_game(game_id)
+        self.mod = self.game.get_mod(mod_id)
         self.member = self.mod.get_team(filters=modio.Filter().text("TestNecro")).results[0]
 
     def test_edit(self):
@@ -130,12 +152,12 @@ class TestTeamMember(unittest.TestCase):
 
 # class TestFilter(unittest.TestCase):
 #     def setUp(self):
-#         client = modio.Client(auth=access_token, test=True)
+#         client = modio.Client(access_token=access_token, test=True)
 
 
 # class TestPagination(unittest.TestCase):
 #     def setUp(self):
-#         client = modio.Client(auth=access_token, test=True)
+#         client = modio.Client(access_token=access_token, test=True)
 
 
 class TestObject(unittest.TestCase):

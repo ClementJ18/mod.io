@@ -3,20 +3,24 @@ import modio
 import random
 
 try:
-    from .config import access_token
+    from .config import access_token, game_id, mod_id
 except ModuleNotFoundError:
     import os
 
     access_token = os.environ["ACCESS_TOKEN"]
+    game_id = os.environ["GAME_ID"]
+    mod_id = os.environ["MOD_ID"]
 
 from .utils import run
 
 
 class TestMod(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(auth=access_token, test=True)
-        self.game = client.get_game(180)
-        self.mod = self.game.get_mod(1251)
+        client = modio.Client(access_token=access_token, test=True)
+        run(client.start())
+
+        self.game = client.get_game(game_id)
+        self.mod = self.game.get_mod(mod_id)
 
     def tearDown(self):
         pass
@@ -36,7 +40,7 @@ class TestMod(unittest.TestCase):
 
     def test_add_file(self):
         new_file = modio.NewModFile(version="1.231", changelog="It works now", active=False)
-        new_file.add_file("test/files/file.zip")
+        new_file.add_file("tests/files/file.zip")
 
         self.mod.add_file(new_file)
 
@@ -52,9 +56,9 @@ class TestMod(unittest.TestCase):
         self.assertEqual(fields, new_fields)
 
     def test_add_media(self):
-        logo = "test/media/logo.png"
-        image_1 = "test/media/icon.png"
-        image_2 = "test/media/header.png"
+        logo = "tests/media/logo.png"
+        image_1 = "tests/media/icon.png"
+        image_2 = "tests/media/header.png"
         youtube = [
             "https://www.youtube.com/watch?v=Z3OLwDNn_Ps",
             "https://www.youtube.com/watch?v=THSMkcuMF0U",
@@ -69,7 +73,7 @@ class TestMod(unittest.TestCase):
 
         self.mod.add_media(logo=logo, images=[image_1, image_2], youtube=youtube, sketchfab=sketchfab)
 
-        images = "test/media/images.zip"
+        images = "tests/media/images.zip"
         self.mod.add_media(images=images)
 
     def test_delete_media(self):
@@ -125,8 +129,8 @@ class TestMod(unittest.TestCase):
     def test_add_team_member(self):
         self.mod.add_team_member("juliacj@cardiff.ac.uk", modio.Level.creator, position="Lord of Tests")
 
-    def test_report(self):
-        self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic)
+    # def test_report(self):
+    #     self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic)
 
     def test_delete(self):
         mod = self.game.get_mods(filters=modio.Filter().text("ToDeleteMod")).results[0]
@@ -147,7 +151,7 @@ class TestMod(unittest.TestCase):
 
     def test_async_add_file(self):
         new_file = modio.NewModFile(version="1.231", changelog="It works now", active=False)
-        new_file.add_file("test/files/file.zip")
+        new_file.add_file("tests/files/file.zip")
 
         run(self.mod.add_file(new_file))
 
@@ -163,9 +167,9 @@ class TestMod(unittest.TestCase):
         self.assertEqual(fields, new_fields)
 
     def test_async_add_media(self):
-        logo = "test/media/logo.png"
-        image_1 = "test/media/icon.png"
-        image_2 = "test/media/header.png"
+        logo = "tests/media/logo.png"
+        image_1 = "tests/media/icon.png"
+        image_2 = "tests/media/header.png"
         youtube = [
             "https://www.youtube.com/watch?v=Z3OLwDNn_Ps",
             "https://www.youtube.com/watch?v=THSMkcuMF0U",
@@ -180,7 +184,7 @@ class TestMod(unittest.TestCase):
 
         run(self.mod.add_media(logo=logo, images=[image_1, image_2], youtube=youtube, sketchfab=sketchfab))
 
-        images = "test/media/images.zip"
+        images = "tests/media/images.zip"
         run(self.mod.add_media(images=images))
 
     def test_async_delete_media(self):
@@ -236,8 +240,8 @@ class TestMod(unittest.TestCase):
     def test_async_add_team_member(self):
         run(self.mod.add_team_member("juliacj@cardiff.ac.uk", modio.Level.creator, position="Lord of Tests"))
 
-    def test_async_report(self):
-        run(self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))
+    # def test_async_report(self):
+    #     run(self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))
 
     def test_async_delete(self):
         mod = run(self.game.get_mods(filters=modio.Filter().text("ToDeleteMod"))).results[0]

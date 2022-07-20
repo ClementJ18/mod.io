@@ -346,6 +346,9 @@ class Filter:
         self._offset = offset
         return self
 
+    def get_dict(self):
+        return {key: value for key, value in self.__dict__.items() if value is not None}
+
 
 class Pagination:
     """This class is unique to the library and represents the pagination

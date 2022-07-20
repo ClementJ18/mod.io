@@ -504,6 +504,25 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
         return ModFile(**file_json, game_id=self.game, connection=self.connection)
 
+    def _prepare_media(self, logo, images, youtube, sketchfab):
+        media = {}
+
+        if logo:
+            media["logo"] = open(logo, "rb")
+
+        if isinstance(images, str):
+            images_d = {"images": ("image.zip", open(images, "rb"))}
+        elif isinstance(images, list):
+            images_d = {f"image{images.index(image)}": open(image, "rb") for image in images}
+
+        yt = {f"youtube[{youtube.index(link)}]": link for link in youtube}
+        sketch = {f"sketchfab[{sketchfab.index(link)}]": link for link in sketchfab}
+
+        media = {**media, **images_d}
+        links = {**yt, **sketch}
+
+        return media, links
+
     def add_media(self, *, logo=None, images=(), youtube=(), sketchfab=()):
         """Upload new media to the mod.
 
@@ -531,66 +550,28 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         Message
             A message confirming the submission of the media
         """
-        media = {}
-
-        if logo:
-            media["logo"] = open(logo, "rb")
-
-        if isinstance(images, str):
-            images_d = {"images": ("image.zip", open(images, "rb"))}
-        elif isinstance(images, list):
-            images_d = {f"image{images.index(image)}": open(image, "rb") for image in images}
-
-        yt = {f"youtube[{youtube.index(link)}]": link for link in youtube}
-        sketch = {f"sketchfab[{sketchfab.index(link)}]": link for link in sketchfab}
-
-        media = {**media, **images_d}
-        links = {**yt, **sketch}
+        media, links = self._prepare_media(logo, images, youtube, sketchfab)
 
         try:
             media_json = self.connection.post_request(
                 f"/games/{self.game}/mods/{self.id}/media", h_type=1, files=media, data=links
             )
         finally:
-            if logo:
-                media["logo"].close()
-            if isinstance(images, str):
-                images_d["images"][1].close()
-            elif isinstance(images, list):
-                for image in images_d.values():
-                    image.close()
+            for media in media:
+                media.close()
 
         return Message(**media_json)
 
     async def async_add_media(self, *, logo=None, images=(), youtube=(), sketchfab=()):
-        media = {}
-
-        if logo:
-            media["logo"] = open(logo, "rb")
-
-        if isinstance(images, str):
-            images_d = {"images": ("image.zip", open(images, "rb"))}
-        elif isinstance(images, list):
-            images_d = {f"image{images.index(image)}": open(image, "rb") for image in images}
-
-        yt = {f"youtube[{youtube.index(link)}]": link for link in youtube}
-        sketch = {f"sketchfab[{sketchfab.index(link)}]": link for link in sketchfab}
-
-        media = {**media, **images_d}
-        links = {**yt, **sketch}
+        media, links = self._prepare_media(logo, images, youtube, sketchfab)
 
         try:
             media_json = await self.connection.async_post_request(
                 f"/games/{self.game}/mods/{self.id}/media", h_type=1, files=media, data=links
             )
         finally:
-            if logo:
-                media["logo"].close()
-            if isinstance(images, str):
-                images_d["images"][1].close()
-            elif isinstance(images, list):
-                for image in images_d.values():
-                    image.close()
+            for media in media:
+                media.close()
 
         return Message(**media_json)
 

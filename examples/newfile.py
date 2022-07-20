@@ -1,6 +1,6 @@
 import modio
 
-client = modio.Client(auth="oauth2 token goes here")
+client = modio.Client(access_token="oauth2 token goes here")
 newfile = modio.NewModFile(
         version="0.3.4",
         changelog = "New version which now contains <b> twice as many toilets </b>",

@@ -125,13 +125,13 @@ class OwnerMixin:
         User
             The original submitter
         """
-        resp = self.connection.post_request(
+        user = self.connection.post_request(
             "/general/ownership", data={"resource_type": self.resource_type, "resource_id": self.id}
         )
-        return entities.User(**resp.json())
+        return entities.User(connection=self.connection, **user)
 
     async def async_get_owner(self):
-        resp = await self.connection.async_post_request(
+        user = await self.connection.async_post_request(
             "/general/ownership", data={"resource_type": self.resource_type, "resource_id": self.id}
         )
-        return entities.User(**resp.json())
+        return entities.User(connection=self.connection, **user)

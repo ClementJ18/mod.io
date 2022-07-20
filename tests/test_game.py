@@ -3,20 +3,23 @@ import modio
 import random
 
 try:
-    from .config import access_token
+    from .config import access_token, game_id
 except ModuleNotFoundError:
     import os
 
     access_token = os.environ["ACCESS_TOKEN"]
+    game_id = os.environ["GAME_ID"]
 
 from .utils import run
 
 
 class TestGame(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(auth=access_token, test=True)
-        self.game = client.get_game(180)
-        self.frozen_copy = client.get_game(180)
+        client = modio.Client(access_token=access_token, test=True)
+        run(client.start())
+
+        self.game = client.get_game(game_id)
+        self.frozen_copy = client.get_game(game_id)
 
     def test_gets(self):
         mods = self.game.get_mods()
@@ -28,32 +31,14 @@ class TestGame(unittest.TestCase):
 
         self.game.get_owner()
 
-    def test_edit(self):
-        name = f"PyWrapper TestGame {random.randint(1, 34534)}"
-        community = random.choice(list(modio.Community))
-        maturity = random.choice(list(modio.MaturityOptions))
-        name_id = name.lower().replace(" ", "-")[:80]
-        fields = {"name": name, "community": community, "maturity_options": maturity, "name_id": name_id}
-
-        self.game.edit(**fields)
-        fields["maturity_options"] = maturity.value
-        new_fields = {
-            "name": self.game.name,
-            "community": self.game.community,
-            "maturity_options": self.game.maturity_options,
-            "name_id": self.game.name_id,
-        }
-
-        self.assertEqual(fields, new_fields)
-
     def test_add_media(self):
-        logo = "test/media/logo.png"
-        header = "test/media/header.png"
-        icon = "test/media/icon.png"
+        logo = "tests/media/logo.png"
+        header = "tests/media/header.png"
+        icon = "tests/media/icon.png"
 
         self.game.add_media(logo=logo, header=header, icon=icon)
 
-    def test_add_tag_options(self):
+    def test_tag_options(self):
         self.game.add_tag_options(
             "pywrappertest",
             tags=["this", "is", "a", "test"],
@@ -61,8 +46,11 @@ class TestGame(unittest.TestCase):
             hidden=random.choice((False, True)),
         )
 
-    def test_report(self):
-        self.game.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic)
+        self.game.delete_tag_options("pywrappertest", tags=["this", "test"])
+        self.game.delete_tag_options("pywrappertest")
+
+    # def test_report(self):
+    #     self.game.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic)
 
     def test_add_mod(self):
         newmod = modio.NewMod(
@@ -74,7 +62,7 @@ class TestGame(unittest.TestCase):
             stock=random.randint(0, 700000),
             visible=modio.Visibility.hidden,
             maturity=modio.Maturity.drugs | modio.Maturity.explicit,
-            logo="test/media/logo.png",
+            logo="tests/media/logo.png",
         )
 
         newmod.add_tags("modification", "345")
@@ -83,10 +71,6 @@ class TestGame(unittest.TestCase):
 
         newmod.name = "ToDeleteMod"
         self.game.add_mod(newmod)
-
-    def test_delete_tag_options(self):
-        self.game.delete_tag_options("pywrappertest", tags=["this", "test"])
-        self.game.delete_tag_options("pywrappertest")
 
     def test_async_gets(self):
         mods = run(self.game.async_get_mods())
@@ -98,32 +82,14 @@ class TestGame(unittest.TestCase):
 
         run(self.game.async_get_owner())
 
-    def test_async_edit(self):
-        name = f"PyWrapper TestGame {random.randint(1, 34534)}"
-        community = random.choice(list(modio.Community))
-        maturity = random.choice(list(modio.MaturityOptions))
-        name_id = name.lower().replace(" ", "-")[:80]
-        fields = {"name": name, "community": community, "maturity_options": maturity, "name_id": name_id}
-
-        run(self.game.async_edit(**fields))
-        fields["maturity_options"] = maturity.value
-        new_fields = {
-            "name": self.game.name,
-            "community": self.game.community,
-            "maturity_options": self.game.maturity_options,
-            "name_id": self.game.name_id,
-        }
-
-        self.assertEqual(fields, new_fields)
-
     def test_async_add_media(self):
-        logo = "test/media/logo.png"
-        header = "test/media/header.png"
-        icon = "test/media/icon.png"
+        logo = "tests/media/logo.png"
+        header = "tests/media/header.png"
+        icon = "tests/media/icon.png"
 
         run(self.game.async_add_media(logo=logo, header=header, icon=icon))
 
-    def test_async_add_tag_options(self):
+    def test_async_tag_options(self):
         run(
             self.game.async_add_tag_options(
                 "pywrappertest",
@@ -133,8 +99,11 @@ class TestGame(unittest.TestCase):
             )
         )
 
-    def test_async_report(self):
-        run(self.game.async_report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))
+        run(self.game.async_delete_tag_options("pywrappertest", tags=["this", "test"]))
+        run(self.game.async_delete_tag_options("pywrappertest"))
+
+    # def test_async_report(self):
+    #     run(self.game.async_report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))
 
     def test_async_add_mod(self):
         newmod = modio.NewMod(
@@ -146,7 +115,7 @@ class TestGame(unittest.TestCase):
             stock=random.randint(0, 700000),
             visible=modio.Visibility.hidden,
             maturity=modio.Maturity.drugs | modio.Maturity.explicit,
-            logo="test/media/logo.png",
+            logo="tests/media/logo.png",
         )
 
         newmod.add_tags("modification", "345")
@@ -155,7 +124,3 @@ class TestGame(unittest.TestCase):
 
         newmod.name = "ToDeleteMod"
         run(self.game.async_add_mod(newmod))
-
-    def test_async_delete_tag_options(self):
-        run(self.game.async_delete_tag_options("pywrappertest", tags=["this", "test"]))
-        run(self.game.async_delete_tag_options("pywrappertest"))

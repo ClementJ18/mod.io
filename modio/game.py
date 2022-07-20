@@ -5,7 +5,7 @@ from .mod import Mod
 from .entities import Event, Image, Message, Stats, TagOption, User
 from .objects import NewMod, Pagination, Returned
 from .errors import modioException
-from .utils import _convert_date, _clean_and_convert, find
+from .utils import _convert_date, find
 from .enums import APIAccess, Community, Curation, MaturityOptions, Presentation, Revenue, Status, Submission
 from .mixins import OwnerMixin, ReportMixin
 
@@ -19,7 +19,7 @@ class Game(ReportMixin, OwnerMixin):
         ID of the game. Filter attribute.
     status : Status
         Status of the game. (see `status and visibility <https://docs.mod.io/#status-amp-visibility>`_ for details) Filter attribute.
-    submitter : User
+    submitter : Optional[User]
         Instance of the modio user who submitted the game. Filter
         attribute.
     date : datetime.datetime
@@ -102,7 +102,10 @@ class Game(ReportMixin, OwnerMixin):
         self.tag_options = [TagOption(**tag) for tag in attrs.pop("tag_options", [])]
         self.maturity_options = MaturityOptions(attrs.pop("maturity_options"))
         self.connection = attrs.pop("connection")
-        self.submitter = User(connection=self.connection, **attrs.pop("submitted_by"))
+        self.submitter = None
+
+        if attrs.get("submitted_by", {}):
+            self.submitter = User(connection=self.connection, **attrs.pop("submitted_by"))
 
     def __repr__(self):
         return f"<Game id={self.id} name={self.name}>"
@@ -245,58 +248,6 @@ class Game(ReportMixin, OwnerMixin):
     async def async_get_stats(self, *, filters=None):
         stats_json = await self.connection.async_get_request(f"/games/{self.id}/mods/stats", filters=filters)
         return Returned([Stats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
-
-    def edit(self, **fields):
-        """Used to edit the game details. For editing the icon, logo or header use :func:`add_media`.
-        Sucessful editing will return the updated game.
-
-        |coro|
-
-        Parameters
-        -----------
-        status : Status
-            Game status
-        name : str
-            Name of the game, cannot exceed 80 characters
-        name_id : str
-            Subdomain for the game, cannot exceed 20 characters
-        summary : str
-            Explaination of game mod support, cannot exceed 250 characters
-        instructions : str
-            Instructions and link creators should follow to upload mods.
-        instructions_url : str
-            Link to guide where modders can learn to make and submit mods
-        ugc_name : str
-            Word used to describe user-generated content (mods, items, addons etc).
-        presentation : Presentation
-            How to display the game's mods on modio
-        submission : Submissions
-            Pick how mods can be uploaded
-        curation : Curation
-            Pick moderation levels of mods
-        community : Community
-            Change the community options of mods
-        revenue : Revenue
-            Change the revenue settings for mods
-        api : APIAccess
-            Change the api access of the mods
-        maturity_options : MaturityOptions
-            Chose whether or not to allow mature content
-
-        Returns
-        --------
-        Game
-            The updated gamed
-        """
-
-        fields = _clean_and_convert(fields)
-        game_json = self.connection.put_request(f"/games/{self.id}", data=fields)
-        return self.__class__(connection=self.connection, **game_json)
-
-    async def async_edit(self, **fields):
-        fields = _clean_and_convert(fields)
-        game_json = await self.connection.async_put_request(f"/games/{self.id}", data=fields)
-        return self.__class__(connection=self.connection, **game_json)
 
     def add_mod(self, mod):
         """Add a mod to this game.
