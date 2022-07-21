@@ -1,0 +1,11 @@
+[tool.flakeheaven]
+max_line_length = 110
+exclude = ["__init__.py"]
+
+[tool.black]
+line-length = 110
+
+[tool.flakeheaven.plugins]
+pyflakes = ["+*", "-F821", "-W0212"]
+"flake8-*" = ["+*", "-F405", "-W0212", "-E0244", "-E203", "-W0223"]
+pylint = ["+*", "-C0301", "-C0116", "-R0902", "-R0904", "-W0212", "-E0244", "-C0103", "-R0903", "-R0913"]

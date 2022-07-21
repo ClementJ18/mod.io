@@ -34,7 +34,8 @@ Welcome to modio's documentation!
 .. image:: https://img.shields.io/github/commits-since/ClementJ18/mod.io/latest.svg
     :target: https://github.com/ClementJ18/mod.io/releases/latest
 
-modio.py is a wrapper package for the mod.io API. There is also an async wrapper available :ref:`here <async-version>`.
+modio.py is a wrapper package for the mod.io API. Most blocking methods have both a synchronous version and async method
+for use within async applications.
 
 Basic Usage
 -----------------
@@ -44,7 +45,7 @@ Basic Usage
 
    client = modio.Client(
       api_key="your api key here", 
-      auth="your o auth 2 token here"
+      access_token="your o auth 2 token here"
    )
 
    game = client.get_game(345)
@@ -79,26 +80,22 @@ Example
    #your oauth2 token is now stored in the variable
 
    #to save into a file simply
-   file = open("oauth2.txt", "w")
-   file.write(oauth2)
-   file.close()
+   with open("oauth2.txt", "w") as file:
+      file.write(oauth2)
 
    #and now the token is stored in oauth2.txt
 
 Installation
 -------------
-Installing modio will install both the sync and the async package. Due to this when uninstalling you must uninstall
-both.
 ::
 
-   pip install -U git+git://github.com/ClementJ18/mod.io.git@0.3
+   pip install mod.io
 
 Uninstalling
 -------------
 ::
 
    pip uninstall modio
-   pip uninstall async_modio
 
 
 .. toctree::
@@ -108,6 +105,7 @@ Uninstalling
    client
    game
    mod
+   entities
    objects
    filtering&sorting
    async
