@@ -11,6 +11,8 @@ env:
   USER_API_KEY: ${{ secrets.USER_API_KEY }}
   GAME_API_KEY: ${{ secrets.GAME_API_KEY }}
   ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+  GAME_ID : ${{ secrets.GAME_ID }}
+  MOD_ID : ${{ secrets.MOD_ID }}
 
 jobs:
   build:

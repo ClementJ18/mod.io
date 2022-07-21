@@ -202,7 +202,7 @@ class Comment:
         """Remove the comment.
 
         |coro|"""
-        resp = self.connection.delete_request(f"/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}")
+        resp = self.connection.delete_request(f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}")
         return resp
 
     async def async_delete(self):
@@ -210,7 +210,7 @@ class Comment:
 
         |coro|"""
         resp = await self.connection.async_delete_request(
-            f"/games/{self.mod.game}/mods/{self.mod.id}/comments/{self.id}"
+            f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}"
         )
         return resp
 
