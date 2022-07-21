@@ -95,7 +95,7 @@ Uninstalling
 -------------
 ::
 
-   pip uninstall modio
+   pip uninstall mod.io
 
 
 .. toctree::
