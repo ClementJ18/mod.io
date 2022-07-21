@@ -13,7 +13,7 @@ with open('README.md') as f:
     readme = f.read()
 
 setup(
-    name="modio",
+    name="mod.io",
     version=version,
     description="mod.io python wrapper",
     author="Clement Julia",
@@ -21,6 +21,6 @@ setup(
     url="https://github.com/ClementJ18/mod.io",
     long_description_content_type="text/markdown",
     long_description=readme,
-    packages=find_packages(include=['moddb', 'moddb.*']),
+    packages=find_packages(include=['modio', 'modio.*']),
     install_requires=["aiohttp==3.8.1", "requests==2.28.1"],
 )
