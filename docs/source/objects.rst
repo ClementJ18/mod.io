@@ -1,8 +1,8 @@
 .. currentmodule:: modio
 
-Misc mod.io Models
+modio Objects
 --------------------
-Documentation on all the other objects returned by mod.io requests which are not large enough to warrant their own page.
+Documentation on objects unique to this library which the user manipulates and sometimes creates.
 
 .. automodule:: modio.objects
     :members:

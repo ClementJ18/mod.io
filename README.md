@@ -14,7 +14,7 @@ Looking for the async wrapper? [Click here](https://github.com/ClementJ18/mod.io
 ```py
 import modio
 
-client = modio.Client(api_key="your api key here", auth="your o auth 2 token here")
+client = modio.Client(api_key="your api key here", access_token="your o auth 2 token here")
 
 game = client.get_game(345)
 #gets the game with id 345
@@ -50,9 +50,8 @@ oauth2 = client.email_exchange(code)
 #your oauth2 token is now stored in the variable
 
 #to save into a file simply
-file = open("oauth2.txt", "w")
-file.write(oauth2)
-file.close()
+with open("oauth2.txt", "w") as file:
+    file.write(oauth2)
 
 #and now the token is stored in oauth2.txt
 ```

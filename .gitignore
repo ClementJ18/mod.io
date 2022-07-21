@@ -1,4 +1,6 @@
 *.pyc
-test.py
 docs/build
-test/config.py
+tests/config.py
+.env/
+
+report.html
