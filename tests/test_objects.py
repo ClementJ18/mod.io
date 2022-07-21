@@ -36,9 +36,23 @@ class TestComment(unittest.TestCase):
 
         self.game = client.get_game(game_id)
         self.mod = self.game.get_mod(mod_id)
+        self.comment = self.mod.get_comments().results[0]
+
+    def test_edit(self):
+        self.comment.edit("test edit")
+
+    def test_async_edit(self):
+        run(self.comment.async_edit("test edit async"))
 
     def test_delete(self):
-        self.mod.get_comments().results[0].delete()
+        comments = self.mod.get_comments().results
+        if comments:
+            comments[0].delete()
+
+    def test_async_delete(self):
+        comments = run(self.mod.async_get_comments()).results
+        if comments:
+            run(comments[0].async_delete())
 
 
 class TestModFile(unittest.TestCase):
@@ -95,37 +109,13 @@ class TestRating(unittest.TestCase):
 
 
 class TestStats(unittest.TestCase):
-    def setUp(self):
+    def test_stats(self):
         client = modio.Client(access_token=access_token, test=True)
         run(client.start())
 
-        self.game = client.get_game(game_id)
-        self.stat = self.game.get_stats().results[0]
-
-    def test_is_stale(self):
-        assert not self.stat.is_stale()
-
-
-class TestUser(unittest.TestCase):
-    def setUp(self):
-        client = modio.Client(access_token=access_token, test=True)
-        run(client.start())
-
-        self.user = client.get_my_user()
-
-    # def test_report(self):
-    #     self.user.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic)
-
-    # def test_async_report(self):
-        # run(self.user.async_report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))
-
-    def test_mute(self):
-        self.user.mute()
-        self.user.unmute()
-
-    def test_async_mute(self):
-        run(self.user.async_mute())
-        run(self.user.async_unmute())
+        game = client.get_game(game_id)
+        stat = game.get_stats().results[0]
+        stat.is_stale()
 
 
 class TestTeamMember(unittest.TestCase):
@@ -135,19 +125,15 @@ class TestTeamMember(unittest.TestCase):
 
         self.game = client.get_game(game_id)
         self.mod = self.game.get_mod(mod_id)
-        self.member = self.mod.get_team(filters=modio.Filter().text("TestNecro")).results[0]
+        self.member = self.mod.get_team(filters=modio.Filter().equals(id=10610)).results[0]
 
-    def test_edit(self):
-        self.member.edit(level=modio.Level.moderator)
+    def test_mute(self):
+        self.member.mute()
+        self.member.unmute()
 
-    def test_delete(self):
-        self.member.delete()
-
-    def test_async_edit(self):
-        run(self.member.async_edit(level=modio.Level.moderator))
-
-    def test_async_delete(self):
-        run(self.member.async_delete())
+    def test_async_mute(self):
+        run(self.member.async_mute())
+        run(self.member.async_unmute())
 
 
 # class TestFilter(unittest.TestCase):

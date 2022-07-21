@@ -116,6 +116,17 @@ class Connection:
 
         return headers
 
+    def _post(self, resp):
+        try:
+            resp_json = resp.json()
+        except requests.JSONDecodeError:
+            resp_json = {}
+
+        data = self._error_check(resp, resp_json)
+        self.enforce_ratelimit()
+
+        return data
+
     def get_request(self, url, *, h_type=0, **fields):
         filters = fields.pop("filters", None)
         filters = (filters or Filter()).get_dict()
@@ -127,29 +138,28 @@ class Connection:
             h_type = 2
 
         resp = self.session.get(self._base_path + url, headers=self._define_headers(h_type), params=extra)
-        data = self._error_check(resp, resp.json())
-        self.enforce_ratelimit()
-
-        return data
+        return self._post(resp)
 
     def post_request(self, url, *, h_type=0, **fields):
         resp = self.session.post(self._base_path + url, headers=self._define_headers(h_type), **fields)
-        data = self._error_check(resp, resp.json())
-        self.enforce_ratelimit()
-
-        return data
+        return self._post(resp)
 
     def put_request(self, url, *, h_type=0, **fields):
         resp = self.session.put(self._base_path + url, headers=self._define_headers(h_type), **fields)
-        data = self._error_check(resp, resp.json())
-        self.enforce_ratelimit()
-
-        return data
+        return self._post(resp)
 
     def delete_request(self, url, *, h_type=0, **fields):
         resp = self.session.delete(self._base_path + url, headers=self._define_headers(h_type), **fields)
-        data = self._error_check(resp, resp.json())
-        self.enforce_ratelimit()
+        return self._post(resp)
+
+    async def _async_post(self, resp):
+        try:
+            resp_json = await resp.json()
+        except aiohttp.ContentTypeError:
+            resp_json = {}
+
+        data = self._error_check(resp, resp_json)
+        await self.async_enforce_ratelimit()
 
         return data
 
@@ -166,10 +176,7 @@ class Connection:
         async with self.async_session.get(
             self._base_path + url, headers=self._define_headers(h_type), params=extra
         ) as resp:
-            data = self._error_check(resp, await resp.json())
-            await self.async_enforce_ratelimit()
-
-            return data
+            return await self._async_post(resp)
 
     async def async_post_request(self, url, *, h_type=0, **fields):
         files = fields.pop("files", {})
@@ -194,28 +201,19 @@ class Connection:
         async with self.async_session.post(
             self._base_path + url, headers=self._define_headers(h_type), data=form
         ) as resp:
-            data = self._error_check(resp, await resp.json())
-            await self.async_enforce_ratelimit()
-
-            return data
+            return await self._async_post(resp)
 
     async def async_put_request(self, url, *, h_type=0, **fields):
         async with self.async_session.put(
             self._base_path + url, headers=self._define_headers(h_type), **fields
         ) as resp:
-            data = self._error_check(resp, await resp.json())
-            await self.async_enforce_ratelimit()
-
-            return data
+            return await self._async_post(resp)
 
     async def async_delete_request(self, url, *, h_type=0, **fields):
         async with self.async_session.delete(
             self._base_path + url, headers=self._define_headers(h_type), **fields
         ) as resp:
-            data = self._error_check(resp, await resp.json())
-            await self.async_enforce_ratelimit()
-
-            return data
+            return await self._async_post(resp)
 
 
 class Client:
@@ -262,7 +260,9 @@ class Client:
         self.lang = lang
         self.version = version
         self.test = test
-        self.connection = Connection(test=test, api_key=api_key, access_token=access_token, version=version, lang=lang)
+        self.connection = Connection(
+            test=test, api_key=api_key, access_token=access_token, version=version, lang=lang
+        )
 
     def __repr__(self):
         return f"< Client version={self.version} test={self.test} >"
@@ -638,7 +638,9 @@ class Client:
             raise ValueError("Security code must be 5 digits")
 
         resp = self.connection.post_request(
-            "/oauth/emailexchange", params={"security_code": code, "api_key": self.connection.api_key}, h_type=2
+            "/oauth/emailexchange",
+            params={"security_code": code, "api_key": self.connection.api_key},
+            h_type=2,
         )
 
         return resp["access_token"]
@@ -648,7 +650,9 @@ class Client:
             raise ValueError("Security code must be 5 digits")
 
         resp = await self.connection.async_post_request(
-            "/oauth/emailexchange", params={"security_code": code, "api_key": self.connection.api_key}, h_type=2
+            "/oauth/emailexchange",
+            params={"security_code": code, "api_key": self.connection.api_key},
+            h_type=2,
         )
 
         return resp["access_token"]

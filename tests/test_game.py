@@ -23,7 +23,9 @@ class TestGame(unittest.TestCase):
 
     def test_gets(self):
         mods = self.game.get_mods()
-        self.game.get_mod(mods.results[0].id)
+
+        if mods:
+            self.game.get_mod(mods.results[0].id)
 
         self.game.get_mod_events()
         self.game.get_tag_options()
@@ -74,7 +76,9 @@ class TestGame(unittest.TestCase):
 
     def test_async_gets(self):
         mods = run(self.game.async_get_mods())
-        run(self.game.async_get_mod(mods.results[0].id))
+
+        if mods:
+            run(self.game.async_get_mod(mods.results[0].id))
 
         run(self.game.async_get_mod_events())
         run(self.game.async_get_tag_options())

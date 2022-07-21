@@ -27,7 +27,9 @@ class TestClient(unittest.TestCase):
     def test_api_token(self):
         client = modio.Client(api_key=game_api_key, test=True)
         games = client.get_games()
-        client.get_game(games.results[0].id)
+
+        if games:
+            client.get_game(games.results[0].id)
 
     def test_async_oauth_access(self):
         client = modio.Client(access_token=access_token, test=True)
@@ -48,5 +50,8 @@ class TestClient(unittest.TestCase):
         run(client.start())
 
         games = run(client.async_get_games())
-        run(client.async_get_game(games.results[0].id))
+
+        if games:
+            run(client.async_get_game(games.results[0].id))
+
         run(client.close())

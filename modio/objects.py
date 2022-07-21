@@ -266,7 +266,7 @@ class Filter:
     def max(self, **kwargs):
         """Where the preceding column value is smaller than or equal to the value specified. There are not set
         parameters, this methods takes any named keywords and transforms them into arguments that will be passed
-        to the request. E.g. 'game=40'
+        to the request. E.g. 'game_id=40'
         """
         for key, value in kwargs.items():
             self._set(key, value, "{}-max")
@@ -275,7 +275,7 @@ class Filter:
     def min(self, **kwargs):
         """Where the preceding column value is greater than or equal to the value specified. There are not set
         parameters, this methods takes any named keywords and transforms them into arguments that will be passed
-        to the request. E.g. 'game=40'
+        to the request. E.g. 'game_id=40'
         """
         for key, value in kwargs.items():
             self._set(key, value, "{}-min")
@@ -284,7 +284,7 @@ class Filter:
     def smaller_than(self, **kwargs):
         """Where the preceding column value is smaller than the value specified. There are not set
         parameters, this methods takes any named keywords and transforms them into arguments that will be passed
-        to the request. E.g. 'game=40'
+        to the request. E.g. 'game_id=40'
         """
         for key, value in kwargs.items():
             self._set(key, value, "{}-st")
@@ -293,7 +293,7 @@ class Filter:
     def greater_than(self, **kwargs):
         """Where the preceding column value is greater than the value specified. There are not set
         parameters, this methods takes any named keywords and transforms them into arguments that will be passed
-        to the request. E.g. 'game=40'
+        to the request. E.g. 'game_id=40'
         """
         for key, value in kwargs.items():
             self._set(key, value, "{}-gt")

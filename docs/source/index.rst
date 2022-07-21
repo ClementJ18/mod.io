@@ -80,9 +80,8 @@ Example
    #your oauth2 token is now stored in the variable
 
    #to save into a file simply
-   file = open("oauth2.txt", "w")
-   file.write(oauth2)
-   file.close()
+   with open("oauth2.txt", "w") as file:
+      file.write(oauth2)
 
    #and now the token is stored in oauth2.txt
 
@@ -106,6 +105,7 @@ Uninstalling
    client
    game
    mod
+   entities
    objects
    filtering&sorting
    async

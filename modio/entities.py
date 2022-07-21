@@ -94,7 +94,7 @@ class Event:
         UNIX timestamp of the event occurrence. Filter attribute.
     type : EventType
         Type of the event. Filter attribute.
-    game : int
+    game_id : int
         ID of the game that the mod the user change came from. Can be None if it is
         a mod event. Filter attribute.
 
@@ -106,7 +106,7 @@ class Event:
         self._raw_type = attrs.pop("event_type")
         self.mod = attrs.pop("mod_id")
         self.user = attrs.pop("user_id")
-        self.game = attrs.pop("game_id", None)
+        self.game_id = attrs.pop("game_id", None)
 
     @property
     def type(self):
@@ -172,6 +172,32 @@ class Comment:
     def __repr__(self):
         return f"<Comment id={self.id} mod={self.mod.id}>"
 
+    def edit(self, content):
+        """Update the contents of a comment.
+
+        |coro|
+
+        Parameters
+        ----------
+        content : str
+            The new content of the comment
+
+        Returns
+        --------
+        Comment
+            The comment with the new content
+        """
+        comment = self.connection.put_request(
+            f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}", data={"content": content}
+        )
+        return self.__class__(connection=self.connection, mod=self.mod, **comment)
+
+    async def async_edit(self, content):
+        comment = await self.connection.async_put_request(
+            f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}", data={"content": content}
+        )
+        return self.__class__(connection=self.connection, mod=self.mod, **comment)
+
     def delete(self):
         """Remove the comment.
 
@@ -225,7 +251,7 @@ class ModFile(OwnerMixin):
         url to download file
     expire : datetime.datetime
         UNIX timestamp of when the url expires
-    game : int
+    game_id : int
         ID of the game of the mod this file belongs to. Can be None if this file
         was returned from the me/modfiles endpoint.
     """
@@ -249,7 +275,7 @@ class ModFile(OwnerMixin):
         download = attrs.pop("download")
         self.url = download["binary_url"]
         self.expires = _convert_date(download["date_expires"])
-        self.game = attrs.pop("game_id", None)
+        self.game_id = attrs.pop("game_id", None)
         self.connection = attrs.pop("connection")
 
     def __repr__(self):
@@ -278,28 +304,28 @@ class ModFile(OwnerMixin):
         ModFile
             The updated file
         """
-        if not self.game:
+        if not self.game_id:
             raise modioException(
                 "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
             )
 
         file_json = self.connection.put_request(
-            f"/games/{self.game}/mods/{self.mod}/files/{self.id}", data=fields
+            f"/games/{self.game_id}/mods/{self.mod}/files/{self.id}", data=fields
         )
 
-        return self.__class__(connection=self.connection, game_id=self.game, **file_json)
+        return self.__class__(connection=self.connection, game_id=self.game_id, **file_json)
 
     async def async_edit(self, **fields):
-        if not self.game:
+        if not self.game_id:
             raise modioException(
                 "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
             )
 
         file_json = await self.connection.async_put_request(
-            f"/games/{self.game}/mods/{self.mod}/files/{self.id}", data=fields
+            f"/games/{self.game_id}/mods/{self.mod}/files/{self.id}", data=fields
         )
 
-        return self.__class__(connection=self.connection, game_id=self.game, **file_json)
+        return self.__class__(connection=self.connection, game_id=self.game_id, **file_json)
 
     def delete(self):
         """Deletes the modfile, this will raise an error if the
@@ -312,12 +338,12 @@ class ModFile(OwnerMixin):
         Forbidden
             You cannot delete the active release of a mod
         """
-        if not self.game:
+        if not self.game_id:
             raise modioException(
                 "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
             )
 
-        resp = self.connection.delete_request(f"/games/{self.game}/mods/{self.mod}/files/{self.id}")
+        resp = self.connection.delete_request(f"/games/{self.game_id}/mods/{self.mod}/files/{self.id}")
         return resp
 
     async def async_delete(self):
@@ -331,13 +357,13 @@ class ModFile(OwnerMixin):
         Forbidden
             You cannot delete the active release of a mod
         """
-        if not self.game:
+        if not self.game_id:
             raise modioException(
                 "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
             )
 
         resp = await self.connection.async_delete_request(
-            f"/games/{self.game}/mods/{self.mod}/files/{self.id}"
+            f"/games/{self.game_id}/mods/{self.mod}/files/{self.id}"
         )
         return resp
 
@@ -407,7 +433,7 @@ class Rating(RatingMixin):
 
     Attributes
     -----------
-    game : int
+    game_id : int
         The ID of the game the rated mod is for.
     mod : int
         The ID of the mod that was rated
@@ -421,7 +447,7 @@ class Rating(RatingMixin):
     mod_key = "mod"
 
     def __init__(self, **attrs):
-        self.game = attrs.pop("game_id")
+        self.game_id = attrs.pop("game_id")
         self.mod = attrs.pop("mod_id")
         self.rating = RatingType(attrs.pop("rating"))
         self.date = _convert_date(attrs.pop("date_added"))
@@ -638,44 +664,3 @@ class TeamMember(User):
 
     def __repr__(self):
         return f"<TeamMember team_id={self.team_id} id={self.id} level={self.level}>"
-
-    def edit(self, *, level=None, position=None):
-        """Edit a team member's details.
-
-        |coro|
-
-        Parameters
-        -----------
-        level : Optional[Level]
-            Level of permissions to grant the user
-        position : Optional[str]
-            Custom title given to the user in this team.
-
-        """
-        data = {"level": level.value, "position": position}
-        msg = self.connection.put_request(
-            f"/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}", data=data
-        )
-        return Message(**msg)
-
-    async def async_edit(self, *, level=None, position=None):
-        data = {"level": level.value, "position": position}
-        msg = await self.connection.async_put_request(
-            f"/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}", data=data
-        )
-        return Message(**msg)
-
-    def delete(self):
-        """Remove the user from the team. Fires a MOD_TEAM_CHANGED event.
-
-        |coro|"""
-        resp = self.connection.delete_request(
-            f"/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}"
-        )
-        return resp
-
-    async def async_delete(self):
-        resp = await self.connection.async_delete_request(
-            f"/games/{self.mod.game}/mods/{self.mod.id}/team/{self.team_id}"
-        )
-        return resp

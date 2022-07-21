@@ -61,7 +61,7 @@ class RatingMixin:
         try:
             mod_id = getattr(self, self.mod_key)
             self.connection.post_request(
-                f"/games/{self.game}/mods/{mod_id}/ratings", data={"rating": rating.value}
+                f"/games/{self.game_id}/mods/{mod_id}/ratings", data={"rating": rating.value}
             )
         except modioException:
             return False
@@ -72,7 +72,7 @@ class RatingMixin:
         try:
             mod_id = getattr(self, self.mod_key)
             await self.connection.async_post_request(
-                f"/games/{self.game}/mods/{mod_id}/ratings", data={"rating": rating.value}
+                f"/games/{self.game_id}/mods/{mod_id}/ratings", data={"rating": rating.value}
             )
         except modioException:
             return False

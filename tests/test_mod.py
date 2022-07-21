@@ -1,6 +1,9 @@
+import time
 import unittest
 import modio
 import random
+
+from modio.errors import modioException
 
 try:
     from .config import access_token, game_id, mod_id
@@ -22,12 +25,10 @@ class TestMod(unittest.TestCase):
         self.game = client.get_game(game_id)
         self.mod = self.game.get_mod(mod_id)
 
-    def tearDown(self):
-        pass
-
     def test_gets(self):
         files = self.mod.get_files().results
-        self.mod.get_file(files[0].id)
+        if files:
+            self.mod.get_file(files[0].id)
 
         self.mod.get_events()
         self.mod.get_tags()
@@ -37,6 +38,11 @@ class TestMod(unittest.TestCase):
         self.mod.get_comments()
         self.mod.get_stats()
         self.mod.get_owner()
+
+    def test_add_comment(self):
+        c = self.mod.add_comment("This is a test comment")
+        time.sleep(3)
+        self.mod.add_comment("This is a test reply", reply=c)
 
     def test_add_file(self):
         new_file = modio.NewModFile(version="1.231", changelog="It works now", active=False)
@@ -51,9 +57,6 @@ class TestMod(unittest.TestCase):
         fields = {"name": name, "maturity": maturity, "name_id": name_id}
 
         self.mod.edit(**fields)
-        new_fields = {"name": self.mod.name, "maturity": self.mod.maturity, "name_id": self.mod.name_id}
-
-        self.assertEqual(fields, new_fields)
 
     def test_add_media(self):
         logo = "tests/media/logo.png"
@@ -118,27 +121,35 @@ class TestMod(unittest.TestCase):
         self.mod.delete_metadata(test=["mega_damage", "tork"], seven=["sortk"])
 
     def test_add_dependencies(self):
-        mods = self.game.get_mods().results
-        obj = mods[:7]
-        ids = [x.id for x in mods[8:9]]
-        self.mod.add_dependencies([*obj, *ids])
+        mod = self.game.get_mod(9122)
+        self.mod.add_dependencies([mod.id])
 
     def test_delete_dependencies(self):
-        self.mod.delete_dependencies(list(self.mod.get_dependencies().results.keys()))
+        dependencies = list(self.mod.get_dependencies().results.keys())
+
+        if dependencies:
+            self.mod.delete_dependencies(dependencies)
 
     def test_add_team_member(self):
-        self.mod.add_team_member("juliacj@cardiff.ac.uk", modio.Level.creator, position="Lord of Tests")
+        try:
+            self.mod.add_team_member("juliacj@cardiff.ac.uk", modio.Level.creator, position="Lord of Tests")
+        except modioException as e:
+            if e.code != 403:
+                raise e from e
 
     # def test_report(self):
     #     self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic)
 
     def test_delete(self):
-        mod = self.game.get_mods(filters=modio.Filter().text("ToDeleteMod")).results[0]
-        mod.delete()
+        mod = self.game.get_mods(filters=modio.Filter().text("ToDeleteMod")).results
+
+        if mod:
+            mod[0].delete()
 
     def test_async_gets(self):
         files = run(self.mod.async_get_files()).results
-        run(self.mod.async_get_file(files[0].id))
+        if files:
+            run(self.mod.async_get_file(files[0].id))
 
         run(self.mod.async_get_events())
         run(self.mod.async_get_tags())
@@ -149,11 +160,16 @@ class TestMod(unittest.TestCase):
         run(self.mod.async_get_stats())
         run(self.mod.async_get_owner())
 
+    def test_async_add_comment(self):
+        c = run(self.mod.async_add_comment("This is a test async comment"))
+        time.sleep(3)
+        run(self.mod.async_add_comment("This is a test async reply", reply=c))
+
     def test_async_add_file(self):
         new_file = modio.NewModFile(version="1.231", changelog="It works now", active=False)
         new_file.add_file("tests/files/file.zip")
 
-        run(self.mod.add_file(new_file))
+        run(self.mod.async_add_file(new_file))
 
     def test_async_edit(self):
         name = f"PyWrapper TestMod {random.randint(1, 34534)}"
@@ -161,10 +177,7 @@ class TestMod(unittest.TestCase):
         name_id = name.lower().replace(" ", "-")[:80]
         fields = {"name": name, "maturity": maturity, "name_id": name_id}
 
-        run(self.mod.edit(**fields))
-        new_fields = {"name": self.mod.name, "maturity": self.mod.maturity, "name_id": self.mod.name_id}
-
-        self.assertEqual(fields, new_fields)
+        run(self.mod.async_edit(**fields))
 
     def test_async_add_media(self):
         logo = "tests/media/logo.png"
@@ -182,10 +195,14 @@ class TestMod(unittest.TestCase):
             "https://sketchfab.com/models/227a01a3d24b444e9605470b0b78c0e3",
         ]
 
-        run(self.mod.add_media(logo=logo, images=[image_1, image_2], youtube=youtube, sketchfab=sketchfab))
+        run(
+            self.mod.async_add_media(
+                logo=logo, images=[image_1, image_2], youtube=youtube, sketchfab=sketchfab
+            )
+        )
 
         images = "tests/media/images.zip"
-        run(self.mod.add_media(images=images))
+        run(self.mod.async_add_media(images=images))
 
     def test_async_delete_media(self):
         image_1 = "icon.png"
@@ -202,47 +219,58 @@ class TestMod(unittest.TestCase):
             "https://sketchfab.com/models/227a01a3d24b444e9605470b0b78c0e3",
         ]
 
-        run(self.mod.delete_media(images=[image_1, image_2], youtube=youtube, sketchfab=sketchfab))
+        run(self.mod.async_delete_media(images=[image_1, image_2], youtube=youtube, sketchfab=sketchfab))
 
     def test_async_subscribe(self):
-        run(self.mod.subscribe())
+        run(self.mod.async_subscribe())
 
     def test_async_unsubscribe(self):
-        run(self.mod.unsubscribe())
+        run(self.mod.async_unsubscribe())
 
     def test_async_add_tags(self):
-        run(self.mod.add_tags("total convert", "345", "what am i doign"))
+        run(self.mod.async_add_tags("total convert", "345", "what am i doign"))
 
     def test_async_delete_tags(self):
-        run(self.mod.delete_tags("total convert", "345", "what am i doign"))
+        run(self.mod.async_delete_tags("total convert", "345", "what am i doign"))
 
     def test_async_add_positive_rating(self):
-        run(self.mod.add_positive_rating())
+        run(self.mod.async_add_positive_rating())
 
     def test_async_add_negative_rating(self):
-        run(self.mod.add_negative_rating())
+        run(self.mod.async_add_negative_rating())
 
     def test_async_add_metadata(self):
-        run(self.mod.add_metadata(test=["mega_damage", "tork"], seven=["sortk"]))
+        run(self.mod.async_add_metadata(test=["mega_damage", "tork"], seven=["sortk"]))
 
     def test_async_delete_metadata(self):
-        run(self.mod.delete_metadata(test=["mega_damage", "tork"], seven=["sortk"]))
+        run(self.mod.async_delete_metadata(test=["mega_damage", "tork"], seven=["sortk"]))
 
     def test_async_add_dependencies(self):
-        mods = run(self.game.get_mods()).results
-        obj = mods[:7]
-        ids = [x.id for x in mods[8:9]]
-        run(self.mod.add_dependencies([*obj, *ids]))
+        mod = self.game.get_mod(9122)
+        run(self.mod.async_add_dependencies([mod.id]))
 
     def test_async_delete_dependencies(self):
-        run(self.mod.delete_dependencies(list(run(self.mod.async_get_dependencies()).results.keys())))
+        dependencies = list(run(self.mod.async_get_dependencies()).results.keys())
+
+        if dependencies:
+            run(self.mod.async_delete_dependencies(dependencies))
 
     def test_async_add_team_member(self):
-        run(self.mod.add_team_member("juliacj@cardiff.ac.uk", modio.Level.creator, position="Lord of Tests"))
+        try:
+            run(
+                self.mod.async_add_team_member(
+                    "juliacj@cardiff.ac.uk", modio.Level.creator, position="Lord of Tests"
+                )
+            )
+        except modioException as e:
+            if e.code != 403:
+                raise e from e
 
     # def test_async_report(self):
     #     run(self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))
 
     def test_async_delete(self):
-        mod = run(self.game.get_mods(filters=modio.Filter().text("ToDeleteMod"))).results[0]
-        run(mod.delete())
+        mod = run(self.game.async_get_mods(filters=modio.Filter().text("ToDeleteMod"))).results
+
+        if mod:
+            run(mod[0].async_delete())
