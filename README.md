@@ -28,7 +28,7 @@ mod = game.get_mod(231)
 ```
 
 ## How to install
-`pip install mod.io==0.3.0`
+`pip install mod.io==0.4.0`
 
 ## Getting an OAuth 2 Access Token
 To perform writes, you will need to authenticate your users via OAuth 2. To make this easy this library provides you with two functions to use in order to obtain your Access Token. You will need an API Key and an email adress to which you have access in order for this to work. Once you have both, follow the example below, you can either run this in a REPL or as a Python script. Don't forget to edit the script to add your own api key and email adress.
@@ -55,3 +55,11 @@ with open("oauth2.txt", "w") as file:
 
 #and now the token is stored in oauth2.txt
 ```
+
+## Unsupported Endpoints
+Most `/external/` endpoints are unsupported as they are inteded to be integrated directly into games which isn't
+the scope of this wrapper. This wrapper is mainly for reading the site although it does have some support for 
+editing and adding new stuff.
+
+This also means that the Platform and Portal endpoints/headers are unsupported.
+

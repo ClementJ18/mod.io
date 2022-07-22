@@ -1,9 +1,9 @@
 """Client used to interact with the API at a base level."""
 import asyncio
 import logging
-import requests
-import aiohttp
 import time
+import aiohttp
+import requests
 
 from .errors import modioException
 from .entities import Event, Message, ModFile, Rating, User
@@ -611,7 +611,7 @@ class Client:
         )
         return Message(**resp)
 
-    def email_exchange(self, code):
+    def email_exchange(self, code, *, date_expires=None):
         """Exchanges the given 5-digit code for an OAuth2 token.
 
         |coro|
@@ -620,6 +620,9 @@ class Client:
         ----------
         code : int
             A 5-digit code received by email less than 15 minutes ago
+        date_expires : Optional[datetime.datetime]
+            Datetime of when the token will expire. By default this
+            is a year, value cannot be greater than a year.
 
         Raises
         -------
@@ -637,21 +640,29 @@ class Client:
         if len(code) != 5:
             raise ValueError("Security code must be 5 digits")
 
+        params = {"security_code": code, "api_key": self.connection.api_key}
+        if date_expires is not None:
+            params["date_expires"] = date_expires.timestamp()
+
         resp = self.connection.post_request(
             "/oauth/emailexchange",
-            params={"security_code": code, "api_key": self.connection.api_key},
+            params=params,
             h_type=2,
         )
 
         return resp["access_token"]
 
-    async def async_email_exchange(self, code):
+    async def async_email_exchange(self, code, *, date_expires=None):
         if len(code) != 5:
             raise ValueError("Security code must be 5 digits")
 
+        params = {"security_code": code, "api_key": self.connection.api_key}
+        if date_expires is not None:
+            params["date_expires"] = date_expires.timestamp()
+
         resp = await self.connection.async_post_request(
             "/oauth/emailexchange",
-            params={"security_code": code, "api_key": self.connection.api_key},
+            params=params,
             h_type=2,
         )
 

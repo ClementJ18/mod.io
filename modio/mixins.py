@@ -1,4 +1,5 @@
 """Module storing all mixins for shared methods"""
+import time
 
 from .errors import modioException
 from .enums import RatingType, Report
@@ -135,3 +136,20 @@ class OwnerMixin:
             "/general/ownership", data={"resource_type": self.resource_type, "resource_id": self.id}
         )
         return entities.User(connection=self.connection, **user)
+
+
+class StatsMixin:
+    """Shared is_stale method."""
+
+    def __repr__(self):
+        return f"<Stats id={self.id} expired={self.is_stale()}>"
+
+    def is_stale(self):
+        """Returns a bool depending on whether or not the stats are considered stale.
+
+        Returns
+        --------
+        bool
+            True if stats are expired, False else.
+        """
+        return self.expires.timestamp() < time.time()

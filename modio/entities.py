@@ -1,10 +1,10 @@
 """Module for miscs objects."""
 import time
 
-from .mixins import OwnerMixin, RatingMixin, ReportMixin
+from .mixins import OwnerMixin, RatingMixin, ReportMixin, StatsMixin
 from .errors import modioException
 from .utils import concat_docs, _convert_date
-from .enums import EventType, RatingType, VirusStatus
+from .enums import EventType, RatingType, TargetPlatform, VirusStatus
 
 
 class Message:
@@ -202,7 +202,9 @@ class Comment:
         """Remove the comment.
 
         |coro|"""
-        resp = self.connection.delete_request(f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}")
+        resp = self.connection.delete_request(
+            f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}"
+        )
         return resp
 
     async def async_delete(self):
@@ -398,6 +400,25 @@ class ModMedia:
         self.images = [Image(**image) for image in attrs.pop("images", [])]
 
 
+class Platform:
+    """A platform
+
+    Attributes
+    ----------
+    platform : TargetPlatform
+        The platform
+    label : str
+        The human readable platform label
+    moderated : bool
+        Whether the platform is moderated by game admins
+    """
+
+    def __init__(self, **attrs):
+        self.platform = TargetPlatform[attrs.pop("platform")]
+        self.label = attrs.pop("label")
+        self.moderated = attrs.pop("moderated")
+
+
 class TagOption:
     """Represents a game tag gropup, a category of tags from which a
     mod may pick one or more.
@@ -454,7 +475,7 @@ class Rating(RatingMixin):
         self.connection = attrs.pop("connection")
 
 
-class Stats:
+class ModStats(StatsMixin):
     """Represents a summary of stats for a mod
 
     Attributes
@@ -504,18 +525,70 @@ class Stats:
         self.weighted = attrs.pop("ratings_weighted_aggregate")
         self.text = attrs.pop("ratings_display_text")
 
-    def __repr__(self):
-        return f"<Stats id={self.id} expired={self.is_stale()}>"
 
-    def is_stale(self):
-        """Returns a bool depending on whether or not the stats are considered stale.
+class GameStats(StatsMixin):
+    """A stat object containing the stats specific to games
 
-        Returns
-        --------
-        bool
-            True if stats are expired, False else.
-        """
-        return self.expires.timestamp() < time.time()
+    Attributes
+    -----------
+    id : int
+        The id of the game
+    mods_count_total : int
+        The total count of mods for this game
+    mods_download_today : int
+        The amount of mod downloaded today
+    mods_download_total : int
+        The amount of mods downloaded all times
+    mods_download_daily_avg : int
+        Average daily mod downlaods
+    mod_subscribers_total : int
+        Total amount of subscribers to all mods
+    data_expires : datetime.datetime
+        The date at which the stats are considered "stale"
+        and no longer accurate.
+    """
+
+    def __init__(self, **attrs):
+        self.id = attrs.pop("game_id")
+        self.mods_count_total = attrs.pop("mods_count_total")
+        self.mods_downloads_today = attrs.pop("mods_downloads_today")
+        self.mods_downloads_total = attrs.pop("mods_downloads_total")
+        self.mods_downloads_daily_avg = attrs.pop("mods_downloads_daily_average")
+        self.mods_subscribers_total = attrs.pop("mod_subscribers_total")
+        self.date_expires = _convert_date(attrs.pop("date_expires"))
+
+
+class Theme:
+    """Object representing a game's theme. This is mostly useful
+    if you desire to create a visual interface for a game or
+    one of its mods. All attributes are hex color codes.
+
+    Attributes
+    -----------
+    primary : string
+        Primary color of the game
+    dark : string
+        The "dark" color of the game
+    light : string
+        The "light" color of the game
+    success : string
+        The color of a successful action with
+        the game interface
+    warning : string
+        The color of a warning with the
+        game interface
+    danger : string
+        The color of a danger warning with
+        the game interface
+    """
+
+    def __init__(self, **attrs):
+        self.primary = attrs.pop("primary")
+        self.dark = attrs.pop("dark")
+        self.light = attrs.pop("light")
+        self.success = attrs.pop("success")
+        self.warning = attrs.pop("warning")
+        self.danger = attrs.pop("danger")
 
 
 class Tag:

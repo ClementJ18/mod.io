@@ -15,6 +15,22 @@ class IntFlag(enum.IntFlag):
     __str__ = __repr__
 
 
+class TargetPlatform(enum.Enum):
+    """Enums for different type of target platforms"""
+
+    windows = enum.auto()
+    mac = enum.auto()
+    linux = enum.auto()
+    android = enum.auto()
+    ios = enum.auto()
+    xboxone = enum.auto()
+    xboxseriesx = enum.auto()
+    ps4 = enum.auto()
+    ps5 = enum.auto()
+    switch = enum.auto()
+    oculus = enum.auto()
+
+
 class Status(enum.Enum):
     """Status of the game.
     0 : Not accepted

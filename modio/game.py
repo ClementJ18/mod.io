@@ -2,7 +2,7 @@
 import json
 
 from .mod import Mod
-from .entities import Event, Image, Message, Stats, TagOption, User
+from .entities import Event, Image, Message, GameStats, Platform, TagOption, Theme, User
 from .objects import NewMod, Pagination, Returned
 from .errors import modioException
 from .utils import _convert_date, find
@@ -68,6 +68,17 @@ class Game(ReportMixin, OwnerMixin):
         URL to the game's mod.io page.
     tag_options : List[TagOption]
         List of tags from which mods can pick
+    stats : GameStats
+        The game stats
+    theme : Theme
+        The colors of the game theme
+    other_urls : Dict[str, str]
+        A dictionnary of labels and urls for
+        the game
+    tag_options : List[TagOption]
+        Tag options of the game
+    platforms : List[Platform]
+        Platforms this games supports
     """
 
     resource_type = "games"
@@ -103,6 +114,11 @@ class Game(ReportMixin, OwnerMixin):
         self.maturity_options = MaturityOptions(attrs.pop("maturity_options"))
         self.connection = attrs.pop("connection")
         self.submitter = None
+        self.stats = GameStats(**attrs.pop("stats"))
+        self.theme = Theme(**attrs.pop("theme"))
+        self.other_urls = {key: value for key, value in attrs.pop("other_urls")}
+        self.tag_options = [TagOption(**option) for option in attrs.pop("tag_options")]
+        self.paltform = [Platform(**platform) for platform in attrs.pop("platforms")]
 
         if attrs.get("submitted_by", {}):
             self.submitter = User(connection=self.connection, **attrs.pop("submitted_by"))
@@ -239,15 +255,15 @@ class Game(ReportMixin, OwnerMixin):
 
         Returns
         --------
-        Returned[List[Stats], Pagination]
+        Returned[List[GameStats], Pagination]
             The results and pagination tuple from this request
         """
         stats_json = self.connection.get_request(f"/games/{self.id}/mods/stats", filters=filters)
-        return Returned([Stats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
+        return Returned([GameStats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
 
     async def async_get_stats(self, *, filters=None):
         stats_json = await self.connection.async_get_request(f"/games/{self.id}/mods/stats", filters=filters)
-        return Returned([Stats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
+        return Returned([GameStats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
 
     def add_mod(self, mod):
         """Add a mod to this game.
