@@ -251,7 +251,7 @@ class ModFile(OwnerMixin):
         Metadata stored by the game developer for this file. Filter attribute.
     url : str
         url to download file
-    expire : datetime.datetime
+    date_expires : datetime.datetime
         UNIX timestamp of when the url expires
     game_id : int
         ID of the game of the mod this file belongs to. Can be None if this file
@@ -276,7 +276,7 @@ class ModFile(OwnerMixin):
         self.metadata = attrs.pop("metadata_blob")
         download = attrs.pop("download")
         self.url = download["binary_url"]
-        self.expires = _convert_date(download["date_expires"])
+        self.date_expires = _convert_date(download.pop("date_expires"))
         self.game_id = attrs.pop("game_id", None)
         self.connection = attrs.pop("connection")
 
@@ -377,7 +377,7 @@ class ModFile(OwnerMixin):
         bool
             True if it's still valid, else False
         """
-        return self.expires.timestamp() < time.time()
+        return self.date_expires.timestamp() < time.time()
 
 
 class ModMedia:
@@ -506,7 +506,7 @@ class ModStats(StatsMixin):
     text : str
         Textual representation of the rating in format. This is currently not updated
         by the lib so you'll have to poll the resource's endpoint again.
-    expires : datetime.datetime
+    date_expires : datetime.datetime
         Unix timestamp until this mods's statistics are considered stale. Endpoint
         should be polled again when this expires.
     """
@@ -517,7 +517,7 @@ class ModStats(StatsMixin):
         self.rank_total = attrs.pop("popularity_rank_total_mods")
         self.downloads = attrs.pop("downloads_total")
         self.subscribers = attrs.pop("subscribers_total")
-        self.expires = _convert_date(attrs.pop("date_expires"))
+        self.date_expires = _convert_date(attrs.pop("date_expires"))
         self.total = attrs.pop("ratings_total")
         self.positive = attrs.pop("ratings_positive")
         self.negative = attrs.pop("ratings_negative")
@@ -541,9 +541,9 @@ class GameStats(StatsMixin):
         The amount of mods downloaded all times
     mods_download_daily_avg : int
         Average daily mod downlaods
-    mod_subscribers_total : int
+    mods_subscribers_total : int
         Total amount of subscribers to all mods
-    data_expires : datetime.datetime
+    date_expires : datetime.datetime
         The date at which the stats are considered "stale"
         and no longer accurate.
     """
@@ -554,7 +554,7 @@ class GameStats(StatsMixin):
         self.mods_downloads_today = attrs.pop("mods_downloads_today")
         self.mods_downloads_total = attrs.pop("mods_downloads_total")
         self.mods_downloads_daily_avg = attrs.pop("mods_downloads_daily_average")
-        self.mods_subscribers_total = attrs.pop("mod_subscribers_total")
+        self.mods_subscribers_total = attrs.pop("mods_subscribers_total")
         self.date_expires = _convert_date(attrs.pop("date_expires"))
 
 
@@ -589,6 +589,9 @@ class Theme:
         self.success = attrs.pop("success")
         self.warning = attrs.pop("warning")
         self.danger = attrs.pop("danger")
+
+    def __repr__(self):
+        return f"< Theme primary={self.primary} >"
 
 
 class Tag:

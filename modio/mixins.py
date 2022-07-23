@@ -152,4 +152,4 @@ class StatsMixin:
         bool
             True if stats are expired, False else.
         """
-        return self.expires.timestamp() < time.time()
+        return self.date_expires.timestamp() < time.time()

@@ -20,8 +20,9 @@ New Features
 * `Stats` renamed to ModStats, new GameStats object
 * New object `Theme`
 * New enum `TargetPlatform`
-* New attributes for Game: `stats`, `theme`, `other_urls`, `tag_options`, `platforms`
+* New attributes for Game: `stats`, `theme`, `other_urls`, `platforms`
 * New attributes for Mod: `game_name`
+* `expires` attribute renamed to `date_expires`
 
 
 v0.3.1

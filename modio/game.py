@@ -75,8 +75,6 @@ class Game(ReportMixin, OwnerMixin):
     other_urls : Dict[str, str]
         A dictionnary of labels and urls for
         the game
-    tag_options : List[TagOption]
-        Tag options of the game
     platforms : List[Platform]
         Platforms this games supports
     """
@@ -117,7 +115,6 @@ class Game(ReportMixin, OwnerMixin):
         self.stats = GameStats(**attrs.pop("stats"))
         self.theme = Theme(**attrs.pop("theme"))
         self.other_urls = {key: value for key, value in attrs.pop("other_urls")}
-        self.tag_options = [TagOption(**option) for option in attrs.pop("tag_options")]
         self.paltform = [Platform(**platform) for platform in attrs.pop("platforms")]
 
         if attrs.get("submitted_by", {}):
