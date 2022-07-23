@@ -68,7 +68,7 @@ class Game(ReportMixin, OwnerMixin):
         URL to the game's mod.io page.
     tag_options : List[TagOption]
         List of tags from which mods can pick
-    stats : GameStats
+    stats : Optional[GameStats]
         The game stats
     theme : Theme
         The colors of the game theme
@@ -112,13 +112,18 @@ class Game(ReportMixin, OwnerMixin):
         self.maturity_options = MaturityOptions(attrs.pop("maturity_options"))
         self.connection = attrs.pop("connection")
         self.submitter = None
-        self.stats = GameStats(**attrs.pop("stats"))
+        self.stats = None
         self.theme = Theme(**attrs.pop("theme"))
         self.other_urls = {key: value for key, value in attrs.pop("other_urls")}
         self.paltform = [Platform(**platform) for platform in attrs.pop("platforms")]
 
-        if attrs.get("submitted_by", {}):
-            self.submitter = User(connection=self.connection, **attrs.pop("submitted_by"))
+        _submitter = attrs.pop("submitted_by", {})
+        if _submitter:
+            self.submitter = User(connection=self.connection, **_submitter)
+
+        _stats = attrs.pop("stats", {})
+        if _stats:
+            self.stats = GameStats(**_stats)
 
     def __repr__(self):
         return f"<Game id={self.id} name={self.name}>"

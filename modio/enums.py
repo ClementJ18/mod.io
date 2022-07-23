@@ -2,15 +2,15 @@
 import enum
 
 
-class IntFlag(enum.IntFlag):
-    """Base class for IntFlags containing formatting methods."""
+class IntFlagMixin:
+    """Mixin class for IntFlags containing formatting methods."""
 
     def __repr__(self):
         cls = self.__class__
         if self._name_ is not None:
             return self._name_
         members, _ = enum._decompose(cls, self._value_)
-        return "|".join([str(m._name_ or m._value_) for m in members])
+        return " | ".join([str(m._name_ or m._value_) for m in members])
 
     __str__ = __repr__
 
@@ -78,7 +78,7 @@ class Curation(enum.Enum):
     full_curation = 2
 
 
-class Community(IntFlag):
+class Community(IntFlagMixin, enum.IntFlag):
     """
     0 : All of the options below are disabled
     1 : Discussion board enabled
@@ -92,7 +92,7 @@ class Community(IntFlag):
     guides_news = 2
 
 
-class Revenue(IntFlag):
+class Revenue(IntFlagMixin, enum.IntFlag):
     """
     0 : All of the options below are disabled
     1 : Allow mods to be sold
@@ -107,10 +107,10 @@ class Revenue(IntFlag):
     sold = 1
     donations = 2
     traded = 4
-    full_control = 5
+    full_control = 8
 
 
-class APIAccess(IntFlag):
+class APIAccess(IntFlagMixin, enum.IntFlag):
     """
     0 : All of the options below are disabled
     1 : Allow 3rd parties to access this games API endpoints
@@ -138,7 +138,7 @@ class MaturityOptions(enum.Enum):
     allowed = 1
 
 
-class Maturity(IntFlag):
+class Maturity(IntFlagMixin, enum.IntFlag):
     """
     0 : None
     1 : Alcohol
