@@ -2,7 +2,7 @@
 import json
 
 from .mod import Mod
-from .entities import Event, Image, Message, GameStats, Platform, TagOption, User
+from .entities import Event, Image, Message, GameStats, ModStats, Platform, TagOption, User
 from .objects import NewMod, Pagination, Returned
 from .errors import modioException
 from .utils import _convert_date, find
@@ -243,7 +243,7 @@ class Game(ReportMixin, OwnerMixin):
         return Returned(tags, Pagination(**tag_json))
 
     def get_stats(self, *, filters=None):
-        """Gets the stat objects for all the mods of this game. |filterable|
+        """Get the stats for the game. |filterable|
 
         |coro|
 
@@ -255,15 +255,39 @@ class Game(ReportMixin, OwnerMixin):
 
         Returns
         --------
-        Returned[List[GameStats], Pagination]
+        GameStats
+            The stats for the game.
+        """
+
+        stats_json = self.connection.get_request(f"/games/{self.id}/stats", filters=filters)
+        return GameStats(**stats_json)
+
+    async def async_get_stats(self, *, filters=None):
+        stats_json = await self.connection.async_get_request(f"/games/{self.id}/stats", filters=filters)
+        return GameStats(**stats_json)
+
+    def get_mods_stats(self, *, filters=None):
+        """Gets the stat for all the mods of this game. |filterable|
+
+        |coro|
+
+        Parameters
+        -----------
+        filter : Optional[Filter]
+            A instance of Filter to be used for filtering, paginating and sorting
+            results
+
+        Returns
+        --------
+        Returned[List[ModStats], Pagination]
             The results and pagination tuple from this request
         """
         stats_json = self.connection.get_request(f"/games/{self.id}/mods/stats", filters=filters)
-        return Returned([GameStats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
+        return Returned([ModStats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
 
-    async def async_get_stats(self, *, filters=None):
+    async def async_get_mods_stats(self, *, filters=None):
         stats_json = await self.connection.async_get_request(f"/games/{self.id}/mods/stats", filters=filters)
-        return Returned([GameStats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
+        return Returned([ModStats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
 
     def add_mod(self, mod):
         """Add a mod to this game.

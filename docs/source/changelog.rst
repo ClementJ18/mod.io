@@ -23,6 +23,8 @@ New Features
 * `expires` attribute renamed to `date_expires`
 * New methods `Comment.add_positive_karma` and `Comment.add_negative_karma` and async equivalents
 * Added comment added/deleted event support
+* `Game.get_stats` renamed to `Game.get_mods_stats`
+* New function `Game.get_stats` that gets stats for the game rather than for the mods of the game
 
 Removed Features
 ##################

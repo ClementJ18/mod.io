@@ -40,6 +40,7 @@ class TestMod(unittest.TestCase):
         self.mod.get_owner()
 
     def test_add_comment(self):
+        time.sleep(3)
         c = self.mod.add_comment("This is a test comment")
         time.sleep(3)
         self.mod.add_comment("This is a test reply", reply=c)
@@ -161,6 +162,7 @@ class TestMod(unittest.TestCase):
         run(self.mod.async_get_owner())
 
     def test_async_add_comment(self):
+        time.sleep(3)
         c = run(self.mod.async_add_comment("This is a test async comment"))
         time.sleep(3)
         run(self.mod.async_add_comment("This is a test async reply", reply=c))
