@@ -6,8 +6,8 @@
 
 Welcome to modio's documentation!
 =================================
-.. image:: https://readthedocs.org/projects/modio/badge/?version=latest
-   :target: https://modio.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/modio/badge/?version=stable
+   :target: https://modio.readthedocs.io/en/latest/?badge=stable
    :alt: Documentation Status
 
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
@@ -22,17 +22,11 @@ Welcome to modio's documentation!
    :target: https://github.com/ClementJ18/mod.io/pulls
    :alt: Open PRs
 
-.. image:: https://img.shields.io/github/release/ClementJ18/mod.io.svg
-   :alt: Latest Release
-
 .. image:: https://img.shields.io/github/stars/ClementJ18/mod.io.svg?label=Stars&style=social 
    :target: https://github.com/ClementJ18/mod.io
 
 .. image:: https://img.shields.io/discord/389039439487434752.svg
    :target: https://discord.gg/Hkq7X7n
-
-.. image:: https://img.shields.io/github/commits-since/ClementJ18/mod.io/latest.svg
-    :target: https://github.com/ClementJ18/mod.io/releases/latest
 
 modio.py is a wrapper package for the mod.io API. Most blocking methods have both a synchronous version and async method
 for use within async applications.
@@ -112,6 +106,7 @@ Uninstalling
    utils
    enums
    errors
+   changelog
 
 
 Indices and tables

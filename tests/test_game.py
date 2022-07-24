@@ -30,6 +30,7 @@ class TestGame(unittest.TestCase):
         self.game.get_mod_events()
         self.game.get_tag_options()
         self.game.get_stats()
+        self.game.get_mods_stats()
 
         self.game.get_owner()
 
@@ -83,6 +84,7 @@ class TestGame(unittest.TestCase):
         run(self.game.async_get_mod_events())
         run(self.game.async_get_tag_options())
         run(self.game.async_get_stats())
+        run(self.game.async_get_mods_stats())
 
         run(self.game.async_get_owner())
 

@@ -9,7 +9,7 @@ from .entities import (
     Message,
     ModFile,
     ModMedia,
-    Stats,
+    ModStats,
     TeamMember,
     User,
 )
@@ -81,7 +81,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         Latest released instance. Can be None. Filter attribute.
     media : ModMedia
         Contains mod media data (links and images)
-    stats : Stats
+    stats : ModStats
         Summary of all stats for this mod
     tags : dict
         Tags for this mod. Filter attribute.
@@ -99,6 +99,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         self.status = Status(attrs.pop("status"))
         self.visible = Visibility(attrs.pop("visible"))
         self.game_id = attrs.pop("game_id")
+        # self.game_name = attrs.pop("game_name")
         self.date = _convert_date(attrs.pop("date_added"))
         self.updated = _convert_date(attrs.pop("date_updated"))
         self.live = _convert_date(attrs.pop("date_live"))
@@ -112,7 +113,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         self.profile = attrs.pop("profile_url")
         self.media = ModMedia(**attrs.pop("media"))
         self.maturity = Maturity(attrs.pop("maturity_option"))
-        self.stats = Stats(**attrs.pop("stats"))
+        self.stats = ModStats(**attrs.pop("stats"))
         self.tags = {tag["name"]: tag["date_added"] for tag in attrs.pop("tags", [])}
         self.connection = attrs.pop("connection")
         self._file = attrs.pop("modfile", None)
@@ -183,9 +184,14 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         Returned[List[ModFile], Pagination]
             The results and pagination tuple from this request
         """
-        files_json = self.connection.get_request(f"/games/{self.game_id}/mods/{self.id}/files", filters=filters)
+        files_json = self.connection.get_request(
+            f"/games/{self.game_id}/mods/{self.id}/files", filters=filters
+        )
         return Returned(
-            [ModFile(**file, game_id=self.game_id, connection=self.connection) for file in files_json["data"]],
+            [
+                ModFile(**file, game_id=self.game_id, connection=self.connection)
+                for file in files_json["data"]
+            ],
             Pagination(**files_json),
         )
 
@@ -194,7 +200,10 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             f"/games/{self.game_id}/mods/{self.id}/files", filters=filters
         )
         return Returned(
-            [ModFile(**file, game_id=self.game_id, connection=self.connection) for file in files_json["data"]],
+            [
+                ModFile(**file, game_id=self.game_id, connection=self.connection)
+                for file in files_json["data"]
+            ],
             Pagination(**files_json),
         )
 
@@ -216,7 +225,9 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             The results and pagination tuple from this request
 
         """
-        event_json = self.connection.get_request(f"/games/{self.game_id}/mods/{self.id}/events", filters=filters)
+        event_json = self.connection.get_request(
+            f"/games/{self.game_id}/mods/{self.id}/events", filters=filters
+        )
         return Returned([Event(**event) for event in event_json["data"]], Pagination(**event_json))
 
     async def async_get_events(self, *, filters=None):
@@ -269,7 +280,9 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         return Returned(self.kvp, Pagination(**meta_json))
 
     async def async_get_metadata(self):
-        meta_json = await self.connection.async_get_request(f"/games/{self.game_id}/mods/{self.id}/metadatakvp")
+        meta_json = await self.connection.async_get_request(
+            f"/games/{self.game_id}/mods/{self.id}/metadatakvp"
+        )
         self._kvp_raw = meta_json["data"]
         return Returned(self.kvp, Pagination(**meta_json))
 
@@ -404,11 +417,13 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         if reply:
             data["reply_id"] = reply.id
 
-        comment = await self.connection.async_post_request(f"/games/{self.game_id}/mods/{self.id}/comments", data=data)
+        comment = await self.connection.async_post_request(
+            f"/games/{self.game_id}/mods/{self.id}/comments", data=data
+        )
         return Comment(connection=self.connection, mod=self, **comment)
 
     def get_stats(self):
-        """Returns a Stats object, representing a series of stats for the mod.
+        """Returns a ModStats object, representing a series of stats for the mod.
 
         |coro|
 
@@ -418,12 +433,12 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             The stats summary object for the mod.
         """
         stats_json = self.connection.get_request(f"/games/{self.game_id}/mods/{self.id}/stats")
-        self.stats = stats = Stats(**stats_json)
+        self.stats = stats = ModStats(**stats_json)
         return stats
 
     async def async_get_stats(self):
         stats_json = await self.connection.async_get_request(f"/games/{self.game_id}/mods/{self.id}/stats")
-        self.stats = stats = Stats(**stats_json)
+        self.stats = stats = ModStats(**stats_json)
         return stats
 
     def edit(self, **fields):
@@ -468,7 +483,9 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
     async def async_edit(self, **fields):
         fields = _clean_and_convert(fields)
-        mod_json = await self.connection.async_put_request(f"/games/{self.game_id}/mods/{self.id}", data=fields)
+        mod_json = await self.connection.async_put_request(
+            f"/games/{self.game_id}/mods/{self.id}", data=fields
+        )
         return self.__class__(connection=self.connection, **mod_json)
 
     def delete(self):
@@ -920,5 +937,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
     async def async_add_team_member(self, email, level, *, position=None):
         data = {"email": email, "level": level.value, "position": position}
-        msg = await self.connection.async_post_request(f"/games/{self.game_id}/mods/{self.id}/team", data=data)
+        msg = await self.connection.async_post_request(
+            f"/games/{self.game_id}/mods/{self.id}/team", data=data
+        )
         return Message(**msg)

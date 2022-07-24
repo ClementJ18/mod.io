@@ -114,7 +114,7 @@ class TestStats(unittest.TestCase):
         run(client.start())
 
         game = client.get_game(game_id)
-        stat = game.get_stats().results[0]
+        stat = game.get_mods_stats().results[0]
         stat.is_stale()
 
 

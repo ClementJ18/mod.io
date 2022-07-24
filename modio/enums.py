@@ -2,17 +2,33 @@
 import enum
 
 
-class IntFlag(enum.IntFlag):
-    """Base class for IntFlags containing formatting methods."""
+class IntFlagMixin:
+    """Mixin class for IntFlags containing formatting methods."""
 
     def __repr__(self):
         cls = self.__class__
         if self._name_ is not None:
             return self._name_
         members, _ = enum._decompose(cls, self._value_)
-        return "|".join([str(m._name_ or m._value_) for m in members])
+        return " | ".join([str(m._name_ or m._value_) for m in members])
 
     __str__ = __repr__
+
+
+class TargetPlatform(enum.Enum):
+    """Enums for different type of target platforms"""
+
+    windows = enum.auto()
+    mac = enum.auto()
+    linux = enum.auto()
+    android = enum.auto()
+    ios = enum.auto()
+    xboxone = enum.auto()
+    xboxseriesx = enum.auto()
+    ps4 = enum.auto()
+    ps5 = enum.auto()
+    switch = enum.auto()
+    oculus = enum.auto()
 
 
 class Status(enum.Enum):
@@ -62,7 +78,7 @@ class Curation(enum.Enum):
     full_curation = 2
 
 
-class Community(IntFlag):
+class Community(IntFlagMixin, enum.IntFlag):
     """
     0 : All of the options below are disabled
     1 : Discussion board enabled
@@ -76,7 +92,7 @@ class Community(IntFlag):
     guides_news = 2
 
 
-class Revenue(IntFlag):
+class Revenue(IntFlagMixin, enum.IntFlag):
     """
     0 : All of the options below are disabled
     1 : Allow mods to be sold
@@ -91,10 +107,10 @@ class Revenue(IntFlag):
     sold = 1
     donations = 2
     traded = 4
-    full_control = 5
+    full_control = 8
 
 
-class APIAccess(IntFlag):
+class APIAccess(IntFlagMixin, enum.IntFlag):
     """
     0 : All of the options below are disabled
     1 : Allow 3rd parties to access this games API endpoints
@@ -122,7 +138,7 @@ class MaturityOptions(enum.Enum):
     allowed = 1
 
 
-class Maturity(IntFlag):
+class Maturity(IntFlagMixin, enum.IntFlag):
     """
     0 : None
     1 : Alcohol
@@ -199,11 +215,12 @@ class EventType(enum.Enum):
     edited = 3
     deleted = 4
     team_changed = 5
-    team_join = 6
-    team_leave = 7
-    subscribe = 8
-    unsubscribe = 9
-    other = 10
+    comment_added = 6
+    comment_deleted = 7
+    team_join = 8
+    team_leave = 9
+    subscribe = 10
+    unsubscribe = 11
 
 
 class RatingType(enum.Enum):
