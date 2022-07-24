@@ -215,11 +215,12 @@ class EventType(enum.Enum):
     edited = 3
     deleted = 4
     team_changed = 5
-    team_join = 6
-    team_leave = 7
-    subscribe = 8
-    unsubscribe = 9
-    other = 10
+    comment_added = 6
+    comment_deleted = 7
+    team_join = 8
+    team_leave = 9
+    subscribe = 10
+    unsubscribe = 11
 
 
 class RatingType(enum.Enum):

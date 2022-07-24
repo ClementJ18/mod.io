@@ -1,5 +1,6 @@
 """Module for user instanced classes."""
 
+import datetime
 import enum
 import hashlib
 from collections import namedtuple
@@ -172,6 +173,9 @@ class Filter:
         self._limit = None
         self._offset = None
 
+    def __repr__(self):
+        return f"< Filter filters={self.__dict__}>"
+
     def _set(self, key, value, text="{}"):
         try:
             key = _lib_to_api[key]
@@ -179,10 +183,13 @@ class Filter:
             pass
 
         if key == "event_type":
-            if value.value < 6:
+            if value.value < 8:
                 value = f"MOD{'_' if value != EventType.file_changed else ''}{value.name.upper()}"
             else:
                 value = f"USER_{value.name.upper()}"
+
+        if isinstance(value, datetime.datetime):
+            value = int(value.timestamp())
 
         if isinstance(value, enum.Enum):
             value = value.value
@@ -281,24 +288,6 @@ class Filter:
             self._set(key, value, "{}-min")
         return self
 
-    def smaller_than(self, **kwargs):
-        """Where the preceding column value is smaller than the value specified. There are not set
-        parameters, this methods takes any named keywords and transforms them into arguments that will be passed
-        to the request. E.g. 'game_id=40'
-        """
-        for key, value in kwargs.items():
-            self._set(key, value, "{}-st")
-        return self
-
-    def greater_than(self, **kwargs):
-        """Where the preceding column value is greater than the value specified. There are not set
-        parameters, this methods takes any named keywords and transforms them into arguments that will be passed
-        to the request. E.g. 'game_id=40'
-        """
-        for key, value in kwargs.items():
-            self._set(key, value, "{}-gt")
-        return self
-
     def bitwise(self, **kwargs):
         """Some columns are stored as bits within an integer. You can combine any number of options for the column
         of the object you are querying. This is dependent on which item is being queried. These can be added together
@@ -347,6 +336,13 @@ class Filter:
         return self
 
     def get_dict(self):
+        """Uility methods to get all filters while omitting None values
+
+        Returns
+        ---------
+        Dict[str, Union[str, int]]
+            The dict of filters
+        """
         return {key: value for key, value in self.__dict__.items() if value is not None}
 
 

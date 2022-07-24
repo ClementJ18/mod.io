@@ -126,13 +126,13 @@ class Comment:
     -----------
     id : int
         ID of the comment. Filter attribute.
-    mod : Mod
-        The mod the comment has been posted on. Filter attribute.
+    resource_id : int
+        The parent resource. Filter attribute.
     user : User
         Istance of the user that submitted the comment. Filter attribute.
     date : datetime.datetime
         Unix timestamp of date the comment was posted. Filter attribute.
-    parent : int
+    parent_id : int
         ID of the parent this comment is replying to. 0 if comment
         is not a reply. Filter attribute.
     position : int
@@ -156,13 +156,12 @@ class Comment:
 
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
-        self.mod = attrs.pop("mod_id")
+        self.resource_id = attrs.pop("resource_id")
         self.date = _convert_date(attrs.pop("date_added"))
-        self.parent = attrs.pop("reply_id")
+        self.parent_id = attrs.pop("reply_id")
         self.position = attrs.pop("thread_position")
         self.level = len(self.position.split("."))
         self.karma = attrs.pop("karma")
-        self.karma_guest = attrs.pop("karma_guest")
         self.content = attrs.pop("content")
         self.connection = attrs.pop("connection")
         self.mod = attrs.pop("mod")
@@ -215,6 +214,50 @@ class Comment:
             f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}"
         )
         return resp
+
+    def _add_karma(self, karma: bool):
+        comment = self.connection.post_request(
+            f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}/karma",
+            data={"karma": 1 if karma else -1},
+        )
+        return Comment(**comment)
+
+    async def _async_add_karma(self, karma: bool):
+        comment = await self.connection.async_post_request(
+            f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}/karma",
+            data={"karma": 1 if karma else -1},
+        )
+        return Comment(**comment)
+
+    def add_positive_karma(self):
+        """Add positive karma to the comment
+
+        |coro|
+
+        Returns
+        --------
+        Comment
+            The updated comment
+        """
+        return self._add_karma(True)
+
+    async def async_add_positive_karma(self):
+        return await self._async_add_karma(True)
+
+    def add_negative_karma(self):
+        """Add negative karma to the comment
+
+        |coro|
+
+        Returns
+        --------
+        Comment
+            The updated comment
+        """
+        return self._add_karma(False)
+
+    async def aynsc_add_negative_karma(self):
+        return await self._async_add_karma(False)
 
 
 class ModFile(OwnerMixin):

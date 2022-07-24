@@ -17,13 +17,18 @@ New Features
 #############
 * `Client.email_exchange` now supports `date_expire`
 * New object `Platform`
-* `Stats` renamed to ModStats, new GameStats object
-* New object `Theme`
+* `Stats` renamed to `ModStats`, new `GameStats` object
 * New enum `TargetPlatform`
-* New attributes for Game: `stats`, `theme`, `other_urls`, `platforms`
-* New attributes for Mod: `game_name`
+* New attributes for Game: `stats`, `other_urls`, `platforms`
 * `expires` attribute renamed to `date_expires`
+* New methods `Comment.add_positive_karma` and `Comment.add_negative_karma` and async equivalents
+* Added comment added/deleted event support
 
+Removed Features
+##################
+* `Comment.mod` is now deprecated and removed, replaced with `Comment.resource_id`
+* `Comment.karma_guest` is deprecated and has been removed
+* Removed deprecated `Filter.greater_than` and `Filter.smaller_than` filtering methods. Use `max` and `min` instead.
 
 v0.3.1
 --------

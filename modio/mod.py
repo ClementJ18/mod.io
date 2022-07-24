@@ -49,8 +49,6 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         Visibility of the mod. Filter attribute.
     game_id : int
         ID of the game the mod is for. Filter attribute.
-    game_name : str
-        Name of the game the mod is for. Filter attribute.
     submitter : User
         Instance of the modio User that submitted the mod. Filter attribute.
     date : datetime.datetime
@@ -101,7 +99,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         self.status = Status(attrs.pop("status"))
         self.visible = Visibility(attrs.pop("visible"))
         self.game_id = attrs.pop("game_id")
-        self.game_name = attrs.pop("game_name")
+        # self.game_name = attrs.pop("game_name")
         self.date = _convert_date(attrs.pop("date_added"))
         self.updated = _convert_date(attrs.pop("date_updated"))
         self.live = _convert_date(attrs.pop("date_live"))

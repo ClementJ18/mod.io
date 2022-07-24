@@ -2,7 +2,7 @@
 import json
 
 from .mod import Mod
-from .entities import Event, Image, Message, GameStats, Platform, TagOption, Theme, User
+from .entities import Event, Image, Message, GameStats, Platform, TagOption, User
 from .objects import NewMod, Pagination, Returned
 from .errors import modioException
 from .utils import _convert_date, find
@@ -70,8 +70,6 @@ class Game(ReportMixin, OwnerMixin):
         List of tags from which mods can pick
     stats : Optional[GameStats]
         The game stats
-    theme : Theme
-        The colors of the game theme
     other_urls : Dict[str, str]
         A dictionnary of labels and urls for
         the game
@@ -113,7 +111,7 @@ class Game(ReportMixin, OwnerMixin):
         self.connection = attrs.pop("connection")
         self.submitter = None
         self.stats = None
-        self.theme = Theme(**attrs.pop("theme"))
+        # self.theme = Theme(**attrs.pop("theme"))
         self.other_urls = {key: value for key, value in attrs.pop("other_urls")}
         self.paltform = [Platform(**platform) for platform in attrs.pop("platforms")]
 
