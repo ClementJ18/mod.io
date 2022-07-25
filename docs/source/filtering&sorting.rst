@@ -4,7 +4,9 @@ Filtering, Sorting and Pagination
 ----------------------------------
 This library supports the filtering and sorting under the form of the Filter object which can be instantiated and
 edited in order to fine tune the returned results. First instantiate the filter with or without parameters and then
-call any of the various help methods attached to the object to add additional paramaters. In addition to filtering, the object supports three sorting methods: sort, offset and limit. All three are explained in depth in the Filter section of the docs.
+call any of the various help methods attached to the object to add additional paramaters. In addition to 
+filtering, the object supports three sorting methods: sort, offset and limit. All three are explained in depth in the 
+Filter section of the docs.
 
 
 :: 

@@ -26,6 +26,7 @@ New Features
 * Added comment added/deleted event support
 * `Game.get_stats` renamed to `Game.get_mods_stats`
 * New function `Game.get_stats` that gets stats for the game rather than for the mods of the game
+* New example `examples/polling_events` showing how to use the filter class to only get the latest attributes
 
 Removed Features
 ##################

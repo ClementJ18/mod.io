@@ -7,5 +7,4 @@ Documentation on all the other objects returned by mod.io requests which are not
 .. automodule:: modio.entities
     :members:
     :undoc-members:
-    :show-inheritance:
     :inherited-members:

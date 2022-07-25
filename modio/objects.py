@@ -165,13 +165,13 @@ class Filter:
         if filters is None:
             filters = {}
 
-        for key, value in filters.items():
-            self._set(key, value)
-
         self._q = None
         self._sort = None
         self._limit = None
         self._offset = None
+
+        for key, value in filters.items():
+            self._set(key, value)
 
     def __repr__(self):
         return f"< Filter filters={self.__dict__}>"
