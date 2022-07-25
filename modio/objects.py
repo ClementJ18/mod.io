@@ -288,6 +288,24 @@ class Filter:
             self._set(key, value, "{}-min")
         return self
 
+    def smaller_than(self, **kwargs):
+        """Where the preceding column value is smaller than the value specified. There are not set
+        parameters, this methods takes any named keywords and transforms them into arguments that will be passed
+        to the request. E.g. 'game_id=40'
+        """
+        for key, value in kwargs.items():
+            self._set(key, value, "{}-st")
+        return self
+
+    def greater_than(self, **kwargs):
+        """Where the preceding column value is greater than the value specified. There are not set
+        parameters, this methods takes any named keywords and transforms them into arguments that will be passed
+        to the request. E.g. 'game_id=40'
+        """
+        for key, value in kwargs.items():
+            self._set(key, value, "{}-gt")
+        return self
+
     def bitwise(self, **kwargs):
         """Some columns are stored as bits within an integer. You can combine any number of options for the column
         of the object you are querying. This is dependent on which item is being queried. These can be added together
@@ -336,7 +354,7 @@ class Filter:
         return self
 
     def get_dict(self):
-        """Uility methods to get all filters while omitting None values
+        """Utility methods to get all filters while omitting None values
 
         Returns
         ---------

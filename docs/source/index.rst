@@ -79,6 +79,8 @@ Example
 
    #and now the token is stored in oauth2.txt
 
+See more examples `here <https://github.com/ClementJ18/mod.io/tree/master/examples>`.
+
 Installation
 -------------
 ::

@@ -8,6 +8,7 @@ The page attempt to keep a clear list of breaking/non-breaking changes and new f
    :local:
    :backlinks: none
 
+
 v0.4.0
 --------
 This patch focuses on making sure none of the new attributes of the mod.io API models slip through the
@@ -30,7 +31,7 @@ Removed Features
 ##################
 * `Comment.mod` is now deprecated and removed, replaced with `Comment.resource_id`
 * `Comment.karma_guest` is deprecated and has been removed
-* Removed deprecated `Filter.greater_than` and `Filter.smaller_than` filtering methods. Use `max` and `min` instead.
+
 
 v0.3.1
 --------
