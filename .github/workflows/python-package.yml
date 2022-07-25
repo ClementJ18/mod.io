@@ -42,5 +42,9 @@ jobs:
         bash run_lint.sh
     - name: Test changes
       run: |
-        bash run_tests.sh --reruns 3 --reruns-delay 15 
+        bash run_tests.sh --reruns 3 --reruns-delay 15 | tee pytest-coverage.txt
+    - name: Pytest coverage comment
+      uses: MishaKav/pytest-coverage-comment@main
+      with:
+        pytest-coverage-path: ./pytest-coverage.txt
   
