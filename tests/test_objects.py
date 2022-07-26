@@ -152,6 +152,12 @@ class TestRating(unittest.TestCase):
     def test_async_add_negative_rating(self):
         run(self.rating.async_add_negative_rating())
 
+    def test_delete_rating(self):
+        self.client.get_my_ratings().results[0].delete()
+
+    def test_async_delete_rating(self):
+        run(self.client.get_my_ratings().results[0].async_delete())
+
 
 class TestStats(unittest.TestCase):
     def test_stats(self):

@@ -1,5 +1,7 @@
 import time
 import unittest
+
+import pytest
 import modio
 import random
 
@@ -131,6 +133,9 @@ class TestMod(unittest.TestCase):
     def test_delete_dependencies(self):
         dependencies = list(self.mod.get_dependencies().results.keys())
 
+        with pytest.raises(modioException):
+            self.mod.delete_dependencies([])
+
         if dependencies:
             self.mod.delete_dependencies(dependencies)
 
@@ -145,7 +150,7 @@ class TestMod(unittest.TestCase):
     #     self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic)
 
     def test_delete(self):
-        mod = self.game.get_mods(filters=modio.Filter().text("ToDeleteMod")).results
+        mod = self.client.get_my_mods(filters=modio.Filter().text("ToDeleteMod")).results
 
         if mod:
             mod[0].delete()
@@ -257,6 +262,9 @@ class TestMod(unittest.TestCase):
     def test_async_delete_dependencies(self):
         dependencies = list(run(self.mod.async_get_dependencies()).results.keys())
 
+        with pytest.raises(modioException):
+            run(self.mod.async_delete_dependencies([]))
+
         if dependencies:
             run(self.mod.async_delete_dependencies(dependencies))
 
@@ -275,7 +283,7 @@ class TestMod(unittest.TestCase):
     #     run(self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))
 
     def test_async_delete(self):
-        mod = run(self.game.async_get_mods(filters=modio.Filter().text("ToDeleteMod"))).results
+        mod = run(self.client.async_get_my_mods(filters=modio.Filter().text("ToDeleteMod"))).results
 
         if mod:
             run(mod[0].async_delete())

@@ -524,9 +524,6 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             The modfile after being processed by the mod.io API
 
         """
-        if not isinstance(file, NewModFile):
-            raise modioException("file argument must be type NewModFile")
-
         file_d = file.__dict__.copy()
         file_file = file_d.pop("file")
 
@@ -538,9 +535,6 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         return ModFile(**file_json, game_id=self.game_id, connection=self.connection)
 
     async def async_add_file(self, file: NewModFile):
-        if not isinstance(file, NewModFile):
-            raise modioException("file argument must be type NewModFile")
-
         file_d = file.__dict__.copy()
         file_file = file_d.pop("file")
 

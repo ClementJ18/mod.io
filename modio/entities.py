@@ -477,6 +477,8 @@ class TagOption:
     hidden : bool
         Whether or not the tag is only accessible to game admins, used
         for internal mod filtering.
+    locked : bool
+        Whether or not mods can self assign from this tag option.
     tags : List[str]
         Array of tags for this group
 
@@ -486,10 +488,11 @@ class TagOption:
         self.name = attrs.pop("name")
         self.type = attrs.pop("type", "dropdown")
         self.hidden = attrs.pop("hidden", False)
+        self.locked = attrs.pop("locked", False)
         self.tags = attrs.pop("tags", [])
 
     def __repr__(self):
-        return f"<TagOption name={self.name} hidden={self.hidden}>"
+        return f"<TagOption name={self.name} hidden={self.hidden} locked=>"
 
 
 class Rating(RatingMixin):

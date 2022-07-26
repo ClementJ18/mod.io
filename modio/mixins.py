@@ -1,7 +1,6 @@
 """Module storing all mixins for shared methods"""
 import time
 
-from .errors import modioException
 from .enums import RatingType, Report
 from . import entities
 
@@ -11,7 +10,7 @@ class ReportMixin:
     be defined at a class level.
     """
 
-    def _make_report_dict(self, name, summary, report_type):
+    def _make_report_dict(self, name, summary, report_type):  # pragma: no cover
         return {
             "id": self.id,
             "resource": self.resource_type,
@@ -20,7 +19,7 @@ class ReportMixin:
             "summary": summary,
         }
 
-    def report(self, name, summary, report_type=Report(0)):
+    def report(self, name, summary, report_type=Report(0)):  # pragma: no cover
         """Report a this game, make sure to read mod.io's ToU to understand what is
         and isnt allowed.
 
@@ -46,7 +45,7 @@ class ReportMixin:
         msg = self.connection.post_request("/report", data=self._make_report_dict(name, summary, report_type))
         return entities.Message(**msg)
 
-    async def async_report(self, name, summary, report_type=Report(0)):
+    async def async_report(self, name, summary, report_type=Report(0)):  # pragma: no cover
         msg = await self.connection.async_post_request(
             "/report", data=self._make_report_dict(name, summary, report_type)
         )
@@ -59,24 +58,18 @@ class RatingMixin:
     """
 
     def _add_rating(self, rating: RatingType):
-        try:
-            mod_id = getattr(self, self.mod_key)
-            self.connection.post_request(
-                f"/games/{self.game_id}/mods/{mod_id}/ratings", data={"rating": rating.value}
-            )
-        except modioException:
-            return False
+        mod_id = getattr(self, self.mod_key)
+        self.connection.post_request(
+            f"/games/{self.game_id}/mods/{mod_id}/ratings", data={"rating": rating.value}
+        )
 
         return True
 
     async def _async_add_rating(self, rating: RatingType):
-        try:
-            mod_id = getattr(self, self.mod_key)
-            await self.connection.async_post_request(
-                f"/games/{self.game_id}/mods/{mod_id}/ratings", data={"rating": rating.value}
-            )
-        except modioException:
-            return False
+        mod_id = getattr(self, self.mod_key)
+        await self.connection.async_post_request(
+            f"/games/{self.game_id}/mods/{mod_id}/ratings", data={"rating": rating.value}
+        )
 
         return True
 
