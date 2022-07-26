@@ -32,7 +32,7 @@ class Connection:
     @property
     def async_session(self):
         if self._async_session is None:
-            raise ValueError("No async session found, did you forget to class Client.start?")
+            raise AttributeError("No async session found, did you forget to use Client.start?")
 
         return self._async_session
 
@@ -587,7 +587,7 @@ class Client:
             [User(**user, connection=self.connection) for user in users["data"]], Pagination(**users)
         )
 
-    def email_request(self, email):
+    def email_request(self, email):  # pragma: no cover
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address
         which can then be entered into :func:`email_exchange`.
 
@@ -605,13 +605,13 @@ class Client:
         )
         return Message(**resp)
 
-    async def async_email_request(self, email):
+    async def async_email_request(self, email):  # pragma: no cover
         resp = await self.connection.async_post_request(
             "/oauth/emailrequest", params={"email": email, "api_key": self.connection.api_key}, h_type=2
         )
         return Message(**resp)
 
-    def email_exchange(self, code, *, date_expires=None):
+    def email_exchange(self, code, *, date_expires=None):  # pragma: no cover
         """Exchanges the given 5-digit code for an OAuth2 token.
 
         |coro|
@@ -652,7 +652,7 @@ class Client:
 
         return resp["access_token"]
 
-    async def async_email_exchange(self, code, *, date_expires=None):
+    async def async_email_exchange(self, code, *, date_expires=None):  # pragma: no cover
         if len(code) != 5:
             raise ValueError("Security code must be 5 digits")
 

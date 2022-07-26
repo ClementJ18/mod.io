@@ -1,4 +1,6 @@
 import unittest
+
+import pytest
 import modio
 
 try:
@@ -13,6 +15,15 @@ from .utils import run
 
 
 class TestClient(unittest.TestCase):
+    def test_paths(self):
+        client = modio.Client(api_key="fake key", test=True)
+        # pylint: disable=W0212
+        assert "test" in client.connection._base_path
+
+        client.test = False
+        # pylint: disable=W0212
+        assert "test" not in client.connection._base_path
+
     def test_oauth_access(self):
         client = modio.Client(access_token=access_token, test=True)
 
@@ -23,6 +34,7 @@ class TestClient(unittest.TestCase):
         client.get_my_mods()
         client.get_my_modfiles()
         client.get_my_ratings()
+        client.get_my_mutes()
 
     def test_api_token(self):
         client = modio.Client(api_key=game_api_key, test=True)
@@ -42,11 +54,15 @@ class TestClient(unittest.TestCase):
         run(client.async_get_my_mods())
         run(client.async_get_my_modfiles())
         run(client.async_get_my_ratings())
+        run(client.async_get_my_mutes())
 
         run(client.close())
 
     def test_async_api_token(self):
         client = modio.Client(api_key=game_api_key, test=True)
+        with pytest.raises(AttributeError):
+            run(client.async_get_games())
+
         run(client.start())
 
         games = run(client.async_get_games())
