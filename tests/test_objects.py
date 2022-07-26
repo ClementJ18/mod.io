@@ -26,16 +26,12 @@ class TestEvent(unittest.TestCase):
             "event_type": "MODFILE_CHANGED",
         }
 
-        event = modio.entities.Event(
-            **params
-        )
+        event = modio.entities.Event(**params)
 
         assert event.type is modio.EventType.file_changed
 
         params["event_type"] = "USER_TEAM_JOIN"
-        event = modio.entities.Event(
-            **params
-        )
+        event = modio.entities.Event(**params)
 
         assert event.type is modio.EventType.team_join
 
@@ -132,6 +128,7 @@ class TestModFile(unittest.TestCase):
 
     def test_async_delete(self):
         run(self.mod.get_files().results[0].async_delete())
+
 
 class TestRating(unittest.TestCase):
     def setUp(self):
