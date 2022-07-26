@@ -19,11 +19,14 @@ from .utils import run
 
 class TestMod(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(access_token=access_token, test=True)
-        run(client.start())
+        self.client = modio.Client(access_token=access_token, test=True)
+        run(self.client.start())
 
-        self.game = client.get_game(game_id)
+        self.game = self.client.get_game(game_id)
         self.mod = self.game.get_mod(mod_id)
+
+    def tearDown(self):
+        run(self.client.close())
 
     def test_gets(self):
         files = self.mod.get_files().results

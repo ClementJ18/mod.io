@@ -31,12 +31,15 @@ class TestEvent(unittest.TestCase):
 
 class TestComment(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(access_token=access_token, test=True)
-        run(client.start())
+        self.client = modio.Client(access_token=access_token, test=True)
+        run(self.client.start())
 
-        self.game = client.get_game(game_id)
+        self.game = self.client.get_game(game_id)
         self.mod = self.game.get_mod(mod_id)
         self.comment = self.mod.get_comments().results[0]
+
+    def tearDown(self):
+        run(self.client.close())
 
     def test_edit(self):
         self.comment.edit("test edit")
@@ -57,12 +60,15 @@ class TestComment(unittest.TestCase):
 
 class TestModFile(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(access_token=access_token, test=True)
-        run(client.start())
+        self.client = modio.Client(access_token=access_token, test=True)
+        run(self.client.start())
 
-        self.game = client.get_game(game_id)
+        self.game = self.client.get_game(game_id)
         self.mod = self.game.get_mod(mod_id)
         self.file = self.mod.get_files().results[0]
+
+    def tearDown(self):
+        run(self.client.close())
 
     def test_get_owner(self):
         self.file.get_owner()
@@ -90,10 +96,13 @@ class TestModFile(unittest.TestCase):
 
 class TestRating(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(access_token=access_token, test=True)
-        run(client.start())
+        self.client = modio.Client(access_token=access_token, test=True)
+        run(self.client.start())
 
-        self.rating = client.get_my_ratings().results[0]
+        self.rating = self.client.get_my_ratings().results[0]
+
+    def tearDown(self):
+        run(self.client.close())
 
     def test_add_positive_rating(self):
         self.rating.add_positive_rating()
@@ -116,16 +125,20 @@ class TestStats(unittest.TestCase):
         game = client.get_game(game_id)
         stat = game.get_mods_stats().results[0]
         stat.is_stale()
+        run(client.close())
 
 
 class TestTeamMember(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(access_token=access_token, test=True)
-        run(client.start())
+        self.client = modio.Client(access_token=access_token, test=True)
+        run(self.client.start())
 
-        self.game = client.get_game(game_id)
+        self.game = self.client.get_game(game_id)
         self.mod = self.game.get_mod(mod_id)
         self.member = self.mod.get_team(filters=modio.Filter().equals(id=10610)).results[0]
+
+    def tearDown(self):
+        run(self.client.close())
 
     def test_mute(self):
         self.member.mute()
