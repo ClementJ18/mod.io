@@ -1,4 +1,6 @@
 import unittest
+
+import pytest
 import modio
 import random
 
@@ -16,17 +18,26 @@ from .utils import run
 
 class TestEvent(unittest.TestCase):
     def test_type(self):
+        params = {
+            "id": 13,
+            "mod_id": 13,
+            "user_id": 13,
+            "date_added": 1499846132,
+            "event_type": "MODFILE_CHANGED",
+        }
+
         event = modio.entities.Event(
-            **{
-                "id": 13,
-                "mod_id": 13,
-                "user_id": 13,
-                "date_added": 1499846132,
-                "event_type": "MODFILE_CHANGED",
-            }
+            **params
         )
 
-        assert isinstance(event.type, modio.EventType)
+        assert event.type is modio.EventType.file_changed
+
+        params["event_type"] = "USER_TEAM_JOIN"
+        event = modio.entities.Event(
+            **params
+        )
+
+        assert event.type is modio.EventType.team_join
 
 
 class TestComment(unittest.TestCase):
@@ -46,6 +57,14 @@ class TestComment(unittest.TestCase):
 
     def test_async_edit(self):
         run(self.comment.async_edit("test edit async"))
+
+    def test_karma(self):
+        self.comment.add_positive_karma()
+        self.comment.add_negative_karma()
+
+    def test_async_karma(self):
+        run(self.comment.async_add_positive_karma())
+        run(self.comment.async_add_negative_karma())
 
     def test_delete(self):
         comments = self.mod.get_comments().results
@@ -93,6 +112,26 @@ class TestModFile(unittest.TestCase):
     def test_url_is_expired(self):
         assert not self.file.url_is_expired()
 
+    def test_edit_my_modfiles(self):
+        file = self.client.get_my_modfiles().results[0]
+
+        with pytest.raises(modio.modioException):
+            file.edit()
+
+        with pytest.raises(modio.modioException):
+            run(file.async_edit())
+
+        with pytest.raises(modio.modioException):
+            file.delete()
+
+        with pytest.raises(modio.modioException):
+            run(file.async_delete())
+
+    def test_delete(self):
+        self.mod.get_files().results[0].delete()
+
+    def test_async_delete(self):
+        run(self.mod.get_files().results[0].async_delete())
 
 class TestRating(unittest.TestCase):
     def setUp(self):

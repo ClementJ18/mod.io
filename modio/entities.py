@@ -220,14 +220,14 @@ class Comment:
             f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}/karma",
             data={"karma": 1 if karma else -1},
         )
-        return Comment(**comment)
+        return Comment(connection=self.connection, mod=self.mod, **comment)
 
     async def _async_add_karma(self, karma: bool):
         comment = await self.connection.async_post_request(
             f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}/karma",
             data={"karma": 1 if karma else -1},
         )
-        return Comment(**comment)
+        return Comment(connnection=self.connection, mod=self.mod, **comment)
 
     def add_positive_karma(self):
         """Add positive karma to the comment
@@ -705,8 +705,7 @@ class User(ReportMixin):
         self.last_online = _convert_date(attrs.pop("date_online"))
 
         avatar = attrs.pop("avatar")
-
-        if avatar.keys():
+        if avatar:
             self.avatar = Image(**avatar)
         else:
             self.avatar = None
