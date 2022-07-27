@@ -1,5 +1,7 @@
 import time
 import unittest
+
+import pytest
 import modio
 import random
 
@@ -19,11 +21,14 @@ from .utils import run
 
 class TestMod(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(access_token=access_token, test=True)
-        run(client.start())
+        self.client = modio.Client(access_token=access_token, test=True)
+        run(self.client.start())
 
-        self.game = client.get_game(game_id)
+        self.game = self.client.get_game(game_id)
         self.mod = self.game.get_mod(mod_id)
+
+    def tearDown(self):
+        run(self.client.close())
 
     def test_gets(self):
         files = self.mod.get_files().results
@@ -109,11 +114,9 @@ class TestMod(unittest.TestCase):
     def test_delete_tags(self):
         self.mod.delete_tags("total convert", "345", "what am i doign")
 
-    def test_add_positive_rating(self):
-        self.mod.add_positive_rating()
-
-    def test_add_negative_rating(self):
+    def test_add_rating(self):
         self.mod.add_negative_rating()
+        self.mod.add_positive_rating()
 
     def test_add_metadata(self):
         self.mod.add_metadata(test=["mega_damage", "tork"], seven=["sortk"])
@@ -127,6 +130,9 @@ class TestMod(unittest.TestCase):
 
     def test_delete_dependencies(self):
         dependencies = list(self.mod.get_dependencies().results.keys())
+
+        with pytest.raises(modioException):
+            self.mod.delete_dependencies([])
 
         if dependencies:
             self.mod.delete_dependencies(dependencies)
@@ -142,7 +148,7 @@ class TestMod(unittest.TestCase):
     #     self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic)
 
     def test_delete(self):
-        mod = self.game.get_mods(filters=modio.Filter().text("ToDeleteMod")).results
+        mod = self.client.get_my_mods(filters=modio.Filter().text("ToDeleteMod")).results
 
         if mod:
             mod[0].delete()
@@ -235,11 +241,9 @@ class TestMod(unittest.TestCase):
     def test_async_delete_tags(self):
         run(self.mod.async_delete_tags("total convert", "345", "what am i doign"))
 
-    def test_async_add_positive_rating(self):
-        run(self.mod.async_add_positive_rating())
-
-    def test_async_add_negative_rating(self):
+    def test_async_add_rating(self):
         run(self.mod.async_add_negative_rating())
+        run(self.mod.async_add_positive_rating())
 
     def test_async_add_metadata(self):
         run(self.mod.async_add_metadata(test=["mega_damage", "tork"], seven=["sortk"]))
@@ -253,6 +257,9 @@ class TestMod(unittest.TestCase):
 
     def test_async_delete_dependencies(self):
         dependencies = list(run(self.mod.async_get_dependencies()).results.keys())
+
+        with pytest.raises(modioException):
+            run(self.mod.async_delete_dependencies([]))
 
         if dependencies:
             run(self.mod.async_delete_dependencies(dependencies))
@@ -272,7 +279,7 @@ class TestMod(unittest.TestCase):
     #     run(self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))
 
     def test_async_delete(self):
-        mod = run(self.game.async_get_mods(filters=modio.Filter().text("ToDeleteMod"))).results
+        mod = run(self.client.async_get_my_mods(filters=modio.Filter().text("ToDeleteMod"))).results
 
         if mod:
             run(mod[0].async_delete())

@@ -15,11 +15,14 @@ from .utils import run
 
 class TestGame(unittest.TestCase):
     def setUp(self):
-        client = modio.Client(access_token=access_token, test=True)
-        run(client.start())
+        self.client = modio.Client(access_token=access_token, test=True)
+        run(self.client.start())
 
-        self.game = client.get_game(game_id)
-        self.frozen_copy = client.get_game(game_id)
+        self.game = self.client.get_game(game_id)
+        self.frozen_copy = self.client.get_game(game_id)
+
+    def tearDown(self):
+        run(self.client.close())
 
     def test_gets(self):
         mods = self.game.get_mods()

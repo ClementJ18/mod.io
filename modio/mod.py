@@ -524,9 +524,6 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             The modfile after being processed by the mod.io API
 
         """
-        if not isinstance(file, NewModFile):
-            raise modioException("file argument must be type NewModFile")
-
         file_d = file.__dict__.copy()
         file_file = file_d.pop("file")
 
@@ -538,9 +535,6 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         return ModFile(**file_json, game_id=self.game_id, connection=self.connection)
 
     async def async_add_file(self, file: NewModFile):
-        if not isinstance(file, NewModFile):
-            raise modioException("file argument must be type NewModFile")
-
         file_d = file.__dict__.copy()
         file_file = file_d.pop("file")
 
@@ -560,10 +554,10 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         if isinstance(images, str):
             images_d = {"images": ("image.zip", open(images, "rb"))}
         elif isinstance(images, list):
-            images_d = {f"image{images.index(image)}": open(image, "rb") for image in images}
+            images_d = {f"image{index}": open(image, "rb") for index, image in enumerate(images)}
 
-        yt = {f"youtube[{youtube.index(link)}]": link for link in youtube}
-        sketch = {f"sketchfab[{sketchfab.index(link)}]": link for link in sketchfab}
+        yt = {f"youtube[{index}]": link for index, link in enumerate(youtube)}
+        sketch = {f"sketchfab[{index}]": link for index, link in enumerate(sketchfab)}
 
         media = {**media, **images_d}
         links = {**yt, **sketch}
@@ -628,6 +622,14 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
         return Message(**media_json)
 
+    def _prepare_delete_media(self, images, youtube, sketchfab):
+        images = {f"images[{index}]": image for index, image in enumerate(images)}
+        yt = {f"youtube[{index}]": link for index, link in enumerate(youtube)}
+        sketch = {f"sketchfab[{index}]": link for index, link in enumerate(sketchfab)}
+        fields = {**images, **yt, **sketch}
+
+        return fields
+
     def delete_media(self, *, images=(), youtube=(), sketchfab=()):
         """Delete media from the mod page.
 
@@ -642,22 +644,17 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         sketchfab : Optional[List[str]]
             Optional. List sketchfab links that you want to delete
         """
-        images = {f"images[{images.index(image)}]": image for image in images}
-        yt = {f"youtube[{youtube.index(link)}]": link for link in youtube}
-        sketch = {f"sketchfab[{sketchfab.index(link)}]": link for link in sketchfab}
-        fields = {**images, **yt, **sketch}
 
-        resp = self.connection.delete_request(f"/games/{self.game_id}/mods/{self.id}/media", data=fields)
+        resp = self.connection.delete_request(
+            f"/games/{self.game_id}/mods/{self.id}/media",
+            data=self._prepare_delete_media(images, youtube, sketchfab),
+        )
         return resp
 
     async def async_delete_media(self, *, images=(), youtube=(), sketchfab=()):
-        images = {f"images[{images.index(image)}]": image for image in images}
-        yt = {f"youtube[{youtube.index(link)}]": link for link in youtube}
-        sketch = {f"sketchfab[{sketchfab.index(link)}]": link for link in sketchfab}
-        fields = {**images, **yt, **sketch}
-
         resp = await self.connection.async_delete_request(
-            f"/games/{self.game_id}/mods/{self.id}/media", data=fields
+            f"/games/{self.game_id}/mods/{self.id}/media",
+            data=self._prepare_delete_media(images, youtube, sketchfab),
         )
         return resp
 
@@ -702,14 +699,14 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             list of tags to be added.
 
         """
-        fields = {f"tags[{tags.index(tag)}]": tag for tag in tags}
+        fields = {f"tags[{index}]": tag for index, tag in enumerate(tags)}
 
         message = self.connection.post_request(f"/games/{self.game_id}/mods/{self.id}/tags", data=fields)
 
         return Message(**message)
 
     async def async_add_tags(self, *tags):
-        fields = {f"tags[{tags.index(tag)}]": tag for tag in tags}
+        fields = {f"tags[{index}]": tag for index, tag in enumerate(tags)}
 
         message = await self.connection.async_post_request(
             f"/games/{self.game_id}/mods/{self.id}/tags", data=fields
@@ -729,13 +726,11 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             List of tags to remove, if no list is provided, will remove every tag from the mod.
 
         """
-        fields = {f"tags[{tags.index(tag)}]": tag for tag in tags} if tags else {"tags[]": ""}
-
+        fields = {f"tags[{index}]": tag for index, tag in enumerate(tags)} if tags else {"tags[]": ""}
         self.connection.delete_request(f"/games/{self.game_id}/mods/{self.id}/tags", data=fields)
 
     async def async_delete_tags(self, *tags):
-        fields = {f"tags[{tags.index(tag)}]": tag for tag in tags} if tags else {"tags[]": ""}
-
+        fields = {f"tags[{index}]": tag for index, tag in enumerate(tags)} if tags else {"tags[]": ""}
         await self.connection.async_delete_request(f"/games/{self.game_id}/mods/{self.id}/tags", data=fields)
 
     def add_metadata(self, **metadata):
@@ -866,7 +861,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
         """
         dependency = {
-            f"dependencies[{dependencies.index(data)}]": getattr(data, "id", data) for data in dependencies
+            f"dependencies[{index}]": getattr(data, "id", data) for index, data in enumerate(dependencies)
         }
         resp = self.connection.post_request(
             f"/games/{self.game_id}/mods/{self.id}/dependencies", data=dependency
@@ -875,7 +870,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
     async def async_add_dependencies(self, dependencies: list):
         dependency = {
-            f"dependencies[{dependencies.index(data)}]": getattr(data, "id", data) for data in dependencies
+            f"dependencies[{index}]": getattr(data, "id", data) for index, data in enumerate(dependencies)
         }
         resp = await self.connection.async_post_request(
             f"/games/{self.game_id}/mods/{self.id}/dependencies", data=dependency
@@ -897,7 +892,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             raise modioException("Please supply at least on dependency to be deleted.")
 
         data = {
-            f"dependencies[{dependencies.index(data)}]": getattr(data, "id", data) for data in dependencies
+            f"dependencies[{index}]": getattr(data, "id", data) for index, data in enumerate(dependencies)
         }
 
         resp = self.connection.delete_request(f"/games/{self.game_id}/mods/{self.id}/dependencies", data=data)
@@ -908,7 +903,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             raise modioException("Please supply at least on dependency to be deleted.")
 
         data = {
-            f"dependencies[{dependencies.index(data)}]": getattr(data, "id", data) for data in dependencies
+            f"dependencies[{index}]": getattr(data, "id", data) for index, data in enumerate(dependencies)
         }
 
         resp = await self.connection.async_delete_request(

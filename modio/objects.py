@@ -398,12 +398,12 @@ class Pagination:
         return self.offset == 0
 
     def next(self):
-        """Returns the offset required for the next set of results. If the max results have been reached the returns the
+        """Returns the offset required for the next set of results. If the max results have been reached this returns the
         current offset."""
         return self.offset + self.limit if not self.max() else self.offset
 
     def previous(self):
-        """Returns the offset required for the previous set of results. If the min results have been reached the returns the
+        """Returns the offset required for the previous set of results. If the min results have been reached this returns the
         current offset."""
         return self.offset - self.limit if not self.min() else self.offset
 

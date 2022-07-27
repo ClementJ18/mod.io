@@ -169,7 +169,7 @@ class Comment:
         self.children = []
 
     def __repr__(self):
-        return f"<Comment id={self.id} mod={self.mod.id}>"
+        return f"<Comment id={self.id} mod={self.mod.id} karma={self.karma}>"
 
     def edit(self, content):
         """Update the contents of a comment.
@@ -220,14 +220,14 @@ class Comment:
             f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}/karma",
             data={"karma": 1 if karma else -1},
         )
-        return Comment(**comment)
+        return Comment(connection=self.connection, mod=self.mod, **comment)
 
     async def _async_add_karma(self, karma: bool):
         comment = await self.connection.async_post_request(
             f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}/karma",
             data={"karma": 1 if karma else -1},
         )
-        return Comment(**comment)
+        return Comment(connection=self.connection, mod=self.mod, **comment)
 
     def add_positive_karma(self):
         """Add positive karma to the comment
@@ -256,7 +256,7 @@ class Comment:
         """
         return self._add_karma(False)
 
-    async def aynsc_add_negative_karma(self):
+    async def async_add_negative_karma(self):
         return await self._async_add_karma(False)
 
 
@@ -392,16 +392,6 @@ class ModFile(OwnerMixin):
         return resp
 
     async def async_delete(self):
-        """Deletes the modfile, this will raise an error if the
-        file is the active release for the mod.
-
-        |coro|
-
-        Raises
-        -------
-        Forbidden
-            You cannot delete the active release of a mod
-        """
         if not self.game_id:
             raise modioException(
                 "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
@@ -477,6 +467,8 @@ class TagOption:
     hidden : bool
         Whether or not the tag is only accessible to game admins, used
         for internal mod filtering.
+    locked : bool
+        Whether or not mods can self assign from this tag option.
     tags : List[str]
         Array of tags for this group
 
@@ -486,10 +478,11 @@ class TagOption:
         self.name = attrs.pop("name")
         self.type = attrs.pop("type", "dropdown")
         self.hidden = attrs.pop("hidden", False)
+        self.locked = attrs.pop("locked", False)
         self.tags = attrs.pop("tags", [])
 
     def __repr__(self):
-        return f"<TagOption name={self.name} hidden={self.hidden}>"
+        return f"<TagOption name={self.name} hidden={self.hidden} locked=>"
 
 
 class Rating(RatingMixin):
@@ -499,7 +492,7 @@ class Rating(RatingMixin):
     -----------
     game_id : int
         The ID of the game the rated mod is for.
-    mod : int
+    mod_id : int
         The ID of the mod that was rated
     rating : RatingType
         The rating type
@@ -508,14 +501,17 @@ class Rating(RatingMixin):
 
     """
 
-    mod_key = "mod"
+    mod_key = "mod_id"
 
     def __init__(self, **attrs):
         self.game_id = attrs.pop("game_id")
-        self.mod = attrs.pop("mod_id")
+        self.mod_id = attrs.pop("mod_id")
         self.rating = RatingType(attrs.pop("rating"))
         self.date = _convert_date(attrs.pop("date_added"))
         self.connection = attrs.pop("connection")
+
+    def __repr__(self) -> str:
+        return f"< Rating mod_id={self.mod_id} rating={self.rating}>"
 
 
 class ModStats(StatsMixin):
@@ -705,8 +701,7 @@ class User(ReportMixin):
         self.last_online = _convert_date(attrs.pop("date_online"))
 
         avatar = attrs.pop("avatar")
-
-        if avatar.keys():
+        if avatar:
             self.avatar = Image(**avatar)
         else:
             self.avatar = None

@@ -3,8 +3,7 @@ import json
 
 from .mod import Mod
 from .entities import Event, Image, Message, GameStats, ModStats, Platform, TagOption, User
-from .objects import NewMod, Pagination, Returned
-from .errors import modioException
+from .objects import Pagination, Returned
 from .utils import _convert_date, find
 from .enums import APIAccess, Community, Curation, MaturityOptions, Presentation, Revenue, Status, Submission
 from .mixins import OwnerMixin, ReportMixin
@@ -112,7 +111,7 @@ class Game(ReportMixin, OwnerMixin):
         self.submitter = None
         self.stats = None
         # self.theme = Theme(**attrs.pop("theme"))
-        self.other_urls = {key: value for key, value in attrs.pop("other_urls")}
+        self.other_urls = {value["label"]: value["url"] for value in attrs.pop("other_urls")}
         self.paltform = [Platform(**platform) for platform in attrs.pop("platforms")]
 
         _submitter = attrs.pop("submitted_by", {})
@@ -125,13 +124,6 @@ class Game(ReportMixin, OwnerMixin):
 
     def __repr__(self):
         return f"<Game id={self.id} name={self.name}>"
-
-    def _all_tags(self):
-        tag_list = []
-        for tag in self.tag_options:
-            tag_list.extend(tag.tags)
-
-        return tag_list
 
     def get_mod(self, mod_id: int):
         """Queries the mod.io API for the given mod ID and if found returns it as a
@@ -301,23 +293,18 @@ class Game(ReportMixin, OwnerMixin):
 
         Raises
         -------
-        modioException
-            Not instance of NewMod or submissions from 3rd party disabled
         ValueError
-            One of the requirementsf for a parameter has not been met.
+            One of the requirements for a parameter has not been met.
 
         Returns
         --------
         Mod
             The newly created mod
         """
-        if not isinstance(mod, NewMod):
-            raise modioException("mod argument must be type NewMod")
-
         mod_d = mod.__dict__.copy()
         tags = list(mod_d.pop("tags"))
-        for tag in tags:
-            mod_d[f"tags[{tags.index(tag)}]"] = tag
+        for index, tag in enumerate(tags):
+            mod_d[f"tags[{index}]"] = tag
 
         with open(mod_d.pop("logo"), "rb") as f:
             mod_json = self.connection.post_request(
@@ -327,13 +314,10 @@ class Game(ReportMixin, OwnerMixin):
         return Mod(connection=self.connection, **mod_json)
 
     async def async_add_mod(self, mod):
-        if not isinstance(mod, NewMod):
-            raise modioException("mod argument must be type NewMod")
-
         mod_d = mod.__dict__.copy()
         tags = list(mod_d.pop("tags"))
-        for tag in tags:
-            mod_d[f"tags[{tags.index(tag)}]"] = tag
+        for index, tag in enumerate(tags):
+            mod_d[f"tags[{index}]"] = tag
 
         with open(mod_d.pop("logo"), "rb") as f:
             mod_json = await self.connection.async_post_request(
@@ -409,7 +393,7 @@ class Game(ReportMixin, OwnerMixin):
 
         return Message(**message)
 
-    def add_tag_options(self, name, *, tags=None, hidden=False, tag_type="dropdown"):
+    def add_tag_options(self, name, *, tags=None, hidden=False, locked=False, tag_type="dropdown"):
         """Add tags which mods can apply to their profiles. If the tag names already exists,
         settings such as hidden or type will be overwritten to the values provided and all the
         tags will be added to the group.
@@ -420,20 +404,29 @@ class Game(ReportMixin, OwnerMixin):
         -----------
         name : str
             Name of the tag group
-        type : Optional[str]
+        type : Optional[Literal['dropdown', 'checkboxes']]
             Defaults to dropdown
             dropdown : Mods can select only one tag from this group, dropdown menu shown on site profile.
             checkboxes : Mods can select multiple tags from this group, checkboxes shown on site profile.
         hidden : Optional[bool]
             Whether or not this group of tags should be hidden from users and mod devs. Defaults to False
+        locked : Optional[bool]
+            Whether or not mods can assign from this group of tag to themselves. If locked only game admins
+            will be able to assign the tag. Defaults to False.
         tags : Optional[List[str]]
             Array of tags that mod creators can apply to their mod
         """
         if tags is None:
             tags = []
 
-        tags = {f"tags[{tags.index(tag)}]": tag for tag in tags}
-        tags = {"name": name, "type": tag_type, "hidden": json.dumps(hidden), **tags}
+        tags = {f"tags[{index}]": tag for index, tag in enumerate(tags)}
+        tags = {
+            "name": name,
+            "type": tag_type,
+            "hidden": json.dumps(hidden),
+            "locked": json.dumps(locked),
+            **tags,
+        }
         message = self.connection.post_request(f"/games/{self.id}/tags", data=tags)
 
         tag_option = find(self.tag_options, name=name)
@@ -446,12 +439,20 @@ class Game(ReportMixin, OwnerMixin):
 
         return Message(**message)
 
-    async def async_add_tag_options(self, name, *, tags=None, hidden=False, tag_type="dropdown"):
+    async def async_add_tag_options(
+        self, name, *, tags=None, hidden=False, locked=False, tag_type="dropdown"
+    ):
         if tags is None:
             tags = []
 
-        tags = {f"tags[{tags.index(tag)}]": tag for tag in tags}
-        tags = {"name": name, "type": tag_type, "hidden": json.dumps(hidden), **tags}
+        tags = {f"tags[{index}]": tag for index, tag in enumerate(tags)}
+        tags = {
+            "name": name,
+            "type": tag_type,
+            "hidden": json.dumps(hidden),
+            "locked": json.dumps(locked),
+            **tags,
+        }
         message = await self.connection.async_post_request(f"/games/{self.id}/tags", data=tags)
 
         tag_option = find(self.tag_options, name=name)
@@ -483,7 +484,7 @@ class Game(ReportMixin, OwnerMixin):
             Returns True if the tags were sucessfully removed, False if the requests was
             sucessful but the tags was not removed (if the tag wasn't part of the option.)
         """
-        data = {f"tags[{tags.index(tag)}]": tag for tag in tags} if tags else {"tags[]": ""}
+        data = {f"tags[{index}]": tag for index, tag in enumerate(tags)} if tags else {"tags[]": ""}
         data["name"] = name
 
         resp = self.connection.delete_request(f"/games/{self.id}/tags", data=data)
@@ -497,7 +498,7 @@ class Game(ReportMixin, OwnerMixin):
         return not isinstance(resp, dict)
 
     async def async_delete_tag_options(self, name, *, tags=None):
-        data = {f"tags[{tags.index(tag)}]": tag for tag in tags} if tags else {"tags[]": ""}
+        data = {f"tags[{index}]": tag for index, tag in enumerate(tags)} if tags else {"tags[]": ""}
         data["name"] = name
 
         resp = await self.connection.async_delete_request(f"/games/{self.id}/tags", data=data)
