@@ -267,6 +267,18 @@ class Client:
     def __repr__(self):
         return f"< Client version={self.version} test={self.test} >"
 
+    @property
+    def rate_limit(self):
+        return self.connection.rate_limit
+
+    @property
+    def rate_remain(self):
+        return self.connection.rate_remain
+
+    @property
+    def rate_retry(self):
+        return self.connection.rate_retry
+
     async def close(self):
         """|async| This function is used to clean up the client in order to close the application that it uses gracefully.
         At the moment it is only used to close the client's Session.

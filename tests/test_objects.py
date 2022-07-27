@@ -43,34 +43,37 @@ class TestComment(unittest.TestCase):
 
         self.game = self.client.get_game(game_id)
         self.mod = self.game.get_mod(mod_id)
-        self.comment = self.mod.get_comments().results[0]
 
     def tearDown(self):
         run(self.client.close())
 
-    def test_edit(self):
-        self.comment.edit("test edit")
+    def test_comment(self):
+        comment = self.mod.get_comments().results[0]
 
-    def test_async_edit(self):
-        run(self.comment.async_edit("test edit async"))
+        comment.edit("test edit")
 
-    def test_karma(self):
-        self.comment.add_positive_karma()
-        self.comment.add_negative_karma()
+        if comment.karma < 2:
+            comment.add_positive_karma()
+            comment.add_negative_karma()
+        else:
+            comment.add_negative_karma()
+            comment.add_positive_karma()
 
-    def test_async_karma(self):
-        run(self.comment.async_add_positive_karma())
-        run(self.comment.async_add_negative_karma())
+        comment.delete()
 
-    def test_delete(self):
-        comments = self.mod.get_comments().results
-        if comments:
-            comments[0].delete()
+    def test_async_comment(self):
+        comment = run(self.mod.async_get_comments()).results[0]
 
-    def test_async_delete(self):
-        comments = run(self.mod.async_get_comments()).results
-        if comments:
-            run(comments[0].async_delete())
+        run(comment.async_edit("test edit async"))
+
+        if comment.karma < 2:
+            run(comment.async_add_positive_karma())
+            run(comment.async_add_negative_karma())
+        else:
+            run(comment.async_add_negative_karma())
+            run(comment.async_add_positive_karma())
+
+        run(comment.async_delete())
 
 
 class TestModFile(unittest.TestCase):
@@ -124,10 +127,10 @@ class TestModFile(unittest.TestCase):
             run(file.async_delete())
 
     def test_delete(self):
-        self.mod.get_files().results[0].delete()
+        self.mod.get_files().results[-1].delete()
 
     def test_async_delete(self):
-        run(self.mod.get_files().results[0].async_delete())
+        run(self.mod.get_files().results[-1].async_delete())
 
 
 class TestRating(unittest.TestCase):
@@ -135,28 +138,26 @@ class TestRating(unittest.TestCase):
         self.client = modio.Client(access_token=access_token, test=True)
         run(self.client.start())
 
-        self.rating = self.client.get_my_ratings().results[0]
+        self.mod = self.client.get_my_mods(filters=modio.Filter().equals(id=mod_id)).results[0]
 
     def tearDown(self):
         run(self.client.close())
 
-    def test_add_positive_rating(self):
-        self.rating.add_positive_rating()
+    def test_rating(self):
+        self.mod.add_negative_rating()
 
-    def test_add_negative_rating(self):
-        self.rating.add_negative_rating()
+        rating = self.client.get_my_ratings().results[0]
+        rating.add_positive_rating()
+        rating.add_negative_rating()
+        rating.delete()
 
-    def test_async_add_positive_rating(self):
-        run(self.rating.async_add_positive_rating())
+    def test_async_rating(self):
+        self.mod.add_negative_rating()
 
-    def test_async_add_negative_rating(self):
-        run(self.rating.async_add_negative_rating())
-
-    def test_delete_rating(self):
-        self.client.get_my_ratings().results[0].delete()
-
-    def test_async_delete_rating(self):
-        run(self.client.get_my_ratings().results[0].async_delete())
+        rating = self.client.get_my_ratings().results[0]
+        run(rating.async_add_positive_rating())
+        run(rating.async_add_negative_rating())
+        run(rating.async_delete())
 
 
 class TestStats(unittest.TestCase):
@@ -189,16 +190,6 @@ class TestTeamMember(unittest.TestCase):
     def test_async_mute(self):
         run(self.member.async_mute())
         run(self.member.async_unmute())
-
-
-# class TestFilter(unittest.TestCase):
-#     def setUp(self):
-#         client = modio.Client(access_token=access_token, test=True)
-
-
-# class TestPagination(unittest.TestCase):
-#     def setUp(self):
-#         client = modio.Client(access_token=access_token, test=True)
 
 
 class TestObject(unittest.TestCase):

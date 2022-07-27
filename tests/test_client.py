@@ -20,7 +20,7 @@ class TestClient(unittest.TestCase):
         # pylint: disable=W0212
         assert "test" in client.connection._base_path
 
-        client.test = False
+        client.connection.test = False
         # pylint: disable=W0212
         assert "test" not in client.connection._base_path
 

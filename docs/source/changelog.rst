@@ -29,6 +29,7 @@ New Features
 * New example `examples/polling_events` showing how to use the filter class to only get the latest attributes
 * `Game.add_tag_options` now supports the `locked` option
 * New attribute for TagOption: `locked`
+* `Rating.mod` renamed to `Rating.mod_id`
 
 Removed Features
 ##################

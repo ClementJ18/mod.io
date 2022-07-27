@@ -114,11 +114,9 @@ class TestMod(unittest.TestCase):
     def test_delete_tags(self):
         self.mod.delete_tags("total convert", "345", "what am i doign")
 
-    def test_add_positive_rating(self):
-        self.mod.add_positive_rating()
-
-    def test_add_negative_rating(self):
+    def test_add_rating(self):
         self.mod.add_negative_rating()
+        self.mod.add_positive_rating()
 
     def test_add_metadata(self):
         self.mod.add_metadata(test=["mega_damage", "tork"], seven=["sortk"])
@@ -243,11 +241,9 @@ class TestMod(unittest.TestCase):
     def test_async_delete_tags(self):
         run(self.mod.async_delete_tags("total convert", "345", "what am i doign"))
 
-    def test_async_add_positive_rating(self):
-        run(self.mod.async_add_positive_rating())
-
-    def test_async_add_negative_rating(self):
+    def test_async_add_rating(self):
         run(self.mod.async_add_negative_rating())
+        run(self.mod.async_add_positive_rating())
 
     def test_async_add_metadata(self):
         run(self.mod.async_add_metadata(test=["mega_damage", "tork"], seven=["sortk"]))
