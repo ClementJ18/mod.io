@@ -4,6 +4,9 @@ import pytest
 import modio
 import random
 
+from modio.enums import Community, EventType, TargetPlatform
+from modio.utils import _convert_date
+
 try:
     from .config import access_token, game_id, mod_id
 except ModuleNotFoundError:
@@ -15,23 +18,23 @@ except ModuleNotFoundError:
 
 from .utils import run
 
+event_params = {
+    "id": 13,
+    "mod_id": 13,
+    "user_id": 13,
+    "date_added": 1499846132,
+    "event_type": "MODFILE_CHANGED",
+}
+
 
 class TestEvent(unittest.TestCase):
     def test_type(self):
-        params = {
-            "id": 13,
-            "mod_id": 13,
-            "user_id": 13,
-            "date_added": 1499846132,
-            "event_type": "MODFILE_CHANGED",
-        }
-
-        event = modio.entities.Event(**params)
+        event = modio.entities.Event(**event_params)
 
         assert event.type is modio.EventType.file_changed
 
-        params["event_type"] = "USER_TEAM_JOIN"
-        event = modio.entities.Event(**params)
+        event_params["event_type"] = "USER_TEAM_JOIN"
+        event = modio.entities.Event(**event_params)
 
         assert event.type is modio.EventType.team_join
 
@@ -190,6 +193,67 @@ class TestTeamMember(unittest.TestCase):
     def test_async_mute(self):
         run(self.member.async_mute())
         run(self.member.async_unmute())
+
+
+class TestFilter(unittest.TestCase):
+    def test_filter_event(self):
+        filters = modio.Filter().equals(event_type=EventType.comment_added)
+        event_params["event_type"] = filters.__dict__["event_type"]
+        event = modio.entities.Event(**event_params)
+
+        assert event.type is EventType.comment_added
+
+        filters = modio.Filter().equals(event_type=EventType.team_join)
+        event_params["event_type"] = filters.__dict__["event_type"]
+        event = modio.entities.Event(**event_params)
+
+        assert event.type is EventType.team_join
+
+    def test_filter_datetime(self):
+        filters = modio.Filter().equals(tico=_convert_date(event_params["date_added"]))
+
+        assert filters.__dict__["tico"] == event_params["date_added"]
+
+    def test_filter_enums(self):
+        filters = modio.Filter().equals(tico=TargetPlatform.android)
+
+        assert filters.__dict__["tico"] == TargetPlatform.android.value
+
+    def test_filter_methods(self):
+        filters = modio.Filter()
+
+        filters.text("tico")
+        filters.equals(tico="tico")
+        filters.not_equals(tico="tico")
+        filters.like(tico="tico")
+        filters.not_like(tico="tico")
+        filters.values_in(tico=["tico"])
+        filters.values_not_in(tico=["tico"])
+        filters.max(tico=3)
+        filters.min(tico=5)
+        filters.smaller_than(tico=2)
+        filters.greater_than(tico=3)
+        filters.bitwise(tico=Community.disabled | Community.guides_news)
+
+        filters.sort("tico", reverse=True)
+        filters.limit(56)
+        filters.offset(49)
+
+        client = modio.Client(access_token=access_token, test=True)
+        client.get_my_mods(filters=filters)
+
+
+class TestPagination(unittest.TestCase):
+    def test_pagination(self):
+        client = modio.Client(access_token=access_token, test=True)
+        mods = client.get_my_mods()
+        pagination = mods.pagination
+
+        pagination.max()
+        pagination.min()
+        pagination.next()
+        pagination.previous()
+        pagination.page()
 
 
 class TestObject(unittest.TestCase):
