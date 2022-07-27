@@ -30,6 +30,7 @@ New Features
 * `Game.add_tag_options` now supports the `locked` option
 * New attribute for TagOption: `locked`
 * `Rating.mod` renamed to `Rating.mod_id`
+* Library is now typed, making it easier to use with IDEs
 
 Removed Features
 ##################

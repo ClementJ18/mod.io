@@ -3,25 +3,11 @@
 import datetime
 import enum
 import hashlib
-from collections import namedtuple
+import typing
+import typing_extensions
 
 from .enums import EventType, Maturity, Visibility
 from .utils import _lib_to_api
-
-_Returned = namedtuple("Returned", "results pagination")
-
-
-class Returned(_Returned):
-    """A named tuple returned by certain methods which return multiple results
-    and need to return pagination data along with it.
-
-    Attributes
-    ----------
-    results : List[Any]
-        The list of results returned
-    pagination : Pagination
-        Pagination metadata attached to the results
-    """
 
 
 class NewMod:
@@ -410,6 +396,25 @@ class Pagination:
     def page(self):
         """Returns the current page number. Page numbers start at 0"""
         return self.offset // self.limit
+
+
+Result = typing.TypeVar("Result")
+
+
+class Returned(typing_extensions.NamedTuple, typing.Generic[Result]):
+    """A named tuple returned by certain methods which return multiple results
+    and need to return pagination data along with it.
+
+    Attributes
+    ----------
+    results : List[Any]
+        The list of results returned
+    pagination : Pagination
+        Pagination metadata attached to the results
+    """
+
+    results: typing.List[Result]
+    pagination: Pagination
 
 
 class Object:
