@@ -1,9 +1,13 @@
-"""Client used to interact with the API at a base level."""
+"""The Client object is the base class from which all the requests are made,
+this is where you can get your  games, authentify and get the models for
+your authenticated user.
+"""
 import asyncio
+import datetime
 import logging
-import requests
-import aiohttp
 import time
+import aiohttp
+import requests
 
 from .errors import modioException
 from .entities import Event, Message, ModFile, Rating, User
@@ -32,7 +36,7 @@ class Connection:
     @property
     def async_session(self):
         if self._async_session is None:
-            raise ValueError("No async session found, did you forget to class Client.start?")
+            raise AttributeError("No async session found, did you forget to use Client.start?")
 
         return self._async_session
 
@@ -217,8 +221,8 @@ class Connection:
 
 
 class Client:
-    """Represents the base-level client to make requests to the mod.io API with. Upon
-    initializiation the Client will confirm the api key and O Auth 2 token.
+    """Represents an authenticated client to make requests to the mod.io API with. If you desire
+    to make aysnc requests you must call :ref:`Client.start` before making any async request.
 
     Parameters
     -----------
@@ -240,9 +244,6 @@ class Client:
     version : Optional[str]
         An optional keyword argument to allow you to pick a specific version of the API to query,
         usually you shouldn't need to change this. Default is the latest supported version.
-    loop : Optional[asyncio.EventLoop]
-        |async| An optional keyword argument allowing you to pass a loop, if no loop is passed the Client
-        will get the current event loop.
 
     Attributes
     -----------
@@ -267,6 +268,18 @@ class Client:
     def __repr__(self):
         return f"< Client version={self.version} test={self.test} >"
 
+    @property
+    def rate_limit(self):
+        return self.connection.rate_limit
+
+    @property
+    def rate_remain(self):
+        return self.connection.rate_remain
+
+    @property
+    def rate_retry(self):
+        return self.connection.rate_retry
+
     async def close(self):
         """|async| This function is used to clean up the client in order to close the application that it uses gracefully.
         At the moment it is only used to close the client's Session.
@@ -283,7 +296,7 @@ class Client:
         """
         await self.connection.start()
 
-    def get_game(self, game_id):
+    def get_game(self, game_id: int) -> Game:
         """Queries the mod.io API for the given game ID and if found returns it as a
         Game instance. If not found raises NotFound.
 
@@ -308,11 +321,11 @@ class Client:
         game_json = self.connection.get_request(f"/games/{game_id}")
         return Game(connection=self.connection, **game_json)
 
-    async def async_get_game(self, game_id):
+    async def async_get_game(self, game_id: int) -> Game:
         game_json = await self.connection.async_get_request(f"/games/{game_id}")
         return Game(connection=self.connection, **game_json)
 
-    def get_games(self, *, filters=None):
+    def get_games(self, *, filters: Filter = None) -> Returned[Game]:
         """Gets all the games available on mod.io. Returns a
         named tuple with parameters results and pagination. |filterable|
 
@@ -334,13 +347,13 @@ class Client:
             [Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json)
         )
 
-    async def async_get_games(self, *, filters=None):
+    async def async_get_games(self, *, filters: Filter = None) -> Returned[Game]:
         game_json = await self.connection.async_get_request("/games", filters=filters)
         return Returned(
             [Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json)
         )
 
-    def get_my_user(self):
+    def get_my_user(self) -> User:
         """Gets the authenticated user's details (aka the user who created the API key/access token)
 
         |coro|
@@ -359,11 +372,11 @@ class Client:
         me_json = self.connection.get_request("/me")
         return User(connection=self.connection, **me_json)
 
-    async def async_get_my_user(self):
+    async def async_get_my_user(self) -> User:
         me_json = await self.connection.async_get_request("/me")
         return User(connection=self.connection, **me_json)
 
-    def get_my_subs(self, *, filters=None):
+    def get_my_subs(self, *, filters: Filter = None) -> Returned[Mod]:
         """Gets all the mods the authenticated user is subscribed to. |filterable|
 
         |coro|
@@ -389,13 +402,13 @@ class Client:
             [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
         )
 
-    async def async_get_my_subs(self, *, filters=None):
+    async def async_get_my_subs(self, *, filters: Filter = None) -> Returned[Mod]:
         mod_json = await self.connection.async_get_request("/me/subscribed", filters=filters)
         return Returned(
             [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
         )
 
-    def get_my_events(self, *, filters=None):
+    def get_my_events(self, *, filters: Filter = None) -> Returned[Event]:
         """Get events that have been fired specifically for the authenticated user. |filterable|
 
         |coro|
@@ -414,11 +427,11 @@ class Client:
         events_json = self.connection.get_request("/me/events", filters=filters)
         return Returned([Event(**event) for event in events_json["data"]], Pagination(**events_json))
 
-    async def async_get_my_events(self, *, filters=None):
+    async def async_get_my_events(self, *, filters: Filter = None) -> Returned[Event]:
         events_json = await self.connection.async_get_request("/me/events", filters=filters)
         return Returned([Event(**event) for event in events_json["data"]], Pagination(**events_json))
 
-    def get_my_games(self, filters=None):
+    def get_my_games(self, filters: Filter = None) -> Returned[Game]:
         """Get all the games the authenticated user added or is a team member of. |filterable|
 
         |coro|
@@ -444,13 +457,13 @@ class Client:
             [Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json)
         )
 
-    async def async_get_my_games(self, filters=None):
+    async def async_get_my_games(self, filters: Filter = None) -> Returned[Game]:
         game_json = await self.connection.async_get_request("/me/games", filters=filters)
         return Returned(
             [Game(connection=self.connection, **game) for game in game_json["data"]], Pagination(**game_json)
         )
 
-    def get_my_mods(self, *, filters=None):
+    def get_my_mods(self, *, filters: Filter = None) -> Returned[Mod]:
         """Get all the mods the authenticated user added or is a team member of. |filterable|
 
         |coro|
@@ -476,13 +489,13 @@ class Client:
             [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
         )
 
-    async def async_get_my_mods(self, *, filters=None):
+    async def async_get_my_mods(self, *, filters: Filter = None) -> Returned[Mod]:
         mod_json = await self.connection.async_get_request("/me/mods", filters=filters)
         return Returned(
             [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
         )
 
-    def get_my_modfiles(self, *, filters=None):
+    def get_my_modfiles(self, *, filters: Filter = None) -> Returned[ModFile]:
         """Get all the mods the authenticated user uploaded. The returned modfile objects cannot be
         edited or deleted and do not have a `game_id` attribute. Returns
         a named tuple with parameters results and pagination. |filterable|
@@ -511,14 +524,14 @@ class Client:
             Pagination(**files_json),
         )
 
-    async def async_get_my_modfiles(self, *, filters=None):
+    async def async_get_my_modfiles(self, *, filters: Filter = None) -> Returned[ModFile]:
         files_json = await self.connection.async_get_request("/me/files", filters=filters)
         return Returned(
             [ModFile(**file, connection=self.connection) for file in files_json["data"]],
             Pagination(**files_json),
         )
 
-    def get_my_ratings(self, *, filters=None):
+    def get_my_ratings(self, *, filters: Filter = None) -> Returned[Rating]:
         """Get all the ratings the authentitated user has submitted. Returns a named
         with parameter results and pagination. |filterable|
 
@@ -547,14 +560,14 @@ class Client:
             Pagination(**ratings),
         )
 
-    async def async_get_my_ratings(self, *, filters=None):
+    async def async_get_my_ratings(self, *, filters: Filter = None) -> Returned[Rating]:
         ratings = await self.connection.async_get_request("/me/ratings", filters=filters)
         return Returned(
             [Rating(**rating, connection=self.connection) for rating in ratings["data"]],
             Pagination(**ratings),
         )
 
-    def get_my_mutes(self, *, filters=None):
+    def get_my_mutes(self, *, filters: Filter = None) -> Returned[User]:
         """Get all users muted by this user
 
         |coro|
@@ -572,7 +585,7 @@ class Client:
 
         Returns
         --------
-        Returned[List[Users], Pagination]
+        Returned[List[User], Pagination]
             The results and pagination tuple from this request
         """
 
@@ -581,13 +594,13 @@ class Client:
             [User(**user, connection=self.connection) for user in users["data"]], Pagination(**users)
         )
 
-    async def async_get_my_mutes(self, *, filters=None):
+    async def async_get_my_mutes(self, *, filters: Filter = None) -> Returned[User]:
         users = await self.connection.async_get_request("/me/users/muted", filters=filters)
         return Returned(
             [User(**user, connection=self.connection) for user in users["data"]], Pagination(**users)
         )
 
-    def email_request(self, email):
+    def email_request(self, email: str):  # pragma: no cover
         """Posts an email request for an OAuth2 token. A code will be sent to the given email address
         which can then be entered into :func:`email_exchange`.
 
@@ -605,13 +618,13 @@ class Client:
         )
         return Message(**resp)
 
-    async def async_email_request(self, email):
+    async def async_email_request(self, email: str):  # pragma: no cover
         resp = await self.connection.async_post_request(
             "/oauth/emailrequest", params={"email": email, "api_key": self.connection.api_key}, h_type=2
         )
         return Message(**resp)
 
-    def email_exchange(self, code):
+    def email_exchange(self, code: int, *, date_expires: datetime.datetime = None) -> str:  # pragma: no cover
         """Exchanges the given 5-digit code for an OAuth2 token.
 
         |coro|
@@ -620,6 +633,9 @@ class Client:
         ----------
         code : int
             A 5-digit code received by email less than 15 minutes ago
+        date_expires : Optional[datetime.datetime]
+            Datetime of when the token will expire. By default this
+            is a year, value cannot be greater than a year.
 
         Raises
         -------
@@ -637,21 +653,31 @@ class Client:
         if len(code) != 5:
             raise ValueError("Security code must be 5 digits")
 
+        params = {"security_code": code, "api_key": self.connection.api_key}
+        if date_expires is not None:
+            params["date_expires"] = date_expires.timestamp()
+
         resp = self.connection.post_request(
             "/oauth/emailexchange",
-            params={"security_code": code, "api_key": self.connection.api_key},
+            params=params,
             h_type=2,
         )
 
         return resp["access_token"]
 
-    async def async_email_exchange(self, code):
+    async def async_email_exchange(
+        self, code: int, *, date_expires: datetime.datetime = None
+    ) -> str:  # pragma: no cover
         if len(code) != 5:
             raise ValueError("Security code must be 5 digits")
 
+        params = {"security_code": code, "api_key": self.connection.api_key}
+        if date_expires is not None:
+            params["date_expires"] = date_expires.timestamp()
+
         resp = await self.connection.async_post_request(
             "/oauth/emailexchange",
-            params={"security_code": code, "api_key": self.connection.api_key},
+            params=params,
             h_type=2,
         )
 

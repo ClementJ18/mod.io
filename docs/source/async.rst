@@ -9,7 +9,7 @@ with an async equivalent will be lablled as such with:
 
         |coro|
 
-Certain methods are also exclusively async, these methods will be lballed with:
+Certain methods are also exclusively async, these methods will be labelled with:
 
         |async|
 

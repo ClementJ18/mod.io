@@ -1,10 +1,10 @@
 """Module for miscs objects."""
 import time
 
-from .mixins import OwnerMixin, RatingMixin, ReportMixin
+from .mixins import OwnerMixin, RatingMixin, ReportMixin, StatsMixin
 from .errors import modioException
 from .utils import concat_docs, _convert_date
-from .enums import EventType, RatingType, VirusStatus
+from .enums import EventType, RatingType, TargetPlatform, VirusStatus
 
 
 class Message:
@@ -126,13 +126,13 @@ class Comment:
     -----------
     id : int
         ID of the comment. Filter attribute.
-    mod : Mod
-        The mod the comment has been posted on. Filter attribute.
+    resource_id : int
+        The parent resource. Filter attribute.
     user : User
         Istance of the user that submitted the comment. Filter attribute.
     date : datetime.datetime
         Unix timestamp of date the comment was posted. Filter attribute.
-    parent : int
+    parent_id : int
         ID of the parent this comment is replying to. 0 if comment
         is not a reply. Filter attribute.
     position : int
@@ -156,13 +156,12 @@ class Comment:
 
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
-        self.mod = attrs.pop("mod_id")
+        self.resource_id = attrs.pop("resource_id")
         self.date = _convert_date(attrs.pop("date_added"))
-        self.parent = attrs.pop("reply_id")
+        self.parent_id = attrs.pop("reply_id")
         self.position = attrs.pop("thread_position")
         self.level = len(self.position.split("."))
         self.karma = attrs.pop("karma")
-        self.karma_guest = attrs.pop("karma_guest")
         self.content = attrs.pop("content")
         self.connection = attrs.pop("connection")
         self.mod = attrs.pop("mod")
@@ -170,7 +169,7 @@ class Comment:
         self.children = []
 
     def __repr__(self):
-        return f"<Comment id={self.id} mod={self.mod.id}>"
+        return f"<Comment id={self.id} mod={self.mod.id} karma={self.karma}>"
 
     def edit(self, content):
         """Update the contents of a comment.
@@ -202,7 +201,9 @@ class Comment:
         """Remove the comment.
 
         |coro|"""
-        resp = self.connection.delete_request(f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}")
+        resp = self.connection.delete_request(
+            f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}"
+        )
         return resp
 
     async def async_delete(self):
@@ -213,6 +214,50 @@ class Comment:
             f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}"
         )
         return resp
+
+    def _add_karma(self, karma: bool):
+        comment = self.connection.post_request(
+            f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}/karma",
+            data={"karma": 1 if karma else -1},
+        )
+        return Comment(connection=self.connection, mod=self.mod, **comment)
+
+    async def _async_add_karma(self, karma: bool):
+        comment = await self.connection.async_post_request(
+            f"/games/{self.mod.game_id}/mods/{self.mod.id}/comments/{self.id}/karma",
+            data={"karma": 1 if karma else -1},
+        )
+        return Comment(connection=self.connection, mod=self.mod, **comment)
+
+    def add_positive_karma(self):
+        """Add positive karma to the comment
+
+        |coro|
+
+        Returns
+        --------
+        Comment
+            The updated comment
+        """
+        return self._add_karma(True)
+
+    async def async_add_positive_karma(self):
+        return await self._async_add_karma(True)
+
+    def add_negative_karma(self):
+        """Add negative karma to the comment
+
+        |coro|
+
+        Returns
+        --------
+        Comment
+            The updated comment
+        """
+        return self._add_karma(False)
+
+    async def async_add_negative_karma(self):
+        return await self._async_add_karma(False)
 
 
 class ModFile(OwnerMixin):
@@ -249,14 +294,14 @@ class ModFile(OwnerMixin):
         Metadata stored by the game developer for this file. Filter attribute.
     url : str
         url to download file
-    expire : datetime.datetime
+    date_expires : datetime.datetime
         UNIX timestamp of when the url expires
     game_id : int
         ID of the game of the mod this file belongs to. Can be None if this file
         was returned from the me/modfiles endpoint.
     """
 
-    resource_type = "files"
+    _resource_type = "files"
 
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
@@ -274,7 +319,7 @@ class ModFile(OwnerMixin):
         self.metadata = attrs.pop("metadata_blob")
         download = attrs.pop("download")
         self.url = download["binary_url"]
-        self.expires = _convert_date(download["date_expires"])
+        self.date_expires = _convert_date(download.pop("date_expires"))
         self.game_id = attrs.pop("game_id", None)
         self.connection = attrs.pop("connection")
 
@@ -347,16 +392,6 @@ class ModFile(OwnerMixin):
         return resp
 
     async def async_delete(self):
-        """Deletes the modfile, this will raise an error if the
-        file is the active release for the mod.
-
-        |coro|
-
-        Raises
-        -------
-        Forbidden
-            You cannot delete the active release of a mod
-        """
         if not self.game_id:
             raise modioException(
                 "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
@@ -375,7 +410,7 @@ class ModFile(OwnerMixin):
         bool
             True if it's still valid, else False
         """
-        return self.expires.timestamp() < time.time()
+        return self.date_expires.timestamp() < time.time()
 
 
 class ModMedia:
@@ -398,6 +433,25 @@ class ModMedia:
         self.images = [Image(**image) for image in attrs.pop("images", [])]
 
 
+class Platform:
+    """A platform
+
+    Attributes
+    ----------
+    platform : TargetPlatform
+        The platform
+    label : str
+        The human readable platform label
+    moderated : bool
+        Whether the platform is moderated by game admins
+    """
+
+    def __init__(self, **attrs):
+        self.platform = TargetPlatform[attrs.pop("platform")]
+        self.label = attrs.pop("label")
+        self.moderated = attrs.pop("moderated")
+
+
 class TagOption:
     """Represents a game tag gropup, a category of tags from which a
     mod may pick one or more.
@@ -413,6 +467,8 @@ class TagOption:
     hidden : bool
         Whether or not the tag is only accessible to game admins, used
         for internal mod filtering.
+    locked : bool
+        Whether or not mods can self assign from this tag option.
     tags : List[str]
         Array of tags for this group
 
@@ -422,10 +478,11 @@ class TagOption:
         self.name = attrs.pop("name")
         self.type = attrs.pop("type", "dropdown")
         self.hidden = attrs.pop("hidden", False)
+        self.locked = attrs.pop("locked", False)
         self.tags = attrs.pop("tags", [])
 
     def __repr__(self):
-        return f"<TagOption name={self.name} hidden={self.hidden}>"
+        return f"<TagOption name={self.name} hidden={self.hidden} locked=>"
 
 
 class Rating(RatingMixin):
@@ -435,7 +492,7 @@ class Rating(RatingMixin):
     -----------
     game_id : int
         The ID of the game the rated mod is for.
-    mod : int
+    mod_id : int
         The ID of the mod that was rated
     rating : RatingType
         The rating type
@@ -444,17 +501,20 @@ class Rating(RatingMixin):
 
     """
 
-    mod_key = "mod"
+    mod_key = "mod_id"
 
     def __init__(self, **attrs):
         self.game_id = attrs.pop("game_id")
-        self.mod = attrs.pop("mod_id")
+        self.mod_id = attrs.pop("mod_id")
         self.rating = RatingType(attrs.pop("rating"))
         self.date = _convert_date(attrs.pop("date_added"))
         self.connection = attrs.pop("connection")
 
+    def __repr__(self) -> str:
+        return f"< Rating mod_id={self.mod_id} rating={self.rating}>"
 
-class Stats:
+
+class ModStats(StatsMixin):
     """Represents a summary of stats for a mod
 
     Attributes
@@ -485,7 +545,7 @@ class Stats:
     text : str
         Textual representation of the rating in format. This is currently not updated
         by the lib so you'll have to poll the resource's endpoint again.
-    expires : datetime.datetime
+    date_expires : datetime.datetime
         Unix timestamp until this mods's statistics are considered stale. Endpoint
         should be polled again when this expires.
     """
@@ -496,7 +556,7 @@ class Stats:
         self.rank_total = attrs.pop("popularity_rank_total_mods")
         self.downloads = attrs.pop("downloads_total")
         self.subscribers = attrs.pop("subscribers_total")
-        self.expires = _convert_date(attrs.pop("date_expires"))
+        self.date_expires = _convert_date(attrs.pop("date_expires"))
         self.total = attrs.pop("ratings_total")
         self.positive = attrs.pop("ratings_positive")
         self.negative = attrs.pop("ratings_negative")
@@ -504,18 +564,73 @@ class Stats:
         self.weighted = attrs.pop("ratings_weighted_aggregate")
         self.text = attrs.pop("ratings_display_text")
 
+
+class GameStats(StatsMixin):
+    """A stat object containing the stats specific to games
+
+    Attributes
+    -----------
+    id : int
+        The id of the game
+    mods_count_total : int
+        The total count of mods for this game
+    mods_download_today : int
+        The amount of mod downloaded today
+    mods_download_total : int
+        The amount of mods downloaded all times
+    mods_download_daily_avg : int
+        Average daily mod downlaods
+    mods_subscribers_total : int
+        Total amount of subscribers to all mods
+    date_expires : datetime.datetime
+        The date at which the stats are considered "stale"
+        and no longer accurate.
+    """
+
+    def __init__(self, **attrs):
+        self.id = attrs.pop("game_id")
+        self.mods_count_total = attrs.pop("mods_count_total")
+        self.mods_downloads_today = attrs.pop("mods_downloads_today")
+        self.mods_downloads_total = attrs.pop("mods_downloads_total")
+        self.mods_downloads_daily_avg = attrs.pop("mods_downloads_daily_average")
+        self.mods_subscribers_total = attrs.pop("mods_subscribers_total")
+        self.date_expires = _convert_date(attrs.pop("date_expires"))
+
+
+class Theme:
+    """Object representing a game's theme. This is mostly useful
+    if you desire to create a visual interface for a game or
+    one of its mods. All attributes are hex color codes.
+
+    Attributes
+    -----------
+    primary : string
+        Primary color of the game
+    dark : string
+        The "dark" color of the game
+    light : string
+        The "light" color of the game
+    success : string
+        The color of a successful action with
+        the game interface
+    warning : string
+        The color of a warning with the
+        game interface
+    danger : string
+        The color of a danger warning with
+        the game interface
+    """
+
+    def __init__(self, **attrs):
+        self.primary = attrs.pop("primary")
+        self.dark = attrs.pop("dark")
+        self.light = attrs.pop("light")
+        self.success = attrs.pop("success")
+        self.warning = attrs.pop("warning")
+        self.danger = attrs.pop("danger")
+
     def __repr__(self):
-        return f"<Stats id={self.id} expired={self.is_stale()}>"
-
-    def is_stale(self):
-        """Returns a bool depending on whether or not the stats are considered stale.
-
-        Returns
-        --------
-        bool
-            True if stats are expired, False else.
-        """
-        return self.expires.timestamp() < time.time()
+        return f"< Theme primary={self.primary} >"
 
 
 class Tag:
@@ -577,7 +692,7 @@ class User(ReportMixin):
 
     """
 
-    resource_type = "users"
+    _resource_type = "users"
 
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
@@ -586,8 +701,7 @@ class User(ReportMixin):
         self.last_online = _convert_date(attrs.pop("date_online"))
 
         avatar = attrs.pop("avatar")
-
-        if avatar.keys():
+        if avatar:
             self.avatar = Image(**avatar)
         else:
             self.avatar = None

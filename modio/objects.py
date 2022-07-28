@@ -1,26 +1,13 @@
 """Module for user instanced classes."""
 
+import datetime
 import enum
 import hashlib
-from collections import namedtuple
+import typing
+import typing_extensions
 
 from .enums import EventType, Maturity, Visibility
 from .utils import _lib_to_api
-
-_Returned = namedtuple("Returned", "results pagination")
-
-
-class Returned(_Returned):
-    """A named tuple returned by certain methods which return multiple results
-    and need to return pagination data along with it.
-
-    Attributes
-    ----------
-    results : List[Any]
-        The list of results returned
-    pagination : Pagination
-        Pagination metadata attached to the results
-    """
 
 
 class NewMod:
@@ -164,13 +151,16 @@ class Filter:
         if filters is None:
             filters = {}
 
-        for key, value in filters.items():
-            self._set(key, value)
-
         self._q = None
         self._sort = None
         self._limit = None
         self._offset = None
+
+        for key, value in filters.items():
+            self._set(key, value)
+
+    def __repr__(self):
+        return f"< Filter filters={self.__dict__}>"
 
     def _set(self, key, value, text="{}"):
         try:
@@ -179,10 +169,13 @@ class Filter:
             pass
 
         if key == "event_type":
-            if value.value < 6:
+            if value.value < 8:
                 value = f"MOD{'_' if value != EventType.file_changed else ''}{value.name.upper()}"
             else:
                 value = f"USER_{value.name.upper()}"
+
+        if isinstance(value, datetime.datetime):
+            value = int(value.timestamp())
 
         if isinstance(value, enum.Enum):
             value = value.value
@@ -347,6 +340,13 @@ class Filter:
         return self
 
     def get_dict(self):
+        """Utility methods to get all filters while omitting None values
+
+        Returns
+        ---------
+        Dict[str, Union[str, int]]
+            The dict of filters
+        """
         return {key: value for key, value in self.__dict__.items() if value is not None}
 
 
@@ -384,18 +384,38 @@ class Pagination:
         return self.offset == 0
 
     def next(self):
-        """Returns the offset required for the next set of results. If the max results have been reached the returns the
+        """Returns the offset required for the next set of results. If the max results have been reached this returns the
         current offset."""
         return self.offset + self.limit if not self.max() else self.offset
 
     def previous(self):
-        """Returns the offset required for the previous set of results. If the min results have been reached the returns the
+        """Returns the offset required for the previous set of results. If the min results have been reached this returns the
         current offset."""
         return self.offset - self.limit if not self.min() else self.offset
 
     def page(self):
         """Returns the current page number. Page numbers start at 0"""
         return self.offset // self.limit
+
+
+Result = typing.TypeVar("Result")
+
+
+class Returned(typing_extensions.NamedTuple, typing.Generic[Result]):
+    """A named tuple returned by certain methods which return multiple results
+    and need to return pagination data along with it.
+
+    Attributes
+    ----------
+    results : List[Result]
+        The list of results returned. This is typed accordingly to
+        the method that returns it.
+    pagination : Pagination
+        Pagination metadata attached to the results
+    """
+
+    results: typing.List[Result]
+    pagination: Pagination
 
 
 class Object:

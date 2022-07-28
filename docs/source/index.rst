@@ -6,8 +6,8 @@
 
 Welcome to modio's documentation!
 =================================
-.. image:: https://readthedocs.org/projects/modio/badge/?version=latest
-   :target: https://modio.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/modio/badge/?version=stable
+   :target: https://modio.readthedocs.io/en/stable/?badge=stable
    :alt: Documentation Status
 
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
@@ -22,19 +22,14 @@ Welcome to modio's documentation!
    :target: https://github.com/ClementJ18/mod.io/pulls
    :alt: Open PRs
 
-.. image:: https://img.shields.io/github/release/ClementJ18/mod.io.svg
-   :alt: Latest Release
-
 .. image:: https://img.shields.io/github/stars/ClementJ18/mod.io.svg?label=Stars&style=social 
    :target: https://github.com/ClementJ18/mod.io
 
 .. image:: https://img.shields.io/discord/389039439487434752.svg
    :target: https://discord.gg/Hkq7X7n
 
-.. image:: https://img.shields.io/github/commits-since/ClementJ18/mod.io/latest.svg
-    :target: https://github.com/ClementJ18/mod.io/releases/latest
-
-modio.py is a wrapper package for the mod.io API. Most blocking methods have both a synchronous version and async method
+mod.io is a python object-oriented wrapper libary for the mod.io API that supports both sync and async 
+applications. Most blocking methods have both a synchronous version and async method
 for use within async applications.
 
 Basic Usage
@@ -60,7 +55,11 @@ Basic Usage
 Getting an OAuth 2 Access Token
 --------------------------------
 
-To perform writes, you will need to authenticate your users via OAuth 2. To make this easy this library provides you with two functions to use in order to obtain your Access Token. You will need an API Key and an email adress to which you have access in order for this to work. Once you have both, follow the example below, you can either run this in a REPL or as a Python script. Don't forget to edit the script to add your own api key and email adress.
+To perform writes, you will need to authenticate your users via OAuth 2. To make this easy this library 
+provides you with two functions to use in order to obtain your Access Token. You will need an API Key and 
+an email adress to which you have access in order for this to work. Once you have both, follow the example 
+below, you can either run this in a REPL or as a Python script. Don't forget to edit the script to add 
+your own api key and email adress.
 
 Example
 -----------
@@ -84,6 +83,8 @@ Example
       file.write(oauth2)
 
    #and now the token is stored in oauth2.txt
+
+See more examples `here <https://github.com/ClementJ18/mod.io/tree/master/examples>`.
 
 Installation
 -------------
@@ -112,6 +113,7 @@ Uninstalling
    utils
    enums
    errors
+   changelog
 
 
 Indices and tables

@@ -7,5 +7,4 @@ Documentation on objects unique to this library which the user manipulates and s
 .. automodule:: modio.objects
     :members:
     :undoc-members:
-    :show-inheritance:
     :inherited-members:

@@ -27,7 +27,7 @@ author = "Clement Julia"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "0.3.0"
+release = "0.4.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -187,13 +187,15 @@ epub_exclude_files = ["search.html"]
 intersphinx_mapping = {"https://docs.python.org/": None}
 
 rst_prolog = """
-.. |coro| replace:: This method has an async equivalent, it is a method of the same name prefixed with `async_`.  You must use :ref:`Client.start` before using this method
+.. |coro| replace:: This method has an async equivalent prefixed with '`async_`'.  You must use :ref:`Client.start` before using the async equivalent.
 .. |corourl| replace:: *coroutine*
 .. _corourl: https://docs.python.org/3/library/asyncio-task.html#coroutine
-.. |async| replace:: Exclusive to the |async-version| of the wrapper. You must use :ref:`Client.start` before using this method
+.. |async| replace:: This method has no sync equivalent. You must use :ref:`Client.start` before using this method
 .. |async-version| replace:: :ref:`async version <async-version>`
 .. |filterable| replace:: This method takes :ref:`filtering arguments <filter>`
 """
 
 napoleon_google_docstring = False
 napoleon_custom_sections = ["Filter-Only Attributes"]
+autodoc_member_order = 'bysource'
+autodoc_typehints = 'none'
