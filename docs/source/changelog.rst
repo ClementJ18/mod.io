@@ -8,6 +8,9 @@ The page attempt to keep a clear list of breaking/non-breaking changes and new f
    :local:
    :backlinks: none
 
+v0.4.1
+-------
+Small dependency bugfix
 
 v0.4.0
 --------
