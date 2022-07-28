@@ -1,9 +1,10 @@
 """Games are the umbrella entities under which all mods are stored."""
 import json
+from typing import List, Literal, Optional
 
 from .mod import Mod
 from .entities import Event, Image, Message, GameStats, ModStats, Platform, TagOption, User
-from .objects import Pagination, Returned
+from .objects import Filter, NewMod, Pagination, Returned
 from .utils import _convert_date, find
 from .enums import APIAccess, Community, Curation, MaturityOptions, Presentation, Revenue, Status, Submission
 from .mixins import OwnerMixin, ReportMixin
@@ -125,7 +126,7 @@ class Game(ReportMixin, OwnerMixin):
     def __repr__(self):
         return f"<Game id={self.id} name={self.name}>"
 
-    def get_mod(self, mod_id: int):
+    def get_mod(self, mod_id: int) -> Mod:
         """Queries the mod.io API for the given mod ID and if found returns it as a
         Mod instance. If not found raises NotFound.
 
@@ -150,11 +151,11 @@ class Game(ReportMixin, OwnerMixin):
         mod_json = self.connection.get_request(f"/games/{self.id}/mods/{mod_id}")
         return Mod(connection=self.connection, **mod_json)
 
-    async def async_get_mod(self, mod_id: int):
+    async def async_get_mod(self, mod_id: int) -> Mod:
         mod_json = await self.connection.async_get_request(f"/games/{self.id}/mods/{mod_id}")
         return Mod(connection=self.connection, **mod_json)
 
-    def get_mods(self, *, filters=None):
+    def get_mods(self, *, filters: Filter = None) -> Returned[Mod]:
         """Gets all the mods available for the game. Returns a
         named tuple with parameters results and pagination. |filterable|
 
@@ -177,13 +178,13 @@ class Game(ReportMixin, OwnerMixin):
             [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
         )
 
-    async def async_get_mods(self, *, filters=None):
+    async def async_get_mods(self, *, filters: Filter = None) -> Returned[Mod]:
         mod_json = await self.connection.async_get_request(f"/games/{self.id}/mods", filters=filters)
         return Returned(
             [Mod(connection=self.connection, **mod) for mod in mod_json["data"]], Pagination(**mod_json)
         )
 
-    def get_mod_events(self, *, filters=None):
+    def get_mod_events(self, *, filters: Filter = None) -> Returned[Event]:
         """Gets all the mod events available for this game sorted by latest event first. |filterable|
 
         |coro|
@@ -204,11 +205,11 @@ class Game(ReportMixin, OwnerMixin):
 
         return Returned([Event(**event) for event in event_json["data"]], Pagination(**event_json))
 
-    async def async_get_mod_events(self, *, filters=None):
+    async def async_get_mod_events(self, *, filters: Filter = None) -> Returned[Event]:
         event_json = await self.connection.async_get_request(f"/games/{self.id}/mods/events", filters=filters)
         return Returned([Event(**event) for event in event_json["data"]], Pagination(**event_json))
 
-    def get_tag_options(self, *, filters=None):
+    def get_tag_options(self, *, filters: Filter = None):
         """Gets all the game tags available for this game. Updates the tag_option attribute. |filterable|
 
         |coro|
@@ -229,12 +230,12 @@ class Game(ReportMixin, OwnerMixin):
         self.tag_options = tags = [TagOption(**tag_option) for tag_option in tag_json["data"]]
         return Returned(tags, Pagination(**tag_json))
 
-    async def async_get_tag_options(self, *, filters=None):
+    async def async_get_tag_options(self, *, filters: Filter = None):
         tag_json = await self.connection.async_get_request(f"/games/{self.id}/tags", filters=filters)
         self.tag_options = tags = [TagOption(**tag_option) for tag_option in tag_json["data"]]
         return Returned(tags, Pagination(**tag_json))
 
-    def get_stats(self, *, filters=None):
+    def get_stats(self, *, filters: Filter = None):
         """Get the stats for the game. |filterable|
 
         |coro|
@@ -254,11 +255,11 @@ class Game(ReportMixin, OwnerMixin):
         stats_json = self.connection.get_request(f"/games/{self.id}/stats", filters=filters)
         return GameStats(**stats_json)
 
-    async def async_get_stats(self, *, filters=None):
+    async def async_get_stats(self, *, filters: Filter = None):
         stats_json = await self.connection.async_get_request(f"/games/{self.id}/stats", filters=filters)
         return GameStats(**stats_json)
 
-    def get_mods_stats(self, *, filters=None):
+    def get_mods_stats(self, *, filters: Filter = None):
         """Gets the stat for all the mods of this game. |filterable|
 
         |coro|
@@ -277,11 +278,11 @@ class Game(ReportMixin, OwnerMixin):
         stats_json = self.connection.get_request(f"/games/{self.id}/mods/stats", filters=filters)
         return Returned([ModStats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
 
-    async def async_get_mods_stats(self, *, filters=None):
+    async def async_get_mods_stats(self, *, filters: Filter = None):
         stats_json = await self.connection.async_get_request(f"/games/{self.id}/mods/stats", filters=filters)
         return Returned([ModStats(**stats) for stats in stats_json["data"]], Pagination(**stats_json))
 
-    def add_mod(self, mod):
+    def add_mod(self, mod: NewMod) -> Mod:
         """Add a mod to this game.
 
         |coro|
@@ -313,7 +314,7 @@ class Game(ReportMixin, OwnerMixin):
 
         return Mod(connection=self.connection, **mod_json)
 
-    async def async_add_mod(self, mod):
+    async def async_add_mod(self, mod: NewMod) -> Mod:
         mod_d = mod.__dict__.copy()
         tags = list(mod_d.pop("tags"))
         for index, tag in enumerate(tags):
@@ -326,7 +327,7 @@ class Game(ReportMixin, OwnerMixin):
 
         return Mod(connection=self.connection, **mod_json)
 
-    def add_media(self, *, logo=None, icon=None, header=None):
+    def add_media(self, *, logo: str = None, icon: str = None, header: str = None):
         """Upload new media to to the game. This function can take between 1 to 3 arguments
         depending on what media you desire to upload/update.
 
@@ -372,7 +373,7 @@ class Game(ReportMixin, OwnerMixin):
 
         return Message(**message)
 
-    async def async_add_media(self, *, logo=None, icon=None, header=None):
+    async def async_add_media(self, *, logo: str = None, icon: str = None, header: str = None):
         media = {}
         if logo:
             media["logo"] = open(logo, "rb")
@@ -393,7 +394,15 @@ class Game(ReportMixin, OwnerMixin):
 
         return Message(**message)
 
-    def add_tag_options(self, name, *, tags=None, hidden=False, locked=False, tag_type="dropdown"):
+    def add_tag_options(
+        self,
+        name: str,
+        *,
+        tags: Optional[List[str]] = None,
+        hidden: Optional[bool] = False,
+        locked: Optional[bool] = False,
+        tag_type: Optional[Literal["dropdown", "checkboxes"]] = "dropdown",
+    ):
         """Add tags which mods can apply to their profiles. If the tag names already exists,
         settings such as hidden or type will be overwritten to the values provided and all the
         tags will be added to the group.
@@ -440,7 +449,13 @@ class Game(ReportMixin, OwnerMixin):
         return Message(**message)
 
     async def async_add_tag_options(
-        self, name, *, tags=None, hidden=False, locked=False, tag_type="dropdown"
+        self,
+        name: str,
+        *,
+        tags: Optional[List[str]] = None,
+        hidden: Optional[bool] = False,
+        locked: Optional[bool] = False,
+        tag_type: Optional[Literal["dropdown", "checkboxes"]] = "dropdown",
     ):
         if tags is None:
             tags = []
@@ -465,7 +480,7 @@ class Game(ReportMixin, OwnerMixin):
 
         return Message(**message)
 
-    def delete_tag_options(self, name, *, tags=None):
+    def delete_tag_options(self, name: str, *, tags: Optional[List[str]] = None) -> bool:
         """Delete one or more tags from a tag option.
 
         |coro|
@@ -497,7 +512,7 @@ class Game(ReportMixin, OwnerMixin):
 
         return not isinstance(resp, dict)
 
-    async def async_delete_tag_options(self, name, *, tags=None):
+    async def async_delete_tag_options(self, name: str, *, tags: Optional[List[str]] = None) -> bool:
         data = {f"tags[{index}]": tag for index, tag in enumerate(tags)} if tags else {"tags[]": ""}
         data["name"] = name
 

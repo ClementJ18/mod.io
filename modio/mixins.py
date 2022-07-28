@@ -19,7 +19,7 @@ class ReportMixin:
             "summary": summary,
         }
 
-    def report(self, name, summary, report_type=Report(0)):  # pragma: no cover
+    def report(self, name: str, summary: str, report_type: Report = Report(0)):  # pragma: no cover
         """Report a this game, make sure to read mod.io's ToU to understand what is
         and isnt allowed.
 
@@ -45,7 +45,9 @@ class ReportMixin:
         msg = self.connection.post_request("/report", data=self._make_report_dict(name, summary, report_type))
         return entities.Message(**msg)
 
-    async def async_report(self, name, summary, report_type=Report(0)):  # pragma: no cover
+    async def async_report(
+        self, name: str, summary: str, report_type: Report = Report(0)
+    ):  # pragma: no cover
         msg = await self.connection.async_post_request(
             "/report", data=self._make_report_dict(name, summary, report_type)
         )
@@ -109,7 +111,7 @@ class RatingMixin:
 class OwnerMixin:
     """Mixin containing get owner methods."""
 
-    def get_owner(self):
+    def get_owner(self) -> 'entities.User':
         """Get the original submitter of the resource.
 
         |coro|
@@ -124,7 +126,7 @@ class OwnerMixin:
         )
         return entities.User(connection=self.connection, **user)
 
-    async def async_get_owner(self):
+    async def async_get_owner(self) -> 'entities.User':
         user = await self.connection.async_post_request(
             "/general/ownership", data={"resource_type": self.resource_type, "resource_id": self.id}
         )
@@ -137,7 +139,7 @@ class StatsMixin:
     def __repr__(self):
         return f"<Stats id={self.id} expired={self.is_stale()}>"
 
-    def is_stale(self):
+    def is_stale(self) -> bool:
         """Returns a bool depending on whether or not the stats are considered stale.
 
         Returns

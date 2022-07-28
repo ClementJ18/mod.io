@@ -1,5 +1,6 @@
 """Module storing representation of the mod objects"""
-from .enums import Maturity, Status, Visibility
+from typing import List, Optional, Union
+from .enums import Level, Maturity, Status, Visibility
 from .errors import modioException
 from .mixins import OwnerMixin, RatingMixin, ReportMixin
 from .entities import (
@@ -13,7 +14,7 @@ from .entities import (
     TeamMember,
     User,
 )
-from .objects import NewModFile, Pagination, Returned
+from .objects import Filter, NewModFile, Pagination, Returned
 from .utils import _convert_date, _clean_and_convert
 
 
@@ -138,7 +139,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
     def __repr__(self):
         return f"<Mod id={self.id} name={self.name} game_id={self.game_id}>"
 
-    def get_file(self, file_id: int):
+    def get_file(self, file_id: int) -> ModFile:
         """Get the Mod File with the following ID.
 
         |coro|
@@ -161,13 +162,13 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         file_json = self.connection.get_request(f"/games/{self.game_id}/mods/{self.id}/files/{file_id}")
         return ModFile(**file_json, game_id=self.game_id, connection=self.connection)
 
-    async def async_get_file(self, file_id: int):
+    async def async_get_file(self, file_id: int) -> ModFile:
         file_json = await self.connection.async_get_request(
             f"/games/{self.game_id}/mods/{self.id}/files/{file_id}"
         )
         return ModFile(**file_json, game_id=self.game_id, connection=self.connection)
 
-    def get_files(self, *, filters=None):
+    def get_files(self, *, filters: Filter = None) -> Returned[ModFile]:
         """Get all mod files for this mod. Returns a named tuple
         with parameters results and pagination. |filterable|
 
@@ -195,7 +196,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             Pagination(**files_json),
         )
 
-    async def async_get_files(self, *, filters=None):
+    async def async_get_files(self, *, filters: Filter = None) -> Returned[ModFile]:
         files_json = await self.connection.async_get_request(
             f"/games/{self.game_id}/mods/{self.id}/files", filters=filters
         )
@@ -207,7 +208,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             Pagination(**files_json),
         )
 
-    def get_events(self, *, filters=None):
+    def get_events(self, *, filters: Filter = None) -> Returned[Event]:
         """Get all events for that mod sorted by latest. Returns,
         a named tuple with parameters results and pagination. |filterable|
 
@@ -230,13 +231,13 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         )
         return Returned([Event(**event) for event in event_json["data"]], Pagination(**event_json))
 
-    async def async_get_events(self, *, filters=None):
+    async def async_get_events(self, *, filters: Filter = None) -> Returned[Event]:
         event_json = await self.connection.async_get_request(
             f"/games/{self.game_id}/mods/{self.id}/events", filters=filters
         )
         return Returned([Event(**event) for event in event_json["data"]], Pagination(**event_json))
 
-    def get_tags(self, *, filters=None):
+    def get_tags(self, *, filters: Filter = None) -> Returned[dict]:
         """Gets all the tags for this mod. Updates the instance's
         tag attribute. Returns a named tuple with parameters results and pagination. |filterable|
 
@@ -258,14 +259,14 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         self.tags = new_tags = {tag["name"]: _convert_date(tag["date_added"]) for tag in tag_json["data"]}
         return Returned(new_tags, Pagination(**tag_json))
 
-    async def async_get_tags(self, *, filters=None):
+    async def async_get_tags(self, *, filters: Filter = None) -> Returned[dict]:
         tag_json = await self.connection.async_get_request(
             f"/games/{self.game_id}/mods/{self.id}/tags", filters=filters
         )
         self.tags = new_tags = {tag["name"]: _convert_date(tag["date_added"]) for tag in tag_json["data"]}
         return Returned(new_tags, Pagination(**tag_json))
 
-    def get_metadata(self):
+    def get_metadata(self) -> Returned[dict]:
         """Returns a dict of metakey-metavalue pairs. This will also update the mod's kvp attribute.
 
         |coro|
@@ -279,14 +280,14 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         self._kvp_raw = meta_json["data"]
         return Returned(self.kvp, Pagination(**meta_json))
 
-    async def async_get_metadata(self):
+    async def async_get_metadata(self) -> Returned[dict]:
         meta_json = await self.connection.async_get_request(
             f"/games/{self.game_id}/mods/{self.id}/metadatakvp"
         )
         self._kvp_raw = meta_json["data"]
         return Returned(self.kvp, Pagination(**meta_json))
 
-    def get_dependencies(self, *, filters=None):
+    def get_dependencies(self, *, filters: Filter = None) -> Returned[dict]:
         """Returns a dict of dependency_id-date_added pairs. Returns
         a named tuple with parameters results and pagination. |filterable|
 
@@ -312,7 +313,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             Pagination(**depen_json),
         )
 
-    async def async_get_dependencies(self, *, filters=None):
+    async def async_get_dependencies(self, *, filters: Filter = None) -> Returned[dict]:
         depen_json = await self.connection.async_get_request(
             f"/games/{self.game_id}/mods/{self.id}/dependencies", filters=filters
         )
@@ -321,7 +322,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             Pagination(**depen_json),
         )
 
-    def get_team(self, *, filters=None):
+    def get_team(self, *, filters: Filter = None) -> Returned[TeamMember]:
         """Returns a list of TeamMember object representing the Team in charge of the mod. |filterable|
 
         |coro|
@@ -344,7 +345,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             Pagination(**team_json),
         )
 
-    async def async_get_team(self, *, filters=None):
+    async def async_get_team(self, *, filters: Filter = None) -> Returned[TeamMember]:
         team_json = await self.connection.async_get_request(
             f"/games/{self.game_id}/mods/{self.id}/team", filters=filters
         )
@@ -353,7 +354,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             Pagination(**team_json),
         )
 
-    def get_comments(self, *, filters=None):
+    def get_comments(self, *, filters: Filter = None) -> Returned[Comment]:
         """Returns a list of all the top level comments for this mod wih comments replying
         to top level comments stored in the children attribute. This can be flattened using
         the utils.flatten function. |filterable|
@@ -379,7 +380,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             Pagination(**comment_json),
         )
 
-    async def async_get_comments(self, *, filters=None):
+    async def async_get_comments(self, *, filters: Filter = None) -> Returned[Comment]:
         comment_json = await self.connection.async_get_request(
             f"/games/{self.game_id}/mods/{self.id}/comments", filters=filters
         )
@@ -388,7 +389,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
             Pagination(**comment_json),
         )
 
-    def add_comment(self, content, *, reply=None):
+    def add_comment(self, content: str, *, reply: int = None) -> Comment:
         """Add a comment to the mod page. You can specify a comment to reply too.
 
         |coro|
@@ -412,7 +413,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         comment = self.connection.post_request(f"/games/{self.game_id}/mods/{self.id}/comments", data=data)
         return Comment(connection=self.connection, mod=self, **comment)
 
-    async def async_add_comment(self, content, *, reply=None):
+    async def async_add_comment(self, content: str, *, reply: int = None) -> Comment:
         data = {"content": content}
         if reply:
             data["reply_id"] = reply.id
@@ -422,7 +423,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         )
         return Comment(connection=self.connection, mod=self, **comment)
 
-    def get_stats(self):
+    def get_stats(self) -> ModStats:
         """Returns a ModStats object, representing a series of stats for the mod.
 
         |coro|
@@ -436,12 +437,12 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         self.stats = stats = ModStats(**stats_json)
         return stats
 
-    async def async_get_stats(self):
+    async def async_get_stats(self) -> ModStats:
         stats_json = await self.connection.async_get_request(f"/games/{self.game_id}/mods/{self.id}/stats")
         self.stats = stats = ModStats(**stats_json)
         return stats
 
-    def edit(self, **fields):
+    def edit(self, **fields) -> "Mod":
         """Used to edit the mod details. Sucessful editing will return the updated mod.
 
         |coro|
@@ -481,7 +482,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         mod_json = self.connection.put_request(f"/games/{self.game_id}/mods/{self.id}", data=fields)
         return self.__class__(connection=self.connection, **mod_json)
 
-    async def async_edit(self, **fields):
+    async def async_edit(self, **fields) -> "Mod":
         fields = _clean_and_convert(fields)
         mod_json = await self.connection.async_put_request(
             f"/games/{self.game_id}/mods/{self.id}", data=fields
@@ -502,7 +503,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         self.status = 3
         return resp
 
-    def add_file(self, file: NewModFile):
+    def add_file(self, file: NewModFile) -> ModFile:
         """Adds a new file to the mod, to do so first construct an instance of NewModFile
         and then pass it to the function.
 
@@ -534,7 +535,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
         return ModFile(**file_json, game_id=self.game_id, connection=self.connection)
 
-    async def async_add_file(self, file: NewModFile):
+    async def async_add_file(self, file: NewModFile) -> ModFile:
         file_d = file.__dict__.copy()
         file_file = file_d.pop("file")
 
@@ -564,7 +565,14 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
         return media, links
 
-    def add_media(self, *, logo=None, images=(), youtube=(), sketchfab=()):
+    def add_media(
+        self,
+        *,
+        logo: Optional[str] = None,
+        images: Optional[Union[str, List[str]]] = (),
+        youtube: List[str] = (),
+        sketchfab: List[str] = (),
+    ):
         """Upload new media to the mod.
 
         |coro|
@@ -606,7 +614,14 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
         return Message(**media_json)
 
-    async def async_add_media(self, *, logo=None, images=(), youtube=(), sketchfab=()):
+    async def async_add_media(
+        self,
+        *,
+        logo: Optional[str] = None,
+        images: Optional[Union[str, List[str]]] = (),
+        youtube: List[str] = (),
+        sketchfab: List[str] = (),
+    ):
         medias, links = self._prepare_media(logo, images, youtube, sketchfab)
 
         try:
@@ -630,7 +645,13 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
         return fields
 
-    def delete_media(self, *, images=(), youtube=(), sketchfab=()):
+    def delete_media(
+        self,
+        *,
+        images: Optional[List[str]] = (),
+        youtube: Optional[List[str]] = (),
+        sketchfab: Optional[List[str]] = (),
+    ):
         """Delete media from the mod page.
 
         |coro|
@@ -651,14 +672,20 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         )
         return resp
 
-    async def async_delete_media(self, *, images=(), youtube=(), sketchfab=()):
+    async def async_delete_media(
+        self,
+        *,
+        images: Optional[List[str]] = (),
+        youtube: Optional[List[str]] = (),
+        sketchfab: Optional[List[str]] = (),
+    ):
         resp = await self.connection.async_delete_request(
             f"/games/{self.game_id}/mods/{self.id}/media",
             data=self._prepare_delete_media(images, youtube, sketchfab),
         )
         return resp
 
-    def subscribe(self):
+    def subscribe(self) -> "Mod":
         """Subscribe to the mod. Returns None if user is already subscribed.
 
         |coro|
@@ -671,7 +698,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         mod_json = self.connection.post_request(f"/games/{self.game_id}/mods/{self.id}/subscribe")
         return Mod(connection=self.connection, **mod_json)
 
-    async def async_subscribe(self):
+    async def async_subscribe(self) -> "Mod":
         mod_json = await self.connection.async_post_request(f"/games/{self.game_id}/mods/{self.id}/subscribe")
         return Mod(connection=self.connection, **mod_json)
 
@@ -687,7 +714,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         resp = await self.connection.async_delete_request(f"/games/{self.game_id}/mods/{self.id}/subscribe")
         return resp
 
-    def add_tags(self, *tags):
+    def add_tags(self, *tags: str):
         """Add tags to a mod, tags are case insensitive and duplicates will be removed. Tags
         which are not in the game's tag_options will not be added.
 
@@ -705,7 +732,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
         return Message(**message)
 
-    async def async_add_tags(self, *tags):
+    async def async_add_tags(self, *tags: str):
         fields = {f"tags[{index}]": tag for index, tag in enumerate(tags)}
 
         message = await self.connection.async_post_request(
@@ -714,7 +741,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
         return Message(**message)
 
-    def delete_tags(self, *tags):
+    def delete_tags(self, *tags: str):
         """Delete tags from the mod, tags are case insensitive and duplicates will be removed. Providing
         no arguments will remove every tag from the mod.
 
@@ -722,14 +749,14 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
         Parameters
         -----------
-        tags : list
+        tags : List[str]
             List of tags to remove, if no list is provided, will remove every tag from the mod.
 
         """
         fields = {f"tags[{index}]": tag for index, tag in enumerate(tags)} if tags else {"tags[]": ""}
         self.connection.delete_request(f"/games/{self.game_id}/mods/{self.id}/tags", data=fields)
 
-    async def async_delete_tags(self, *tags):
+    async def async_delete_tags(self, *tags: str):
         fields = {f"tags[{index}]": tag for index, tag in enumerate(tags)} if tags else {"tags[]": ""}
         await self.connection.async_delete_request(f"/games/{self.game_id}/mods/{self.id}/tags", data=fields)
 
@@ -848,7 +875,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
 
         return resp
 
-    def add_dependencies(self, dependencies: list):
+    def add_dependencies(self, dependencies: List[Union[int, "Mod"]]):
         """Add mod dependencies required by the corresponding mod. A dependency is a mod
         that should be installed for this mod to run.
 
@@ -868,7 +895,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         )
         return Message(**resp)
 
-    async def async_add_dependencies(self, dependencies: list):
+    async def async_add_dependencies(self, dependencies: List[Union[int, "Mod"]]):
         dependency = {
             f"dependencies[{index}]": getattr(data, "id", data) for index, data in enumerate(dependencies)
         }
@@ -877,7 +904,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         )
         return Message(**resp)
 
-    def delete_dependencies(self, dependencies: list):
+    def delete_dependencies(self, dependencies: List[Union[int, "Mod"]]):
         """Delete mod dependecies required by this mod. You must
         supply at least one dependency.
 
@@ -898,7 +925,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         resp = self.connection.delete_request(f"/games/{self.game_id}/mods/{self.id}/dependencies", data=data)
         return resp
 
-    async def async_delete_dependencies(self, dependencies: list):
+    async def async_delete_dependencies(self, dependencies: List[Union[int, "Mod"]]):
         if not dependencies:
             raise modioException("Please supply at least on dependency to be deleted.")
 
@@ -911,7 +938,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         )
         return resp
 
-    def add_team_member(self, email, level, *, position=None):
+    def add_team_member(self, email: str, level: Level, *, position: Optional[str] = None):
         """Add a user to the mod team. Will fire a MOD_TEAM_CHANGED event.
 
         |coro|
@@ -930,7 +957,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         msg = self.connection.post_request(f"/games/{self.game_id}/mods/{self.id}/team", data=data)
         return Message(**msg)
 
-    async def async_add_team_member(self, email, level, *, position=None):
+    async def async_add_team_member(self, email: str, level: Level, *, position: Optional[str] = None):
         data = {"email": email, "level": level.value, "position": position}
         msg = await self.connection.async_post_request(
             f"/games/{self.game_id}/mods/{self.id}/team", data=data
