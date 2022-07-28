@@ -6,14 +6,14 @@ from . import entities
 
 
 class ReportMixin:
-    """Mixin for entities that can be reported, requireds 'resource_type' to
+    """Mixin for entities that can be reported, requireds '_resource_type' to
     be defined at a class level.
     """
 
     def _make_report_dict(self, name, summary, report_type):  # pragma: no cover
         return {
             "id": self.id,
-            "resource": self.resource_type,
+            "resource": self._resource_type,
             "name": name,
             "type": report_type.value,
             "summary": summary,
@@ -122,13 +122,13 @@ class OwnerMixin:
             The original submitter
         """
         user = self.connection.post_request(
-            "/general/ownership", data={"resource_type": self.resource_type, "resource_id": self.id}
+            "/general/ownership", data={"resource_type": self._resource_type, "resource_id": self.id}
         )
         return entities.User(connection=self.connection, **user)
 
     async def async_get_owner(self) -> 'entities.User':
         user = await self.connection.async_post_request(
-            "/general/ownership", data={"resource_type": self.resource_type, "resource_id": self.id}
+            "/general/ownership", data={"resource_type": self._resource_type, "resource_id": self.id}
         )
         return entities.User(connection=self.connection, **user)
 

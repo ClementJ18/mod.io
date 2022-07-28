@@ -1,6 +1,6 @@
 .. currentmodule:: modio
 
-Misc mod.io Models
+Misc Models
 --------------------
 Documentation on all the other objects returned by mod.io requests which are not large enough to warrant their own page.
 

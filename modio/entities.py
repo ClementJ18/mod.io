@@ -301,7 +301,7 @@ class ModFile(OwnerMixin):
         was returned from the me/modfiles endpoint.
     """
 
-    resource_type = "files"
+    _resource_type = "files"
 
     def __init__(self, **attrs):
         self.id = attrs.pop("id")
@@ -692,7 +692,7 @@ class User(ReportMixin):
 
     """
 
-    resource_type = "users"
+    _resource_type = "users"
 
     def __init__(self, **attrs):
         self.id = attrs.pop("id")

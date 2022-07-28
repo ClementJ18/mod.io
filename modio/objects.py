@@ -407,8 +407,9 @@ class Returned(typing_extensions.NamedTuple, typing.Generic[Result]):
 
     Attributes
     ----------
-    results : List[Any]
-        The list of results returned
+    results : List[Result]
+        The list of results returned. This is typed accordingly to
+        the method that returns it.
     pagination : Pagination
         Pagination metadata attached to the results
     """

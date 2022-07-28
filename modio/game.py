@@ -77,7 +77,7 @@ class Game(ReportMixin, OwnerMixin):
         Platforms this games supports
     """
 
-    resource_type = "games"
+    _resource_type = "games"
 
     def __init__(self, **attrs):
         self.id = attrs.pop("id")

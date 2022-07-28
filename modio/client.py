@@ -1,4 +1,7 @@
-"""Client used to interact with the API at a base level."""
+"""The Client object is the base class from which all the requests are made,
+this is where you can get your  games, authentify and get the models for
+your authenticated user.
+"""
 import asyncio
 import datetime
 import logging
@@ -218,8 +221,8 @@ class Connection:
 
 
 class Client:
-    """Represents the base-level client to make requests to the mod.io API with. Upon
-    initializiation the Client will confirm the api key and O Auth 2 token.
+    """Represents an authenticated client to make requests to the mod.io API with. If you desire
+    to make aysnc requests you must call :ref:`Client.start` before making any async request.
 
     Parameters
     -----------
@@ -241,9 +244,6 @@ class Client:
     version : Optional[str]
         An optional keyword argument to allow you to pick a specific version of the API to query,
         usually you shouldn't need to change this. Default is the latest supported version.
-    loop : Optional[asyncio.EventLoop]
-        |async| An optional keyword argument allowing you to pass a loop, if no loop is passed the Client
-        will get the current event loop.
 
     Attributes
     -----------
@@ -585,7 +585,7 @@ class Client:
 
         Returns
         --------
-        Returned[List[Users], Pagination]
+        Returned[List[User], Pagination]
             The results and pagination tuple from this request
         """
 

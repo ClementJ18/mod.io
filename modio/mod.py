@@ -92,7 +92,7 @@ class Mod(ReportMixin, RatingMixin, OwnerMixin):
         description field converted into plaintext.
     """
 
-    resource_type = "mods"
+    _resource_type = "mods"
     mod_key = "id"
 
     def __init__(self, **attrs):
