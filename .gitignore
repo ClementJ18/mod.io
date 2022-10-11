@@ -5,3 +5,5 @@ tests/config.py
 report.html
 .coverage
 pytest-coverage.txt
+dist/
+mod.io.egg-info/
