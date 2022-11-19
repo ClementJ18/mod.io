@@ -8,6 +8,18 @@ The page attempt to keep a clear list of breaking/non-breaking changes and new f
    :local:
    :backlinks: none
 
+v0.4.2
+-------
+
+New Features
+##############
+* `ModFile` now has a `platforms` attribute
+
+Bugs Fixed
+###########
+* `Game` now properly has a `platforms` attribute
+* `Filter.max` no longer overflows
+
 v0.4.1
 -------
 Small dependency bugfix

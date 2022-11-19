@@ -113,7 +113,7 @@ class Game(ReportMixin, OwnerMixin):
         self.stats = None
         # self.theme = Theme(**attrs.pop("theme"))
         self.other_urls = {value["label"]: value["url"] for value in attrs.pop("other_urls")}
-        self.paltform = [Platform(**platform) for platform in attrs.pop("platforms")]
+        self.platforms = [Platform(**platform) for platform in attrs.pop("platforms")]
 
         _submitter = attrs.pop("submitted_by", {})
         if _submitter:
