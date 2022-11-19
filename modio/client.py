@@ -28,7 +28,7 @@ class Connection:
 
         self.rate_limit = None
         self.rate_remain = None
-        self.rate_retry = 0
+        self.retry_after = 0
 
         self.session = requests.Session()
         self._async_session = None
@@ -52,7 +52,7 @@ class Connection:
         return f"https://api.mod.io/{self.version}"
 
     def __repr__(self):
-        return f"<Connection rate_limit={self.rate_limit} rate_retry={self.rate_retry} rate_remain={self.rate_remain}>"
+        return f"<Connection retry_after={self.retry_after}>"
 
     async def close(self):
         """Close session"""
@@ -63,20 +63,18 @@ class Connection:
         self.async_session = aiohttp.ClientSession()
 
     def enforce_ratelimit(self):
-        if self.rate_retry > 0:
-            logging.info("Ratelimited, sleeping for %s seconds", self.rate_retry)
-            time.sleep(self.rate_retry)
+        if self.retry_after > 0:
+            logging.info("Ratelimited, sleeping for %s seconds", self.retry_after)
+            time.sleep(self.retry_after)
 
     async def async_enforce_ratelimit(self):
-        if self.rate_retry > 0:
-            logging.info("Ratelimited, sleeping for %s seconds", self.rate_retry)
-            await asyncio.sleep(self.rate_retry)
+        if self.retry_after > 0:
+            logging.info("Ratelimited, sleeping for %s seconds", self.retry_after)
+            await asyncio.sleep(self.retry_after)
 
     def _error_check(self, resp, request_json):
         """Updates the rate-limit attributes and check validity of the request."""
-        self.rate_limit = resp.headers.get("X-RateLimit-Limit", self.rate_limit)
-        self.rate_remain = resp.headers.get("X-RateLimit-Remaining", self.rate_remain)
-        self.rate_retry = resp.headers.get("X-Ratelimit-RetryAfter", 0)
+        self.retry_after = resp.headers.get("retry-after", 0)
         code = getattr(resp, "status_code", getattr(resp, "status", None))
 
         if code == 204:
@@ -126,8 +124,13 @@ class Connection:
         except requests.JSONDecodeError:
             resp_json = {}
 
-        data = self._error_check(resp, resp_json)
-        self.enforce_ratelimit()
+        try: 
+            data = self._error_check(resp, resp_json)
+        except modioException as e:
+            if e.code == 429:
+                self.enforce_ratelimit()
+            
+            raise e
 
         return data
 
@@ -162,8 +165,14 @@ class Connection:
         except aiohttp.ContentTypeError:
             resp_json = {}
 
-        data = self._error_check(resp, resp_json)
-        await self.async_enforce_ratelimit()
+
+        try: 
+            data = self._error_check(resp, resp_json)
+        except modioException as e:
+            if e.code == 429:
+                await self.async_enforce_ratelimit()
+            
+            raise e
 
         return data
 
@@ -252,7 +261,7 @@ class Client:
     rate_remain : int
         Number of requests remaining. Once this number hits 0 the requests will become
         rejected and the library will sleep until the limit resets then raise 429 TooManyRequests.
-    rate_retry : int
+    retry_after : int
         Number of seconds until the rate limits are reset for this API Key/access token.
         Is 0 until the rate_remain is 0 and becomes 0 again once the rate limit is reset.
     """
@@ -277,8 +286,8 @@ class Client:
         return self.connection.rate_remain
 
     @property
-    def rate_retry(self):
-        return self.connection.rate_retry
+    def retry_after(self):
+        return self.connection.retry_after
 
     async def close(self):
         """|async| This function is used to clean up the client in order to close the application that it uses gracefully.

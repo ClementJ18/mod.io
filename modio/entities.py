@@ -299,6 +299,8 @@ class ModFile(OwnerMixin):
     game_id : int
         ID of the game of the mod this file belongs to. Can be None if this file
         was returned from the me/modfiles endpoint.
+    platforms : List[Platform]
+        List of platforms this file is avalaible on.
     """
 
     _resource_type = "files"
@@ -321,6 +323,7 @@ class ModFile(OwnerMixin):
         self.url = download["binary_url"]
         self.date_expires = _convert_date(download.pop("date_expires"))
         self.game_id = attrs.pop("game_id", None)
+        self.platforms = [Platform(**platform) for platform in attrs.pop("platforms")]
         self.connection = attrs.pop("connection")
 
     def __repr__(self):

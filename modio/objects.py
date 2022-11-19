@@ -377,7 +377,7 @@ class Pagination:
 
     def max(self):
         """Returns True if there are no additional results after this set."""
-        return (self.offset + self.count) == self.total
+        return (self.offset + self.count) >= self.total
 
     def min(self):
         """Returns True if there are no additional results before this set."""
