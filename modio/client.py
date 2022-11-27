@@ -74,7 +74,7 @@ class Connection:
 
     def _error_check(self, resp, request_json):
         """Updates the rate-limit attributes and check validity of the request."""
-        self.retry_after = resp.headers.get("retry-after", 0)
+        self.retry_after = int(resp.headers.get("retry-after", "0"))
         code = getattr(resp, "status_code", getattr(resp, "status", None))
 
         if code == 204:
