@@ -124,12 +124,12 @@ class Connection:
         except requests.JSONDecodeError:
             resp_json = {}
 
-        try: 
+        try:
             data = self._error_check(resp, resp_json)
         except modioException as e:
             if e.code == 429:
                 self.enforce_ratelimit()
-            
+
             raise e
 
         return data
@@ -165,13 +165,12 @@ class Connection:
         except aiohttp.ContentTypeError:
             resp_json = {}
 
-
-        try: 
+        try:
             data = self._error_check(resp, resp_json)
         except modioException as e:
             if e.code == 429:
                 await self.async_enforce_ratelimit()
-            
+
             raise e
 
         return data
