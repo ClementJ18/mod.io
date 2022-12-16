@@ -8,6 +8,19 @@ The page attempt to keep a clear list of breaking/non-breaking changes and new f
    :local:
    :backlinks: none
 
+v0.4.3
+-------
+
+New Features
+#############
+* `Platform` object has been split into `GamePlatform`, `ModPlatform` and `ModFilePlatform` to better reflect the API models
+* New `Mod.platforms` attribute
+* `Game.platforms`is now a `List[GamePlatform]`, different class but same attributes
+
+Bugs Fixed
+###########
+* `Modfile.platforms` fixed, now a `List[ModFilePlatforms]` with correct attributes
+
 v0.4.2
 -------
 
@@ -76,4 +89,3 @@ Removed Features
 * Many of exceptions have been removed, the library now uses the base exception for most errors
 * Removed the account links support, looking into a better implementation
 * Many removed endpoints have had their method also removed
-* 

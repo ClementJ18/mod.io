@@ -45,6 +45,19 @@ class Status(enum.Enum):
     deleted = 3
 
 
+class ModFilePlatformStatus:
+    """Status of a modfile for the specific platform.
+
+    0 : Pending
+    1 : Accepted
+    2 : Denied
+    """
+
+    pending = 0
+    accepted = 1
+    denied = 2
+
+
 class Presentation(enum.Enum):
     """
     0 : Display mods for that game in a grid on mod.io

@@ -3,7 +3,7 @@ import json
 from typing import List, Literal, Optional
 
 from .mod import Mod
-from .entities import Event, Image, Message, GameStats, ModStats, Platform, TagOption, User
+from .entities import Event, Image, Message, GameStats, ModStats, GamePlatform, TagOption, User
 from .objects import Filter, NewMod, Pagination, Returned
 from .utils import _convert_date, find
 from .enums import APIAccess, Community, Curation, MaturityOptions, Presentation, Revenue, Status, Submission
@@ -73,7 +73,7 @@ class Game(ReportMixin, OwnerMixin):
     other_urls : Dict[str, str]
         A dictionnary of labels and urls for
         the game
-    platforms : List[Platform]
+    platforms : List[GamePlatform]
         Platforms this games supports
     """
 
@@ -113,7 +113,7 @@ class Game(ReportMixin, OwnerMixin):
         self.stats = None
         # self.theme = Theme(**attrs.pop("theme"))
         self.other_urls = {value["label"]: value["url"] for value in attrs.pop("other_urls")}
-        self.platforms = [Platform(**platform) for platform in attrs.pop("platforms")]
+        self.platforms = [GamePlatform(**platform) for platform in attrs.pop("platforms")]
 
         _submitter = attrs.pop("submitted_by", {})
         if _submitter:

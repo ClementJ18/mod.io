@@ -111,7 +111,7 @@ class RatingMixin:
 class OwnerMixin:
     """Mixin containing get owner methods."""
 
-    def get_owner(self) -> 'entities.User':
+    def get_owner(self) -> "entities.User":
         """Get the original submitter of the resource.
 
         |coro|
@@ -126,7 +126,7 @@ class OwnerMixin:
         )
         return entities.User(connection=self.connection, **user)
 
-    async def async_get_owner(self) -> 'entities.User':
+    async def async_get_owner(self) -> "entities.User":
         user = await self.connection.async_post_request(
             "/general/ownership", data={"resource_type": self._resource_type, "resource_id": self.id}
         )

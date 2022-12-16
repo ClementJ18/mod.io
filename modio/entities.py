@@ -4,7 +4,7 @@ import time
 from .mixins import OwnerMixin, RatingMixin, ReportMixin, StatsMixin
 from .errors import modioException
 from .utils import concat_docs, _convert_date
-from .enums import EventType, RatingType, TargetPlatform, VirusStatus
+from .enums import EventType, RatingType, TargetPlatform, VirusStatus, ModFilePlatformStatus
 
 
 class Message:
@@ -299,7 +299,7 @@ class ModFile(OwnerMixin):
     game_id : int
         ID of the game of the mod this file belongs to. Can be None if this file
         was returned from the me/modfiles endpoint.
-    platforms : List[Platform]
+    platforms : List[ModFilePlatform]
         List of platforms this file is avalaible on.
     """
 
@@ -323,7 +323,7 @@ class ModFile(OwnerMixin):
         self.url = download["binary_url"]
         self.date_expires = _convert_date(download.pop("date_expires"))
         self.game_id = attrs.pop("game_id", None)
-        self.platforms = [Platform(**platform) for platform in attrs.pop("platforms")]
+        self.platforms = [ModFilePlatform(**platform) for platform in attrs.pop("platforms")]
         self.connection = attrs.pop("connection")
 
     def __repr__(self):
@@ -436,8 +436,15 @@ class ModMedia:
         self.images = [Image(**image) for image in attrs.pop("images", [])]
 
 
-class Platform:
-    """A platform
+class BasePlatform:
+    """Base class for a platform."""
+
+    def __init__(self, **attrs):
+        self.platform = TargetPlatform[attrs.pop("platform")]
+
+
+class GamePlatform(BasePlatform):
+    """The platform for a game.
 
     Attributes
     ----------
@@ -450,9 +457,41 @@ class Platform:
     """
 
     def __init__(self, **attrs):
-        self.platform = TargetPlatform[attrs.pop("platform")]
+        super().__init__(**attrs)
         self.label = attrs.pop("label")
         self.moderated = attrs.pop("moderated")
+
+
+class ModPlatform(BasePlatform):
+    """The platform for a mod
+
+    Attributes
+    ------------
+    platform : TargetPlatform
+        The platform
+    modfile_live : int
+        The ID of the modfile currently live for that platform.
+    """
+
+    def __init__(self, **attrs):
+        super().__init__(**attrs)
+        self.modfile_live = attrs.pop("modfile_live")
+
+
+class ModFilePlatform:
+    """The platform for a mod file
+
+    Attributes
+    -----------
+    platform : TargetPlatform
+        The platform
+    status : ModFilePlatformStatus
+        The status of the modfile for the corresponding platform.
+    """
+
+    def __init__(self, **attrs):
+        super().__init__(**attrs)
+        self.status = ModFilePlatformStatus(attrs.pop("status"))
 
 
 class TagOption:
