@@ -74,7 +74,7 @@ class Connection:
 
     def _error_check(self, resp, request_json):
         """Updates the rate-limit attributes and check validity of the request."""
-        self.retry_after = resp.headers.get("retry-after", 0)
+        self.retry_after = int(resp.headers.get("retry-after", "0"))
         code = getattr(resp, "status_code", getattr(resp, "status", None))
 
         if code == 204:
@@ -124,12 +124,12 @@ class Connection:
         except requests.JSONDecodeError:
             resp_json = {}
 
-        try: 
+        try:
             data = self._error_check(resp, resp_json)
         except modioException as e:
             if e.code == 429:
                 self.enforce_ratelimit()
-            
+
             raise e
 
         return data
@@ -165,13 +165,12 @@ class Connection:
         except aiohttp.ContentTypeError:
             resp_json = {}
 
-
-        try: 
+        try:
             data = self._error_check(resp, resp_json)
         except modioException as e:
             if e.code == 429:
                 await self.async_enforce_ratelimit()
-            
+
             raise e
 
         return data
