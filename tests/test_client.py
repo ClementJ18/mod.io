@@ -71,3 +71,31 @@ class TestClient(unittest.TestCase):
             run(client.async_get_game(games.results[0].id))
 
         run(client.close())
+
+    def test_platform(self):
+        client = modio.Client(api_key=game_api_key, test=True)
+
+        assert client.connection.platform is None
+
+        client.set_platform(modio.enums.TargetPlatform.linux)
+
+        assert client.connection.platform is modio.enums.TargetPlatform.linux
+
+        headers = client.connection._define_headers(2)
+
+        assert "X-Modio-Platform" in headers
+        assert headers["X-Modio-Platform"] is modio.enums.TargetPlatform.linux.value
+
+    def test_portal(self):
+        client = modio.Client(api_key=game_api_key, test=True)
+
+        assert client.connection.portal is None
+
+        client.set_portal(modio.enums.TargetPortal.facebook)
+
+        assert client.connection.portal is modio.enums.TargetPortal.facebook
+
+        headers = client.connection._define_headers(2)
+
+        assert "X-Modio-Portal" in headers
+        assert headers["X-Modio-Portal"] is modio.enums.TargetPortal.facebook.value

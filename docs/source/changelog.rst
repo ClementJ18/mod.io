@@ -8,6 +8,17 @@ The page attempt to keep a clear list of breaking/non-breaking changes and new f
    :local:
    :backlinks: none
 
+v0.5
+------
+This patch adds support for targetting platforms and portals
+
+New Features
+#############
+* New `platform` and `portal` parameters for `Client`
+* New `Client.set_portal` and `Client.set_platform` methods
+* New `TargetPortal` to represent portals
+
+
 v0.4.3
 -------
 
