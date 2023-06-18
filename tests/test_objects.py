@@ -16,7 +16,7 @@ except ModuleNotFoundError:
     game_id = os.environ["GAME_ID"]
     mod_id = os.environ["MOD_ID"]
 
-from .utils import run
+from .utils import run, use_test_env
 
 event_params = {
     "id": 13,
@@ -41,7 +41,7 @@ class TestEvent(unittest.TestCase):
 
 class TestComment(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(access_token=access_token, test=True)
+        self.client = modio.Client(access_token=access_token, test=use_test_env)
         run(self.client.start())
 
         self.game = self.client.get_game(game_id)
@@ -81,7 +81,7 @@ class TestComment(unittest.TestCase):
 
 class TestModFile(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(access_token=access_token, test=True)
+        self.client = modio.Client(access_token=access_token, test=use_test_env)
         run(self.client.start())
 
         self.game = self.client.get_game(game_id)
@@ -138,7 +138,7 @@ class TestModFile(unittest.TestCase):
 
 class TestRating(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(access_token=access_token, test=True)
+        self.client = modio.Client(access_token=access_token, test=use_test_env)
         run(self.client.start())
 
         self.mod = self.client.get_my_mods(filters=modio.Filter().equals(id=mod_id)).results[0]
@@ -165,7 +165,7 @@ class TestRating(unittest.TestCase):
 
 class TestStats(unittest.TestCase):
     def test_stats(self):
-        client = modio.Client(access_token=access_token, test=True)
+        client = modio.Client(access_token=access_token, test=use_test_env)
         run(client.start())
 
         game = client.get_game(game_id)
@@ -176,7 +176,7 @@ class TestStats(unittest.TestCase):
 
 class TestTeamMember(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(access_token=access_token, test=True)
+        self.client = modio.Client(access_token=access_token, test=use_test_env)
         run(self.client.start())
 
         self.game = self.client.get_game(game_id)
@@ -239,13 +239,13 @@ class TestFilter(unittest.TestCase):
         filters.limit(56)
         filters.offset(49)
 
-        client = modio.Client(access_token=access_token, test=True)
+        client = modio.Client(access_token=access_token, test=use_test_env)
         client.get_my_mods(filters=filters)
 
 
 class TestPagination(unittest.TestCase):
     def test_pagination(self):
-        client = modio.Client(access_token=access_token, test=True)
+        client = modio.Client(access_token=access_token, test=use_test_env)
         mods = client.get_my_mods()
         pagination = mods.pagination
 

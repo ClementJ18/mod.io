@@ -5,10 +5,9 @@
 
 
 A wrapper for the mod.io API in Python. 
-* [Docs](https://modio.readthedocs.io/en/latest/) 
+* [Docs](https://modio.readthedocs.io) 
 * [Support](https://discord.gg/Hkq7X7n)
 
-Looking for the async wrapper? [Click here](https://github.com/ClementJ18/mod.io/tree/async)
 
 ## Basic Examples
 ```py

@@ -10,12 +10,12 @@ except ModuleNotFoundError:
     access_token = os.environ["ACCESS_TOKEN"]
     game_id = os.environ["GAME_ID"]
 
-from .utils import run
+from .utils import run, use_test_env
 
 
 class TestGame(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(access_token=access_token, test=True)
+        self.client = modio.Client(access_token=access_token, test=use_test_env)
         run(self.client.start())
 
         self.game = self.client.get_game(game_id)
@@ -25,10 +25,10 @@ class TestGame(unittest.TestCase):
         run(self.client.close())
 
     def test_gets(self):
-        mods = self.game.get_mods()
+        mods = self.game.get_mods().results
 
         if mods:
-            self.game.get_mod(mods.results[0].id)
+            self.game.get_mod(mods[0].id)
 
         self.game.get_mod_events()
         self.game.get_tag_options()
@@ -79,10 +79,10 @@ class TestGame(unittest.TestCase):
         self.game.add_mod(newmod)
 
     def test_async_gets(self):
-        mods = run(self.game.async_get_mods())
+        mods = run(self.game.async_get_mods()).results
 
         if mods:
-            run(self.game.async_get_mod(mods.results[0].id))
+            run(self.game.async_get_mod(mods[0].id))
 
         run(self.game.async_get_mod_events())
         run(self.game.async_get_tag_options())
