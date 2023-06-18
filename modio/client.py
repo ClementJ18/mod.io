@@ -128,7 +128,7 @@ class Connection:
 
         return headers
 
-    def _post(self, resp):
+    def _post_process(self, resp):
         try:
             resp_json = resp.json()
         except requests.JSONDecodeError:
@@ -155,21 +155,21 @@ class Connection:
             h_type = 2
 
         resp = self.session.get(self._base_path + url, headers=self._define_headers(h_type), params=extra)
-        return self._post(resp)
+        return self._post_process(resp)
 
     def post_request(self, url, *, h_type=0, **fields):
         resp = self.session.post(self._base_path + url, headers=self._define_headers(h_type), **fields)
-        return self._post(resp)
+        return self._post_process(resp)
 
     def put_request(self, url, *, h_type=0, **fields):
         resp = self.session.put(self._base_path + url, headers=self._define_headers(h_type), **fields)
-        return self._post(resp)
+        return self._post_process(resp)
 
     def delete_request(self, url, *, h_type=0, **fields):
         resp = self.session.delete(self._base_path + url, headers=self._define_headers(h_type), **fields)
-        return self._post(resp)
+        return self._post_process(resp)
 
-    async def _async_post(self, resp):
+    async def _async_post_process(self, resp):
         try:
             resp_json = await resp.json()
         except aiohttp.ContentTypeError:
@@ -198,7 +198,7 @@ class Connection:
         async with self.async_session.get(
             self._base_path + url, headers=self._define_headers(h_type), params=extra
         ) as resp:
-            return await self._async_post(resp)
+            return await self._async_post_process(resp)
 
     async def async_post_request(self, url, *, h_type=0, **fields):
         files = fields.pop("files", {})
@@ -223,19 +223,19 @@ class Connection:
         async with self.async_session.post(
             self._base_path + url, headers=self._define_headers(h_type), data=form
         ) as resp:
-            return await self._async_post(resp)
+            return await self._async_post_process(resp)
 
     async def async_put_request(self, url, *, h_type=0, **fields):
         async with self.async_session.put(
             self._base_path + url, headers=self._define_headers(h_type), **fields
         ) as resp:
-            return await self._async_post(resp)
+            return await self._async_post_process(resp)
 
     async def async_delete_request(self, url, *, h_type=0, **fields):
         async with self.async_session.delete(
             self._base_path + url, headers=self._define_headers(h_type), **fields
         ) as resp:
-            return await self._async_post(resp)
+            return await self._async_post_process(resp)
 
 
 class Client:
@@ -269,14 +269,9 @@ class Client:
 
     Attributes
     -----------
-    rate_limit : int
-        Number of requests that can be made using the supplied API Key/access token.
-    rate_remain : int
-        Number of requests remaining. Once this number hits 0 the requests will become
-        rejected and the library will sleep until the limit resets then raise 429 TooManyRequests.
     retry_after : int
         Number of seconds until the rate limits are reset for this API Key/access token.
-        Is 0 until the rate_remain is 0 and becomes 0 again once the rate limit is reset.
+        Is 0 until the the API returns a 429.
     """
 
     def __init__(self, *, api_key=None, access_token=None, lang="en", version="v1", test=False, platform=None, portal=None):

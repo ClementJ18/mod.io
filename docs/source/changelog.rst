@@ -8,7 +8,7 @@ The page attempt to keep a clear list of breaking/non-breaking changes and new f
    :local:
    :backlinks: none
 
-v0.5
+v0.5.0
 ------
 This patch adds support for targetting platforms and portals
 
