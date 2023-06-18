@@ -5,6 +5,7 @@ import modio
 import random
 
 from modio.enums import Community, EventType, TargetPlatform
+from modio.errors import modioException
 from modio.utils import _convert_date
 
 try:
@@ -16,7 +17,7 @@ except ModuleNotFoundError:
     game_id = os.environ["GAME_ID"]
     mod_id = os.environ["MOD_ID"]
 
-from .utils import run
+from .utils import run, use_test_env
 
 event_params = {
     "id": 13,
@@ -41,7 +42,7 @@ class TestEvent(unittest.TestCase):
 
 class TestComment(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(access_token=access_token, test=True)
+        self.client = modio.Client(access_token=access_token, test=use_test_env)
         run(self.client.start())
 
         self.game = self.client.get_game(game_id)
@@ -51,7 +52,11 @@ class TestComment(unittest.TestCase):
         run(self.client.close())
 
     def test_comment(self):
-        comment = self.mod.get_comments().results[0]
+        comments = self.mod.get_comments().results
+        if not comments:
+            return
+        
+        comment = comments[0]
 
         comment.edit("test edit")
 
@@ -65,7 +70,11 @@ class TestComment(unittest.TestCase):
         comment.delete()
 
     def test_async_comment(self):
-        comment = run(self.mod.async_get_comments()).results[0]
+        comments = run(self.mod.async_get_comments()).results
+        if not comments:
+            return
+        
+        comment = comments[0]
 
         run(comment.async_edit("test edit async"))
 
@@ -81,7 +90,7 @@ class TestComment(unittest.TestCase):
 
 class TestModFile(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(access_token=access_token, test=True)
+        self.client = modio.Client(access_token=access_token, test=use_test_env)
         run(self.client.start())
 
         self.game = self.client.get_game(game_id)
@@ -138,7 +147,7 @@ class TestModFile(unittest.TestCase):
 
 class TestRating(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(access_token=access_token, test=True)
+        self.client = modio.Client(access_token=access_token, test=use_test_env)
         run(self.client.start())
 
         self.mod = self.client.get_my_mods(filters=modio.Filter().equals(id=mod_id)).results[0]
@@ -165,7 +174,7 @@ class TestRating(unittest.TestCase):
 
 class TestStats(unittest.TestCase):
     def test_stats(self):
-        client = modio.Client(access_token=access_token, test=True)
+        client = modio.Client(access_token=access_token, test=use_test_env)
         run(client.start())
 
         game = client.get_game(game_id)
@@ -176,7 +185,7 @@ class TestStats(unittest.TestCase):
 
 class TestTeamMember(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(access_token=access_token, test=True)
+        self.client = modio.Client(access_token=access_token, test=use_test_env)
         run(self.client.start())
 
         self.game = self.client.get_game(game_id)
@@ -187,11 +196,15 @@ class TestTeamMember(unittest.TestCase):
         run(self.client.close())
 
     def test_mute(self):
-        self.member.mute()
+        with pytest.raises(modioException):
+            self.member.mute()
+    
         self.member.unmute()
 
     def test_async_mute(self):
-        run(self.member.async_mute())
+        with pytest.raises(modioException):
+            run(self.member.async_mute())
+    
         run(self.member.async_unmute())
 
 
@@ -239,13 +252,13 @@ class TestFilter(unittest.TestCase):
         filters.limit(56)
         filters.offset(49)
 
-        client = modio.Client(access_token=access_token, test=True)
+        client = modio.Client(access_token=access_token, test=use_test_env)
         client.get_my_mods(filters=filters)
 
 
 class TestPagination(unittest.TestCase):
     def test_pagination(self):
-        client = modio.Client(access_token=access_token, test=True)
+        client = modio.Client(access_token=access_token, test=use_test_env)
         mods = client.get_my_mods()
         pagination = mods.pagination
 

@@ -18,17 +18,34 @@ class IntFlagMixin:
 class TargetPlatform(enum.Enum):
     """Enums for different type of target platforms"""
 
-    windows = enum.auto()
-    mac = enum.auto()
-    linux = enum.auto()
-    android = enum.auto()
-    ios = enum.auto()
-    xboxone = enum.auto()
-    xboxseriesx = enum.auto()
-    ps4 = enum.auto()
-    ps5 = enum.auto()
-    switch = enum.auto()
-    oculus = enum.auto()
+    windows = "Windows"
+    mac = "Mac"
+    linux = "Linux"
+    android = "Android"
+    ios = "iOS"
+    xboxone = "XboxOne"
+    xboxseriesx = "XboxSeriesX"
+    ps4 = "PS4"
+    ps5 = "PS5"
+    switch = "Switch"
+    oculus = "Oculus"
+
+
+class TargetPortal(enum.Enum):
+    """Enums for different type of target portals"""
+
+    apple = "Apply"
+    discord = "Discord"
+    epic = "EGS"
+    facebook = "Facebook"
+    gog = "GOG"
+    google = "Google"
+    itchio = "Itchio"
+    nintendo = "Nintendo"
+    openid = "OpenID"
+    psn = "PSN"
+    steam = "Steam"
+    xboxlive = "XBoxLive"
 
 
 class Status(enum.Enum):
@@ -45,7 +62,7 @@ class Status(enum.Enum):
     deleted = 3
 
 
-class ModFilePlatformStatus:
+class ModFilePlatformStatus(enum.Enum):
     """Status of a modfile for the specific platform.
 
     0 : Pending

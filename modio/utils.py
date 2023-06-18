@@ -1,7 +1,10 @@
 """Utility functions for the library"""
+from functools import wraps
 import inspect
 import enum
 import datetime
+
+from modio.errors import modioException
 
 
 def concat_docs(cls):
@@ -154,3 +157,40 @@ def _clean_and_convert(fields):
 
 def _convert_date(time):
     return datetime.datetime.utcfromtimestamp(time)
+
+
+def ratelimit_retry(max_retries):
+    def wrapper(func):
+        @wraps(func)
+        def retry_logic(*args, **kwargs):
+            for _ in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except modioException as e:
+                    if e.code != 429:
+                        raise e
+                    
+                    error = e
+
+            raise error
+
+        return retry_logic
+    return wrapper
+
+def async_ratelimit_retry(max_retries):
+    def wrapper(func):
+        @wraps(func)
+        async def retry_logic(*args, **kwargs):
+            for _ in range(max_retries):
+                try:
+                    return await func(*args, **kwargs)
+                except modioException as e:
+                    if e.code != 429:
+                        raise e
+                    
+                    error = e
+
+            raise error
+
+        return retry_logic
+    return wrapper

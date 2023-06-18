@@ -8,6 +8,22 @@ The page attempt to keep a clear list of breaking/non-breaking changes and new f
    :local:
    :backlinks: none
 
+v0.5.0
+------
+This patch adds support for targetting platforms and portals
+
+New Features
+#############
+* New `platform` and `portal` parameters for `Client`
+* New `Client.set_portal` and `Client.set_platform` methods
+* New `TargetPortal` to represent portals
+* Library will now retry any ratelimited requests once after sleeping
+
+Bugs Fixed
+###########
+* Fixed ratelimit sleep not being enforced properly
+
+
 v0.4.3
 -------
 

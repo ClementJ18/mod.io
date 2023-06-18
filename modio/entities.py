@@ -478,7 +478,7 @@ class ModPlatform(BasePlatform):
         self.modfile_live = attrs.pop("modfile_live")
 
 
-class ModFilePlatform:
+class ModFilePlatform(BasePlatform):
     """The platform for a mod file
 
     Attributes
