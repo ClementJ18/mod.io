@@ -271,7 +271,7 @@ class Client:
     -----------
     retry_after : int
         Number of seconds until the rate limits are reset for this API Key/access token.
-        Is 0 until the the API returns a 429.
+        Is 0 until the API returns a 429.
     """
 
     def __init__(

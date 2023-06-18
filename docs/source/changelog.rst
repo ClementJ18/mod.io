@@ -18,6 +18,10 @@ New Features
 * New `Client.set_portal` and `Client.set_platform` methods
 * New `TargetPortal` to represent portals
 
+Bugs Fixed
+###########
+* Fixed ratelimit sleep not being enforced properly
+
 
 v0.4.3
 -------
