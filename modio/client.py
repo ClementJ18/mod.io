@@ -274,7 +274,17 @@ class Client:
         Is 0 until the the API returns a 429.
     """
 
-    def __init__(self, *, api_key=None, access_token=None, lang="en", version="v1", test=False, platform=None, portal=None):
+    def __init__(
+        self,
+        *,
+        api_key=None,
+        access_token=None,
+        lang="en",
+        version="v1",
+        test=False,
+        platform=None,
+        portal=None,
+    ):
         self.lang = lang
         self.version = version
         self.test = test

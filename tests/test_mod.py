@@ -16,12 +16,12 @@ except ModuleNotFoundError:
     game_id = os.environ["GAME_ID"]
     mod_id = os.environ["MOD_ID"]
 
-from .utils import run
+from .utils import run, use_test_env
 
 
 class TestMod(unittest.TestCase):
     def setUp(self):
-        self.client = modio.Client(access_token=access_token, test=True)
+        self.client = modio.Client(access_token=access_token, test=use_test_env)
         run(self.client.start())
 
         self.game = self.client.get_game(game_id)
