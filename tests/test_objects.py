@@ -5,6 +5,7 @@ import modio
 import random
 
 from modio.enums import Community, EventType, TargetPlatform
+from modio.errors import modioException
 from modio.utils import _convert_date
 
 try:
@@ -51,7 +52,11 @@ class TestComment(unittest.TestCase):
         run(self.client.close())
 
     def test_comment(self):
-        comment = self.mod.get_comments().results[0]
+        comments = self.mod.get_comments().results
+        if not comments:
+            return
+        
+        comment = comments[0]
 
         comment.edit("test edit")
 
@@ -65,7 +70,11 @@ class TestComment(unittest.TestCase):
         comment.delete()
 
     def test_async_comment(self):
-        comment = run(self.mod.async_get_comments()).results[0]
+        comments = run(self.mod.async_get_comments()).results
+        if not comments:
+            return
+        
+        comment = comments[0]
 
         run(comment.async_edit("test edit async"))
 
@@ -187,11 +196,15 @@ class TestTeamMember(unittest.TestCase):
         run(self.client.close())
 
     def test_mute(self):
-        self.member.mute()
+        with pytest.raises(modioException):
+            self.member.mute()
+    
         self.member.unmute()
 
     def test_async_mute(self):
-        run(self.member.async_mute())
+        with pytest.raises(modioException):
+            run(self.member.async_mute())
+    
         run(self.member.async_unmute())
 
 

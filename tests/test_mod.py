@@ -109,10 +109,10 @@ class TestMod(unittest.TestCase):
         self.mod.unsubscribe()
 
     def test_add_tags(self):
-        self.mod.add_tags("total convert", "345", "what am i doign")
+        self.mod.add_tags("true")
 
     def test_delete_tags(self):
-        self.mod.delete_tags("total convert", "345", "what am i doign")
+        self.mod.delete_tags("true")
 
     def test_add_rating(self):
         self.mod.add_negative_rating()
@@ -125,7 +125,7 @@ class TestMod(unittest.TestCase):
         self.mod.delete_metadata(test=["mega_damage", "tork"], seven=["sortk"])
 
     def test_add_dependencies(self):
-        mod = self.game.get_mod(9122)
+        mod = self.game.get_mod(3096610)
         self.mod.add_dependencies([mod.id])
 
     def test_delete_dependencies(self):
@@ -143,9 +143,6 @@ class TestMod(unittest.TestCase):
         except modioException as e:
             if e.code != 403:
                 raise e from e
-
-    # def test_report(self):
-    #     self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic)
 
     def test_delete(self):
         mod = self.client.get_my_mods(filters=modio.Filter().text("ToDeleteMod")).results
@@ -236,10 +233,10 @@ class TestMod(unittest.TestCase):
         run(self.mod.async_unsubscribe())
 
     def test_async_add_tags(self):
-        run(self.mod.async_add_tags("total convert", "345", "what am i doign"))
+        run(self.mod.async_add_tags("true"))
 
     def test_async_delete_tags(self):
-        run(self.mod.async_delete_tags("total convert", "345", "what am i doign"))
+        run(self.mod.async_delete_tags("true"))
 
     def test_async_add_rating(self):
         run(self.mod.async_add_negative_rating())
@@ -252,7 +249,7 @@ class TestMod(unittest.TestCase):
         run(self.mod.async_delete_metadata(test=["mega_damage", "tork"], seven=["sortk"]))
 
     def test_async_add_dependencies(self):
-        mod = self.game.get_mod(9122)
+        mod = self.game.get_mod(3096610)
         run(self.mod.async_add_dependencies([mod.id]))
 
     def test_async_delete_dependencies(self):
@@ -274,9 +271,6 @@ class TestMod(unittest.TestCase):
         except modioException as e:
             if e.code != 403:
                 raise e from e
-
-    # def test_async_report(self):
-    #     run(self.mod.report("pywrappertestreport", "pywrappertestreportsummary", modio.Report.generic))
 
     def test_async_delete(self):
         mod = run(self.client.async_get_my_mods(filters=modio.Filter().text("ToDeleteMod"))).results

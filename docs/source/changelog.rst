@@ -17,6 +17,7 @@ New Features
 * New `platform` and `portal` parameters for `Client`
 * New `Client.set_portal` and `Client.set_platform` methods
 * New `TargetPortal` to represent portals
+* Library will now retry any ratelimited requests once after sleeping
 
 Bugs Fixed
 ###########

@@ -18,11 +18,11 @@ class TestClient(unittest.TestCase):
     def test_paths(self):
         client = modio.Client(api_key="fake key", test=use_test_env)
         # pylint: disable=W0212
-        assert "test" in client.connection._base_path
+        assert use_test_env == ("test" in client.connection._base_path)
 
-        client.connection.test = False
+        client.connection.test = not use_test_env
         # pylint: disable=W0212
-        assert "test" not in client.connection._base_path
+        assert use_test_env != ("test" in client.connection._base_path)
 
     def test_oauth_access(self):
         client = modio.Client(access_token=access_token, test=use_test_env)

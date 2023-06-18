@@ -10,6 +10,8 @@ from typing import Optional
 import aiohttp
 import requests
 
+from modio.utils import async_ratelimit_retry, ratelimit_retry
+
 from .errors import modioException
 from .entities import Event, Message, ModFile, Rating, User
 from .enums import TargetPlatform, TargetPortal
@@ -144,6 +146,7 @@ class Connection:
 
         return data
 
+    @ratelimit_retry(2)
     def get_request(self, url, *, h_type=0, **fields):
         filters = fields.pop("filters", None)
         filters = (filters or Filter()).get_dict()
@@ -157,14 +160,17 @@ class Connection:
         resp = self.session.get(self._base_path + url, headers=self._define_headers(h_type), params=extra)
         return self._post_process(resp)
 
+    @ratelimit_retry(2)
     def post_request(self, url, *, h_type=0, **fields):
         resp = self.session.post(self._base_path + url, headers=self._define_headers(h_type), **fields)
         return self._post_process(resp)
 
+    @ratelimit_retry(2)
     def put_request(self, url, *, h_type=0, **fields):
         resp = self.session.put(self._base_path + url, headers=self._define_headers(h_type), **fields)
         return self._post_process(resp)
 
+    @ratelimit_retry(2)
     def delete_request(self, url, *, h_type=0, **fields):
         resp = self.session.delete(self._base_path + url, headers=self._define_headers(h_type), **fields)
         return self._post_process(resp)
@@ -185,6 +191,7 @@ class Connection:
 
         return data
 
+    @async_ratelimit_retry(2)
     async def async_get_request(self, url, *, h_type=0, **fields):
         filters = fields.pop("filters", None)
         filters = (filters or Filter()).get_dict()
@@ -200,6 +207,7 @@ class Connection:
         ) as resp:
             return await self._async_post_process(resp)
 
+    @async_ratelimit_retry(2)
     async def async_post_request(self, url, *, h_type=0, **fields):
         files = fields.pop("files", {})
         data = fields.pop("data", {})
@@ -225,12 +233,14 @@ class Connection:
         ) as resp:
             return await self._async_post_process(resp)
 
+    @async_ratelimit_retry(2)
     async def async_put_request(self, url, *, h_type=0, **fields):
         async with self.async_session.put(
             self._base_path + url, headers=self._define_headers(h_type), **fields
         ) as resp:
             return await self._async_post_process(resp)
 
+    @async_ratelimit_retry(2)
     async def async_delete_request(self, url, *, h_type=0, **fields):
         async with self.async_session.delete(
             self._base_path + url, headers=self._define_headers(h_type), **fields
