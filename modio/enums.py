@@ -29,6 +29,7 @@ class TargetPlatform(enum.Enum):
     ps5 = "PS5"
     switch = "Switch"
     oculus = "Oculus"
+    source = "Source"
 
 
 class TargetPortal(enum.Enum):
