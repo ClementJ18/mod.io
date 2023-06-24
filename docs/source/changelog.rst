@@ -15,6 +15,7 @@ This patch adds support for targetting platforms and portals
 New Features
 #############
 * The behavior of the library when being ratelimited can now be customised with the `Client.ratelimit_max_sleep` parameter. 
+* Added new platform type `TargetPlatform.source`
 
 v0.5.0
 ------
