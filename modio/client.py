@@ -5,8 +5,10 @@ your authenticated user.
 import asyncio
 import datetime
 import logging
+import math
 import time
 from typing import Optional
+import warnings
 import aiohttp
 import requests
 
@@ -19,11 +21,12 @@ from .objects import Pagination, Returned, Filter
 from .game import Game
 from .mod import Mod
 
+MAX_RETRIES = 2
 
 class Connection:
     """Class handling under the hood requests and ratelimits."""
 
-    def __init__(self, api_key, access_token, lang, version, test, platform, portal):
+    def __init__(self, api_key, access_token, lang, version, test, platform, portal, ratelimit_max_sleep):
         self.test = test
         self.version = version
         self.access_token = access_token
@@ -35,6 +38,7 @@ class Connection:
         self.rate_limit = None
         self.rate_remain = None
         self.retry_after = 0
+        self.ratelimit_max_sleep = ratelimit_max_sleep
 
         self.session = requests.Session()
         self._async_session = None
@@ -69,12 +73,12 @@ class Connection:
         self.async_session = aiohttp.ClientSession()
 
     def enforce_ratelimit(self):
-        if self.retry_after > 0:
+        if self.retry_after <= self.ratelimit_max_sleep:
             logging.info("Ratelimited, sleeping for %s seconds", self.retry_after)
             time.sleep(self.retry_after)
 
     async def async_enforce_ratelimit(self):
-        if self.retry_after > 0:
+        if self.retry_after <= self.ratelimit_max_sleep:
             logging.info("Ratelimited, sleeping for %s seconds", self.retry_after)
             await asyncio.sleep(self.retry_after)
 
@@ -146,7 +150,7 @@ class Connection:
 
         return data
 
-    @ratelimit_retry(2)
+    @ratelimit_retry(MAX_RETRIES)
     def get_request(self, url, *, h_type=0, **fields):
         filters = fields.pop("filters", None)
         filters = (filters or Filter()).get_dict()
@@ -160,17 +164,17 @@ class Connection:
         resp = self.session.get(self._base_path + url, headers=self._define_headers(h_type), params=extra)
         return self._post_process(resp)
 
-    @ratelimit_retry(2)
+    @ratelimit_retry(MAX_RETRIES)
     def post_request(self, url, *, h_type=0, **fields):
         resp = self.session.post(self._base_path + url, headers=self._define_headers(h_type), **fields)
         return self._post_process(resp)
 
-    @ratelimit_retry(2)
+    @ratelimit_retry(MAX_RETRIES)
     def put_request(self, url, *, h_type=0, **fields):
         resp = self.session.put(self._base_path + url, headers=self._define_headers(h_type), **fields)
         return self._post_process(resp)
 
-    @ratelimit_retry(2)
+    @ratelimit_retry(MAX_RETRIES)
     def delete_request(self, url, *, h_type=0, **fields):
         resp = self.session.delete(self._base_path + url, headers=self._define_headers(h_type), **fields)
         return self._post_process(resp)
@@ -191,7 +195,7 @@ class Connection:
 
         return data
 
-    @async_ratelimit_retry(2)
+    @async_ratelimit_retry(MAX_RETRIES)
     async def async_get_request(self, url, *, h_type=0, **fields):
         filters = fields.pop("filters", None)
         filters = (filters or Filter()).get_dict()
@@ -207,7 +211,7 @@ class Connection:
         ) as resp:
             return await self._async_post_process(resp)
 
-    @async_ratelimit_retry(2)
+    @async_ratelimit_retry(MAX_RETRIES)
     async def async_post_request(self, url, *, h_type=0, **fields):
         files = fields.pop("files", {})
         data = fields.pop("data", {})
@@ -233,14 +237,14 @@ class Connection:
         ) as resp:
             return await self._async_post_process(resp)
 
-    @async_ratelimit_retry(2)
+    @async_ratelimit_retry(MAX_RETRIES)
     async def async_put_request(self, url, *, h_type=0, **fields):
         async with self.async_session.put(
             self._base_path + url, headers=self._define_headers(h_type), **fields
         ) as resp:
             return await self._async_post_process(resp)
 
-    @async_ratelimit_retry(2)
+    @async_ratelimit_retry(MAX_RETRIES)
     async def async_delete_request(self, url, *, h_type=0, **fields):
         async with self.async_session.delete(
             self._base_path + url, headers=self._define_headers(h_type), **fields
@@ -276,6 +280,11 @@ class Client:
         The platform to target with requests.
     portal : Optional[TargetPortal]
         The portal to target with requests.
+    ratelimit_max_sleep : Optiona[int]
+        The maximum amount of time the library will sleep in the case of a ratelimit. If the ratelimit
+        header returned dictates a longer sleep than that value then the library will instead raise
+        the ratelimit. If it is less then the library will sleep for the duration required before
+        retrying the request once.
 
     Attributes
     -----------
@@ -294,6 +303,7 @@ class Client:
         test=False,
         platform=None,
         portal=None,
+        ratelimit_max_sleep=math.inf
     ):
         self.lang = lang
         self.version = version
@@ -306,6 +316,7 @@ class Client:
             lang=lang,
             platform=platform,
             portal=portal,
+            ratelimit_max_sleep=ratelimit_max_sleep
         )
 
     def __repr__(self):
@@ -313,10 +324,12 @@ class Client:
 
     @property
     def rate_limit(self):
+        warnings.warn("rate_limit is deprecated and will be removed in a future version", DeprecationWarning)
         return self.connection.rate_limit
 
     @property
     def rate_remain(self):
+        warnings.warn("rate_remain is deprecated and will be removed in a future version", DeprecationWarning)
         return self.connection.rate_remain
 
     @property
