@@ -68,13 +68,16 @@ class Connection:
         """Start session"""
         self.async_session = aiohttp.ClientSession()
 
+    async def is_ratelimited(self):
+        return self.retry_after <= self.ratelimit_max_sleep
+
     def enforce_ratelimit(self):
-        if self.retry_after > 0:
+        if self.is_ratelimited():
             logging.info("Ratelimited, sleeping for %s seconds", self.retry_after)
             time.sleep(self.retry_after)
 
     async def async_enforce_ratelimit(self):
-        if self.retry_after > 0:
+        if self.is_ratelimited():
             logging.info("Ratelimited, sleeping for %s seconds", self.retry_after)
             await asyncio.sleep(self.retry_after)
 

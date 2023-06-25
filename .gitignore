@@ -8,3 +8,6 @@ pytest-coverage.txt
 dist/
 mod.io.egg-info/
 test_ratelimits.py
+env/
+fake_rate.py
+
