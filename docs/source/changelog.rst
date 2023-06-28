@@ -13,8 +13,7 @@ v0.6.0
 
 New Features
 #############
-* The behavior of the library when being ratelimited can now be customised with the `Client.ratelimit_max_sleep` parameter. By default this 
-is set to infinity to keep the same behavior as before. More info in this section :ref:`Ratelimit Overview`
+* The behavior of the library when being ratelimited can now be customised with the `Client.ratelimit_max_sleep` parameter. By default this  is set to infinity to keep the same behavior as before. More info in this section :ref:`Ratelimit Overview`
 * Added new platform type `TargetPlatform.source`
 
 v0.5.0
