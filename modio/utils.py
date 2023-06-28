@@ -167,7 +167,7 @@ def ratelimit_retry(max_retries):
                 try:
                     return func(*args, **kwargs)
                 except modioException as e:
-                    if e.code != 429:
+                    if e.code != 429 or args[0].ratelimit_max_sleep == 0:
                         raise e
                     
                     error = e
@@ -185,7 +185,7 @@ def async_ratelimit_retry(max_retries):
                 try:
                     return await func(*args, **kwargs)
                 except modioException as e:
-                    if e.code != 429:
+                    if e.code != 429 or args[0].ratelimit_max_sleep == 0:
                         raise e
                     
                     error = e

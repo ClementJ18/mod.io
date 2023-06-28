@@ -1,7 +1,8 @@
-import unittest
+from unittest import mock
 
 import pytest
 import modio
+from modio.errors import modioException
 
 try:
     from .config import game_api_key, access_token
@@ -11,10 +12,10 @@ except ModuleNotFoundError:
     game_api_key = os.environ["GAME_API_KEY"]
     access_token = os.environ["ACCESS_TOKEN"]
 
-from .utils import run, use_test_env
+from .utils import FakeRequest, run, use_test_env
 
 
-class TestClient(unittest.TestCase):
+class TestClient:
     def test_paths(self):
         client = modio.Client(api_key="fake key", test=use_test_env)
         # pylint: disable=W0212
@@ -99,3 +100,17 @@ class TestClient(unittest.TestCase):
 
         assert "X-Modio-Portal" in headers
         assert headers["X-Modio-Portal"] is modio.enums.TargetPortal.facebook.value
+
+    @pytest.mark.parametrize("retry_after, max_sleep, expected", [
+        (60, 0, False),
+        (60, 60, True), 
+        (0, 60, True), 
+        (60, 3600, True)
+    ])
+    @mock.patch("time.sleep")
+    def test_ratelimit(self, sleep_mock, retry_after, max_sleep, expected):
+        client = modio.Client(access_token=access_token, test=use_test_env, ratelimit_max_sleep=max_sleep)
+        with pytest.raises(modioException):
+            client.connection._post_process(FakeRequest(status_code=429, headers={"retry-after": retry_after}, json_data={"error": {"code": "", "message": "", "error_ref": ""}}))
+            assert sleep_mock.called == expected
+
