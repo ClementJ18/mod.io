@@ -12,11 +12,7 @@ except ModuleNotFoundError:
     game_api_key = os.environ["GAME_API_KEY"]
     access_token = os.environ["ACCESS_TOKEN"]
 
-from .utils import run, use_test_env
-
-class FakeRequest(modio.Object):
-    def json(self):
-        return self.json_data
+from .utils import FakeRequest, run, use_test_env
 
 
 class TestClient:
