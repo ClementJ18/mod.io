@@ -22,5 +22,5 @@ setup(
     long_description_content_type="text/markdown",
     long_description=readme,
     packages=find_packages(include=["modio", "modio.*"]),
-    install_requires=["aiohttp==3.8.1", "requests==2.31.0", "typing-extensions==4.3.0"],
+    install_requires=["aiohttp==3.8.5", "requests==2.31.0", "typing-extensions==4.3.0"],
 )
