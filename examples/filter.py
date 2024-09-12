@@ -1,6 +1,6 @@
 import modio
 
-client = modio.Client(api_key="api key goes here")
+client = modio.Client(api_path="api path goes here (eg. g-123 or u-123)", api_key="api key goes here")
 filters = modio.Filter()
 
 filters.text("The Lord of the Rings")
