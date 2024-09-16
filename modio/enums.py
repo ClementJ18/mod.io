@@ -74,6 +74,7 @@ class ModFilePlatformStatus(enum.Enum):
     pending = 0
     accepted = 1
     denied = 2
+    targetted = 3
 
 
 class Presentation(enum.Enum):
