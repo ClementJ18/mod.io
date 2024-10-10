@@ -1,6 +1,6 @@
 """Module for miscs objects."""
 import time
-import json
+from typing import List
 
 from .mixins import OwnerMixin, RatingMixin, ReportMixin, StatsMixin
 from .errors import modioException
@@ -406,23 +406,22 @@ class ModFile(OwnerMixin):
         )
         return resp
 
-
-    def manage_platforms(self, approved:list[str]=None, denied:list[str]=None):
+    def manage_platforms(self, approved: List[str] = None, denied: List[str] = None):
         """Manage the platform status of this mod file. Returns an updated
-            instances of the file.
+        instances of the file.
 
-            Parameters
-            -----------
-            approved : str
-                Change the release version of the file
-            denied : str
-                Change the changelog of this release
+        Parameters
+        -----------
+        approved : str
+            Change the release version of the file
+        denied : str
+            Change the changelog of this release
 
-            Returns
-            --------
-            ModFile
-                The updated file
-            """
+        Returns
+        --------
+        ModFile
+            The updated file
+        """
 
         if approved is None:
             approved = []
@@ -446,7 +445,7 @@ class ModFile(OwnerMixin):
 
         return self.__class__(connection=self.connection, game_id=self.game_id, **file_json)
 
-    async def manage_platforms_async(self, approved:list[str]=None, denied:list[str]=None):
+    async def manage_platforms_async(self, approved: List[str] = None, denied: List[str] = None):
         if approved is None:
             approved = []
         if denied is None:
@@ -468,7 +467,6 @@ class ModFile(OwnerMixin):
         )
 
         return self.__class__(connection=self.connection, game_id=self.game_id, **file_json)
-
 
     def url_is_expired(self):
         """Check if the url is still valid for this modfile.

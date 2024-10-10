@@ -1,5 +1,8 @@
 # mod.io
 
+> [!WARNING]
+> This project is now archived, feel free to fork it.
+
 ![mod.io Logo](https://static.mod.io/v1/images/branding/modio-color-dark.png "https://mod.io")
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
