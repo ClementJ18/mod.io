@@ -101,16 +101,18 @@ class TestClient:
         assert "X-Modio-Portal" in headers
         assert headers["X-Modio-Portal"] is modio.enums.TargetPortal.facebook.value
 
-    @pytest.mark.parametrize("retry_after, max_sleep, expected", [
-        (60, 0, False),
-        (60, 60, True), 
-        (0, 60, True), 
-        (60, 3600, True)
-    ])
+    @pytest.mark.parametrize(
+        "retry_after, max_sleep, expected", [(60, 0, False), (60, 60, True), (0, 60, True), (60, 3600, True)]
+    )
     @mock.patch("time.sleep")
     def test_ratelimit(self, sleep_mock, retry_after, max_sleep, expected):
         client = modio.Client(access_token=access_token, test=use_test_env, ratelimit_max_sleep=max_sleep)
         with pytest.raises(modioException):
-            client.connection._post_process(FakeRequest(status_code=429, headers={"retry-after": retry_after}, json_data={"error": {"code": "", "message": "", "error_ref": ""}}))
+            client.connection._post_process(
+                FakeRequest(
+                    status_code=429,
+                    headers={"retry-after": retry_after},
+                    json_data={"error": {"code": "", "message": "", "error_ref": ""}},
+                )
+            )
             assert sleep_mock.called == expected
-

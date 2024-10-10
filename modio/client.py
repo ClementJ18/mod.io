@@ -23,10 +23,13 @@ from .mod import Mod
 
 MAX_TRIES = 2
 
+
 class Connection:
     """Class handling under the hood requests and ratelimits."""
 
-    def __init__(self, api_path, api_key, access_token, lang, version, test, platform, portal, ratelimit_max_sleep):
+    def __init__(
+        self, api_path, api_key, access_token, lang, version, test, platform, portal, ratelimit_max_sleep
+    ):
         self.test = test
         self.version = version
         self.api_path = api_path
@@ -262,6 +265,9 @@ class Client:
 
     Parameters
     -----------
+    api_path: str
+        The api path is the "root" from which you will access the api. This has two format: "g-<game_id>"
+        for a game root path or "u-<user_id>" for a user root path.
     api_key : Optional[str]
         The api key that will be used to authenticate the bot while it makes most of
         its GET requests. This can be generated on the mod.io website. Optional if an access
@@ -300,7 +306,7 @@ class Client:
     def __init__(
         self,
         *,
-        api_path=None,
+        api_path,
         api_key=None,
         access_token=None,
         lang="en",
@@ -308,7 +314,7 @@ class Client:
         test=False,
         platform=None,
         portal=None,
-        ratelimit_max_sleep=math.inf
+        ratelimit_max_sleep=math.inf,
     ):
         self.lang = lang
         self.version = version
@@ -322,7 +328,7 @@ class Client:
             lang=lang,
             platform=platform,
             portal=portal,
-            ratelimit_max_sleep=ratelimit_max_sleep
+            ratelimit_max_sleep=ratelimit_max_sleep,
         )
 
     def __repr__(self):

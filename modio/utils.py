@@ -169,13 +169,15 @@ def ratelimit_retry(max_retries):
                 except modioException as e:
                     if e.code != 429 or args[0].ratelimit_max_sleep == 0:
                         raise e
-                    
+
                     error = e
 
             raise error
 
         return retry_logic
+
     return wrapper
+
 
 def async_ratelimit_retry(max_retries):
     def wrapper(func):
@@ -187,10 +189,11 @@ def async_ratelimit_retry(max_retries):
                 except modioException as e:
                     if e.code != 429 or args[0].ratelimit_max_sleep == 0:
                         raise e
-                    
+
                     error = e
 
             raise error
 
         return retry_logic
+
     return wrapper
