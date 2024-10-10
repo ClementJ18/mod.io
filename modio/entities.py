@@ -1,5 +1,6 @@
 """Module for miscs objects."""
 import time
+import json
 
 from .mixins import OwnerMixin, RatingMixin, ReportMixin, StatsMixin
 from .errors import modioException
@@ -404,6 +405,70 @@ class ModFile(OwnerMixin):
             f"/games/{self.game_id}/mods/{self.mod}/files/{self.id}"
         )
         return resp
+
+
+    def manage_platforms(self, approved:list[str]=None, denied:list[str]=None):
+        """Manage the platform status of this mod file. Returns an updated
+            instances of the file.
+
+            Parameters
+            -----------
+            approved : str
+                Change the release version of the file
+            denied : str
+                Change the changelog of this release
+
+            Returns
+            --------
+            ModFile
+                The updated file
+            """
+
+        if approved is None:
+            approved = []
+        if denied is None:
+            denied = []
+
+        if not self.game_id:
+            raise modioException(
+                "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
+            )
+
+        data = {}
+        for index in range(0, len(approved)):
+            data[f"approved[{index}]"] = approved[index]
+        for index in range(0, len(denied)):
+            data[f"denied[{index}]"] = denied[index]
+
+        file_json = self.connection.post_request(
+            f"/games/{self.game_id}/mods/{self.mod}/files/{self.id}/platforms", data=data
+        )
+
+        return self.__class__(connection=self.connection, game_id=self.game_id, **file_json)
+
+    async def manage_platforms_async(self, approved:list[str]=None, denied:list[str]=None):
+        if approved is None:
+            approved = []
+        if denied is None:
+            denied = []
+
+        if not self.game_id:
+            raise modioException(
+                "This endpoint cannot be used for ModFile object recuperated through the me/modfiles endpoint"
+            )
+
+        data = {}
+        for index in range(0, len(approved)):
+            data[f"approved[{index}]"] = approved[index]
+        for index in range(0, len(denied)):
+            data[f"denied[{index}]"] = denied[index]
+
+        file_json = await self.connection.async_post_request(
+            f"/games/{self.game_id}/mods/{self.mod}/files/{self.id}/platforms", data=data
+        )
+
+        return self.__class__(connection=self.connection, game_id=self.game_id, **file_json)
+
 
     def url_is_expired(self):
         """Check if the url is still valid for this modfile.

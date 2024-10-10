@@ -6,5 +6,6 @@ from .client import Client
 from .objects import NewMod, NewModFile, Object, Filter
 from .enums import *
 from .errors import *
+from .mod import *
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"

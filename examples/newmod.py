@@ -1,6 +1,6 @@
 import modio
 
-client = modio.Client(access_token="oauth2 token goes here")
+client = modio.Client(api_path="api path goes here (eg. g-123 or u-123)", access_token="oauth2 token goes here")
 newmod = modio.NewMod(
     name="A LOTR Toilet Mod",
     name_id="lotr-toilets",

@@ -1,7 +1,7 @@
 # This example shows how to gain an OAuth 2 Access Token through the Email Authentication Flow to gain Write access
 import modio
 
-client = modio.Client(api_key="your api key here")
+client = modio.Client(api_path="api path goes here (eg. g-123 or u-123)", api_key="your api key here")
 
 # request a security code be sent at this email adress
 client.email_request("necro@mordor.com")

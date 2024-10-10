@@ -26,9 +26,10 @@ MAX_TRIES = 2
 class Connection:
     """Class handling under the hood requests and ratelimits."""
 
-    def __init__(self, api_key, access_token, lang, version, test, platform, portal, ratelimit_max_sleep):
+    def __init__(self, api_path, api_key, access_token, lang, version, test, platform, portal, ratelimit_max_sleep):
         self.test = test
         self.version = version
+        self.api_path = api_path
         self.access_token = access_token
         self.api_key = api_key
         self.lang = lang
@@ -57,9 +58,9 @@ class Connection:
     @property
     def _base_path(self):
         if self.test:
-            return f"https://api.test.mod.io/{self.version}"
+            return f"https://{self.api_path}.test.mod.io/{self.version}"
 
-        return f"https://api.mod.io/{self.version}"
+        return f"https://{self.api_path}.modapi.io/{self.version}"
 
     def __repr__(self):
         return f"<Connection retry_after={self.retry_after}>"
@@ -299,6 +300,7 @@ class Client:
     def __init__(
         self,
         *,
+        api_path=None,
         api_key=None,
         access_token=None,
         lang="en",
@@ -313,6 +315,7 @@ class Client:
         self.test = test
         self.connection = Connection(
             test=test,
+            api_path=api_path,
             api_key=api_key,
             access_token=access_token,
             version=version,
