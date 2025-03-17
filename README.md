@@ -1,3 +1,5 @@
+This repository is archived because I sadly don't have the time to work on it. Feel free to fork
+
 # mod.io
 
 ![mod.io Logo](https://static.mod.io/v1/images/branding/modio-color-dark.png "https://mod.io")
